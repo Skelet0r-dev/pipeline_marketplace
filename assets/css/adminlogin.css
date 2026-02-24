@@ -1,0 +1,58 @@
+.body-adminlogin {
+    background-color: #283618;
+    color: white;
+}
+
+.img-logo{
+  max-width: 10%;
+  height: auto;
+}
+
+.img-login{
+  max-width: 100%;
+  height: 100%;
+  border-radius: 15px;
+}
+
+.btn-size{
+  width: 70%;
+}
+
+
+.field{
+  border: 1px solid #fefae0;
+  width: 70%;
+  background-color: #283618;
+  
+}
+
+.field-label{
+  font-family: "DM Sans", sans-serif;
+  color: #dde5b6;
+}
+
+.dm-sans {
+  font-family: "DM Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.h1{
+  font-size: 2.5rem;
+  font-family: "DM Sans", sans-serif;
+  color: #fefae0;
+
+ 
+}
+
+.h4{
+  font-size: 1.25rem;
+  font-family: "DM Sans", sans-serif;
+  color: #dde5b6;
+}
+
+.btn-color{
+    background-color: #dde5b6;
+    color: #283618;
+}
