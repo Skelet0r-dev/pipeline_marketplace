@@ -58,8 +58,8 @@
 }
 
 .hr-style {
-  height: 4px;
-  background-color: black;
+  height: 2px;
+  background-color: white;
   border: none; 
   opacity: 1;
 }

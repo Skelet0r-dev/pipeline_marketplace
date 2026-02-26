@@ -38,8 +38,8 @@
   width: 100%;
 }
 
-.hr-style {
-  height: 4px;
+.hr-style{
+  height: 2px;
   background-color: black;
   border: none; 
   opacity: 1;

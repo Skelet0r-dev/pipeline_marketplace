@@ -17,68 +17,71 @@
     </div>
 
     <div>
-        <hr class="black-line">        
+        <hr class="hr-style">        
     </div>
 
 
-    <div class="container mt-6 justify-content-between" style="padding-top: 50px;">
-        <div class="d-flex justify-content-end row">
-            <div class="col-md-6">
-                <h1 class="text-start mb-4 h1">Create an Account</h1>
-                <form action="regis.php" method="POST">
-                    
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between">
-                        <label for="fullname" class="form-label field-label">First Name
-                        <input type="text" class="form-control form-half" id="firstname" name="firstname" style="width: 300px" required>
-                        </label>
-                        <label for="fullname" class="form-label field-label">Last Name
-                        <input type="text" class="form-control form-half" id="lastname" name="lastname" style="width: 300px" required>    
-                         </label>
+    <div class="container mt-6 d-flex justify-content-between align-items-center" style="padding-top: 50px;">
+
+        <!-- Left side: Image -->
+        <div class="col-md-5">
+            <img src="assets/img/regis_img.png" class="img-regis img-fluid" alt="regis_img">
+        </div>
+    
+        <!-- Right side: Form -->
+        <div class="col-md-6">
+            <h1 class="text-start mb-4 h1">Create an Account</h1>
+            <form action="regis.php" method="POST">
+    
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between gap-3">
+                        <div class="w-100">
+                            <label for="firstname" class="form-label field-label">First Name</label>
+                            <input type="text" class="form-control" id="firstname" name="firstname" required>
+                        </div>
+                        <div class="w-100">
+                            <label for="lastname" class="form-label field-label">Last Name</label>
+                            <input type="text" class="form-control" id="lastname" name="lastname" required>
                         </div>
                     </div>
-
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between">
-                        <label for="fullname" class="form-label field-label">Student Number
-                        <input type="text" class="form-control form-half" id="stdnum" name="stdnum" style="width: 300px" required>
-                        </label>
-                        
-                        <label for="fullname" class="form-label field-label">Course Section
-                        <input type="text" class="form-control form-half" id="cys" name="cys" required>
-                         </label>
+                </div>
+    
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between gap-3">
+                        <div class="w-100">
+                            <label for="stdnum" class="form-label field-label">Student Number</label>
+                            <input type="text" class="form-control" id="stdnum" name="stdnum" required>
+                        </div>
+                        <div class="w-100">
+                            <label for="cys" class="form-label field-label">Course Section</label>
+                            <input type="text" class="form-control" id="cys" name="cys" required>
                         </div>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="username" class="form-label field-label ">Username</label>
-                        <input type="text" class="form-control form" id="username" name="username" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="email" class="form-label field-label">Email address</label>
-                        <input type="email" class="form-control form" id="email" name="email" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="password" class="form-label field-label">Password</label>
-                        <input type="password" class="form-control form" id="password" name="password" required>
-                    </div>
-                    
-                    <div class="justify-content-end d-flex">
-                        <button type="submit" class="btn btn-primary w-100">Register</button>
-                        <button type="submit" class="btn btn-primary w-100">Register</button>
-                        
-                    </div>
-                
-                </form>
-            </div>
+                </div>
+    
+                <div class="mb-3">
+                    <label for="username" class="form-label field-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+    
+                <div class="mb-3">
+                    <label for="email" class="form-label field-label">Email address</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+    
+                <div class="mb-3">
+                    <label for="password" class="form-label field-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+    
+                <div class="d-flex justify-content-end gap-3">
+                    <button type="reset" class="btn btn-secondary w-50">Cancel</button>
+                    <button type="submit" class="btn btn-primary w-50">Register</button>
+                </div>
+    
+            </form>
         </div>
-
-        <div class="container mt-4">
-            <img src="assets/img/regis_img.png" class=" img-regis" alt="regis_img">
-        </div>
-        
+    
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
