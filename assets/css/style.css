@@ -49,4 +49,9 @@
   width: 70%;
 }
 
-
+.hr-style {
+  height: 4px;
+  background-color: black;
+  border: none; 
+  opacity: 1;
+}

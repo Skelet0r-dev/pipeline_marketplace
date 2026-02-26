@@ -17,15 +17,69 @@
     </div>
 
     <div>
-        <hr class="black-line">
-
+        <hr class="black-line">        
     </div>
 
 
-    
+    <div class="container mt-6 justify-content-between" style="padding-top: 50px;">
+        <div class="d-flex justify-content-end row">
+            <div class="col-md-6">
+                <h1 class="text-start mb-4 h1">Create an Account</h1>
+                <form action="regis.php" method="POST">
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                        <label for="fullname" class="form-label field-label">First Name
+                        <input type="text" class="form-control form-half" id="firstname" name="firstname" style="width: 300px" required>
+                        </label>
+                        <label for="fullname" class="form-label field-label">Last Name
+                        <input type="text" class="form-control form-half" id="lastname" name="lastname" style="width: 300px" required>    
+                         </label>
+                        </div>
+                    </div>
 
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                        <label for="fullname" class="form-label field-label">Student Number
+                        <input type="text" class="form-control form-half" id="stdnum" name="stdnum" style="width: 300px" required>
+                        </label>
+                        
+                        <label for="fullname" class="form-label field-label">Course Section
+                        <input type="text" class="form-control form-half" id="cys" name="cys" required>
+                         </label>
+                        </div>
+                    </div>
 
+                    <div class="mb-3">
+                        <label for="username" class="form-label field-label ">Username</label>
+                        <input type="text" class="form-control form" id="username" name="username" required>
+                    </div>
 
+                    <div class="mb-3">
+                        <label for="email" class="form-label field-label">Email address</label>
+                        <input type="email" class="form-control form" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label field-label">Password</label>
+                        <input type="password" class="form-control form" id="password" name="password" required>
+                    </div>
+                    
+                    <div class="justify-content-end d-flex">
+                        <button type="submit" class="btn btn-primary w-100">Register</button>
+                        <button type="submit" class="btn btn-primary w-100">Register</button>
+                        
+                    </div>
+                
+                </form>
+            </div>
+        </div>
+
+        <div class="container mt-4">
+            <img src="assets/img/regis_img.png" class=" img-regis" alt="regis_img">
+        </div>
+        
+    </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>

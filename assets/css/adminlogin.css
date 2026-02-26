@@ -56,3 +56,10 @@
     background-color: #dde5b6;
     color: #283618;
 }
+
+.hr-style {
+  height: 4px;
+  background-color: black;
+  border: none; 
+  opacity: 1;
+}
