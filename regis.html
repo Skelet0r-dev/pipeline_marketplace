@@ -20,7 +20,7 @@
         <hr class="hr-style">        
     </div>
 
-
+<form action="regis.html" method="POST" enctype="multipart/form-data">
     <div class="container mt-6 d-flex justify-content-between align-items-center" style="padding-top: 50px;">
 
         <!-- Left side: Image -->
@@ -28,9 +28,11 @@
             <img src="assets/img/regis_img.png" class="img-regis img-fluid" alt="regis_img">
 
             <div class="text-center mt-4">
-                <form action="upload.php" method="POST" enctype="multipart/form-data">
-                <button type="submit" class="btn btn-primary w-75 btn-create">UPLOAD IMAGE</button>
-                </form>
+          
+                    <label for="imageUpload" class="btn btn-primary w-75 btn-create" style="cursor: pointer;">
+                        UPLOAD IMAGE
+                      </label>
+                      <input type="file" name="image" id="imageUpload" class="form-control mb-3" style="display: none;">
             </div> 
 
 
@@ -38,7 +40,6 @@
         <!-- Right side: Form -->
         <div class="col-md-6">
             <h1 class="text-start mb-4 h1">Create an Account</h1>
-            <form action="regis.php" method="POST">
     
                 <div class="mb-3">
                     <div class="d-flex justify-content-between gap-3">
@@ -86,10 +87,10 @@
                     <button type="submit" class="btn btn-primary w-50 btn-create">Register</button>
                 </div>
     
-            </form>
+         
         </div>
-    
     </div>
+</form>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
