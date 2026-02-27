@@ -18,6 +18,7 @@
             <p class="field-label mb-0">Hello,</p>
             <p class="fw-bold mb-0">Name of Customer</p>
         </div>
+
     </div>
 
     <hr style="height: 2px;
@@ -26,66 +27,78 @@
         opacity: 1;">
 
 
-
 <div class="container mt-4">
-    <div class="row justify-content-between">
-    <h1 class="h1 mt-4">Everything You Need,</h1>
-    <h1 class="h1"> Within Campus Reach </h1>
-</div>
+    <!-- Main Content Row: Categories (Left) + Video (Right) -->
+    <div class="row mt-4 align-items-center">
+        <!-- Categories on the Left -->
+        <div class="col d-flex flex-column">
+            <!-- Heading -->
+            <h1 class="h1 mt-4">Everything You Need,</h1>
+            <h1 class="h1">Within Campus Reach</h1>
 
+            <!-- Row 1 -->
+            <div class="row justify-content-start gap-4 mt-4">
+                <div class="col-auto d-flex flex-column align-items-center square-acad">
+                    <img src="assets/img/academics.svg" class="img-acad" alt="Academics Icon">
+                    <p class="p-acad mb-0">Academics</p>
+                </div>
 
+                <div class="col-auto d-flex flex-column align-items-center square-tech">
+                    <img src="assets/img/keyboard.svg" class="img-tech" alt="Keyboard Icon">
+                    <p class="p-tech mb-0">Electronics and Tech</p>
+                </div>
 
-<div class="mt-2 container">
-    <!-- Row 1 -->
+                <div class="col-auto d-flex flex-column align-items-center square-clothing">
+                    <img src="assets/img/shirts.svg" class="img" alt="Shirt">
+                    <p class="p-clothing mb-0">Clothing & Apparel</p>
+                </div>
 
-    <div class="row justify-content-start gap-4 mt-4">
-        <div class="col-auto d-flex flex-column align-items-center square-acad">
-            <img src="assets/img/academics.svg" class="img-acad" alt="Academics Icon">
-            <p class="d-sub mb-0">Academics</p>
+                <div class="col-auto d-flex flex-column align-items-center square-hobbies">
+                    <img src="assets/img/labubus.svg" class="img" alt="Labubu">
+                    <p class="p-hobbies mb-0">Hobbies & Lifestyle</p>
+                </div>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="row justify-content-start gap-4 mt-4">
+                <div class="col-auto d-flex flex-column align-items-center square-food">
+                    <img src="assets/img/cookies.svg" class="img" alt="Cookies Icon">
+                    <p class="p-cookies mb-0">Food</p>
+                </div>
+
+                <div class="col-auto d-flex flex-column align-items-center square-events">
+                    <img src="assets/img/tickets.svg" class="img" alt="Tickets Icon">
+                    <p class="p-events mb-0">Events & Tickets</p>
+                </div>
+
+                <div class="col-auto d-flex flex-column align-items-center square-specific">
+                    <img src="assets/img/electronics.svg" class="img" alt="Electronics Icon">
+                    <p class="p-specific mb-0">Course-Specific</p>
+                </div>
+
+                <div class="col-auto d-flex flex-column align-items-center square-allitems">
+                    <img src="assets/img/cart.svg" class="img" alt="Cart Icon">
+                    <p class="p-allitems mb-0">All Items</p>
+                </div>
+            </div>
         </div>
 
-        <div class="col-auto d-flex flex-column align-items-center square-tech">
-            <img src="assets/img/keyboard.svg" class="img-acad" alt="keyboard Icon">
-            <p class="p-electronics">Electronics and Tech</p>
+        <!-- Video on the Right -->
+        <div class="col-auto d-flex align-items-center">
+            <video
+                src="assets/img/dashboard-final.mp4"
+                autoplay
+                muted
+                loop
+                playsinline
+                poster="thumbnail.jpg"
+                style="width: 360px; max-width: 100%; height: auto;"
+            >
+                Your browser does not support the video tag.
+            </video>
         </div>
-
-        <div class="col-auto d-flex flex-column align-items-center square-acad">
-            <img src="assets/img/academics.svg" class="img-acad" alt="Academics Icon">
-            <p class="d-sub mb-0">Clothing & Apparel</p>
-        </div>
-
-        <div class="col-auto d-flex flex-column align-items-center square-acad">
-            <img src="assets/img/academics.svg" class="img-acad" alt="Academics Icon">
-            <p class="d-sub mb-0">Hobbies & :Lifestyle</p>
-        </div>
-
-
     </div>
-
-    <!-- Row 2 -->
-    <div class="row justify-content-start gap-4 mt-4">
-        <div class="col-auto d-flex flex-column align-items-center square-acad">
-            <img src="assets/img/academics.svg" class="img-acad" alt="Academics Icon">
-            <p class="d-sub mb-0">Food</p>
-        </div>
-
-        <div class="col-auto d-flex flex-column align-items-center square-acad">
-            <img src="assets/img/academics.svg" class="img-acad" alt="Academics Icon">
-            <p class="d-sub mb-0">Events & Tickets</p>
-        </div>
-
-        <div class="col-auto d-flex flex-column align-items-center square-acad">
-            <img src="assets/img/academics.svg" class="img-acad" alt="Academics Icon">
-            <p class="d-sub mb-0">Course-Specific</p>
-        </div>
-
-        <div class="col-auto d-flex flex-column align-items-center square-acad">
-            <img src="assets/img/academics.svg" class="img-acad" alt="Academics Icon">
-            <p class="d-sub mb-0">All Items</p>
-        </div>
-    </div>
 </div>
-
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
