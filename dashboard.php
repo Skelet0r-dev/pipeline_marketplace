@@ -6,7 +6,7 @@ $connectionOptions = [
     "PWD" => "",
 ];
 $conn = sqlsrv_connect($serverName, $connectionOptions);
-$std_num = $_POST['stdnum'];
+$stdnum = $_POST['stdnum'];
 $password = $_POST['password'];
 
 $sql = "SELECT *
@@ -38,7 +38,7 @@ $loginId = $rowpassword['USER_ID'];
 
 $sqlprofile = "SELECT *
                 FROM dbo.[USER_IMG] 
-                WHERE USER_ID = '$std_num'";
+                WHERE USER_ID = '$loginId'";
 $resultprofile = sqlsrv_query($conn, $sqlprofile);
 if ($resultprofile === false) {
     die("PROFILE QUERY ERROR:<br>" . print_r(sqlsrv_errors(), true));
@@ -70,8 +70,11 @@ $firstname = $rowpassword['FIRST_NAME'];
 
         <div class="d-flex align-items-center gap-1">
             <p class="field-label mb-0">Hello,</p>
+
+            <div class="gap-3 d-flex align-items-center">
             <p class="fw-bold mb-0"><?php echo $firstname?></p>
             <img src="<?php echo $file_path ?>" class="img-profile" alt="Profile Picture">
+            </div>  
         </div>
 
     </div>
