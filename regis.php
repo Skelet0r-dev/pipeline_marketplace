@@ -7,69 +7,67 @@
     ];
     $conn = sqlsrv_connect($serverName, $connectionOptions);
 
-    if (isset($_POST['submit'])) {
-    $password = $_POST['password'];
-    $confirm  = $_POST['confirm_password'];
-
-    if ($password !== $confirm) {
-        echo "<script>
-                alert('Passwords do not match!');
-                window.history.back();
-              </script>";
-        exit;
-    }
-
-    if (empty($password) || empty($confirm) || empty($_POST['fullname']) || empty($_POST['username'])) {
-        echo "<script>
-                alert('Please fill in all fields!');
-                window.history.back();
-              </script>";
-        exit;
-    }
-}
-
     if (!$conn) {
         die("Connection failed: " . sqlsrv_errors());
     }
 
-    $fullname = $_POST['fullname'];
+
+
+    $firstname = $_POST['f_name'];
+    $lastname = $_POST['l_name'];
+    $std_number = $_POST['stdnum'];
+    $cys = $_POST['cys'];
     $username = $_POST['username'];
+    $email = $_POST['email'];
     $password = $_POST['password'];
-    $profile = $_FILES['profile']['name'];
+
+
+
+
+
 
     $sqlcheck = "SELECT * 
-                 FROM dbo.[LOGIN] 
-                 WHERE [EMAIL] = '$username'";
+                 FROM dbo.[USERS] 
+                 WHERE [STD_NUM] = '$std_number'";
     $resultcheck = sqlsrv_query($conn, $sqlcheck);
     if ($resultcheck === false) {
         die(print_r(sqlsrv_errors(), true));
     }
     if (sqlsrv_fetch($resultcheck) === true) {
         echo "<script>
-                alert('Username Already Taken');
+                alert('There is already an account with this Student Number');
                 window.history.back();
               </script>";
         exit;
     } else {
         echo "Registration Success";
     }
-    $sqlinsert = "INSERT INTO dbo.[LOGIN] ([FULL_NAME], [EMAIL], [PASS]) 
-                  VALUES ('$fullname', '$username', '$password')";
+
+
+
+
+
+
+
+
+
+    $sqlinsert = "INSERT INTO dbo.[USERS] ([FIRST_NAME], [LAST_NAME], [STD_NUM], [CYS], [USERNAME], [EMAIL], [PASSWORD]) 
+                  VALUES ('$firstname', ''$lastname'', '$std_number', '$cys', '$username', '$email', '$password')";
+
     $resultinsert = sqlsrv_query($conn, $sqlinsert);
     if ($resultinsert === false) {
         die(print_r(sqlsrv_errors(), true));
     } 
+    $sqlid = "SELECT USER_ID 
+             FROM dbo.[USERS] 
+             WHERE [STD_NUM] = '$std_number'";
 
-
-    $sqlid = "SELECT LOGIN_ID 
-             FROM dbo.[LOGIN] 
-             WHERE [EMAIL] = '$username'";
     $resultid = sqlsrv_query($conn, $sqlid);
     if ($resultid === false) {
         die(print_r(sqlsrv_errors(), true));
     }
     $row = sqlsrv_fetch_array($resultid,);
-    $id = $row['LOGIN_ID'];
+    $id = $row['USER_ID'];
 
 
 #Image Upload
@@ -85,15 +83,15 @@ $checkImage = pathinfo($targetimagePath, PATHINFO_EXTENSION);
 if (in_array(strtolower($checkImage), $allowTypes)) {
     $movetoUploads = move_uploaded_file($_FILES['profile']['tmp_name'], $targetimagePath);
     if ($movetoUploads == true) {
-        $insertIMAGES = "INSERT INTO IMAGES ([IMAGE_NAME], [FILE_PATH], [UPLOAD_DATE], [LOGIN_ID]) VALUES
-                                            ('$imageName', '$targetimagePath', GETDATE(), '$id')";
+        $insertIMAGES = "INSERT INTO USER_IMG ([IMAGE_NAME], [FILE_PATH], [USER_ID]) VALUES
+                                            ('$imageName', '$targetimagePath', '$id')";
         $resultIMAGES = sqlsrv_query($conn, $insertIMAGES);
         if ($resultIMAGES == false) {
             die(print_r(sqlsrv_errors(), true)); 
         } else{
             echo "<script>
                     alert('Registration Successful');
-                    window.location.href = 'homepage.php';
+                    window.location.href = 'login.html';
                   </script>";
         }
     }
