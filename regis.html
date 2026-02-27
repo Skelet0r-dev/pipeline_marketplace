@@ -26,8 +26,15 @@
         <!-- Left side: Image -->
         <div class="col-md-5">
             <img src="assets/img/regis_img.png" class="img-regis img-fluid" alt="regis_img">
+
+            <div class="text-center mt-4">
+                <form action="upload.php" method="POST" enctype="multipart/form-data">
+                <button type="submit" class="btn btn-primary w-75 btn-create">UPLOAD IMAGE</button>
+                </form>
+            </div> 
+
+
         </div>
-    
         <!-- Right side: Form -->
         <div class="col-md-6">
             <h1 class="text-start mb-4 h1">Create an Account</h1>
@@ -75,8 +82,8 @@
                 </div>
     
                 <div class="d-flex justify-content-end gap-3">
-                    <button type="reset" class="btn btn-secondary w-50">Cancel</button>
-                    <button type="submit" class="btn btn-primary w-50">Register</button>
+                    <button type="reset" class="btn btn-secondary w-50 btn-cancel">Cancel</button>
+                    <button type="submit" class="btn btn-primary w-50 btn-create">Register</button>
                 </div>
     
             </form>

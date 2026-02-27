@@ -44,3 +44,27 @@
   border: none; 
   opacity: 1;
 }
+
+.btn-create{
+  background-color: #dde5b6;
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+
+
+}
+
+.btn-create:hover {
+  background-color: rgb(60, 135, 43);
+}
+
+.btn-cancel{
+  background-color: #d9d9d9;
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
