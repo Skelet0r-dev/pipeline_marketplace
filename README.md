@@ -1,11 +1,24 @@
 to add this to your computer:
 
-run these in the terminal of vs code step by step
+run this in you vscode terminal:
 
 git clone [https://github.com
 ](https://github.com/Skelet0r-dev/pipeline_marketplace.git)
 
 
+
+------------------------------
+to update pipeline_marketplace:
+
+1.) open terminal in vscode
+
+2.) copy paste this:
+		git pull origin main
+------------------------------
+
+
+
+------------------------------
 
 
 CREATE DATABASE NAMED "pipeline_db"
