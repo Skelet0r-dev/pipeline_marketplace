@@ -39,8 +39,6 @@
                 window.history.back();
               </script>";
         exit;
-    } else {
-        echo "Registration Success";
     }
 
 
@@ -49,10 +47,8 @@
 
 
 
-
-
     $sqlinsert = "INSERT INTO dbo.[USERS] ([FIRST_NAME], [LAST_NAME], [STD_NUM], [CYS], [USERNAME], [EMAIL], [PASSWORD]) 
-                  VALUES ('$firstname', ''$lastname'', '$std_number', '$cys', '$username', '$email', '$password')";
+                  VALUES ('$firstname', '$lastname', '$std_number', '$cys', '$username', '$email', '$password')";
 
     $resultinsert = sqlsrv_query($conn, $sqlinsert);
     if ($resultinsert === false) {
@@ -66,13 +62,13 @@
     if ($resultid === false) {
         die(print_r(sqlsrv_errors(), true));
     }
-    $row = sqlsrv_fetch_array($resultid,);
+    $row = sqlsrv_fetch_array($resultid, SQLSRV_FETCH_ASSOC);
     $id = $row['USER_ID'];
 
 
 #Image Upload
 $destination = "uploads/";
-$imageName = basename($_FILES['profile']['name']);
+$imageName = basename($_FILES['image']['name']);
 $targetimagePath = $destination.$imageName;
 
 
@@ -81,9 +77,9 @@ $checkImage = pathinfo($targetimagePath, PATHINFO_EXTENSION);
 
 
 if (in_array(strtolower($checkImage), $allowTypes)) {
-    $movetoUploads = move_uploaded_file($_FILES['profile']['tmp_name'], $targetimagePath);
+    $movetoUploads = move_uploaded_file($_FILES['image']['tmp_name'], $targetimagePath);
     if ($movetoUploads == true) {
-        $insertIMAGES = "INSERT INTO USER_IMG ([IMAGE_NAME], [FILE_PATH], [USER_ID]) VALUES
+        $insertIMAGES = "INSERT INTO USER_IMG ([IMG_NAME], [FILE_PATH], [USER_ID]) VALUES
                                             ('$imageName', '$targetimagePath', '$id')";
         $resultIMAGES = sqlsrv_query($conn, $insertIMAGES);
         if ($resultIMAGES == false) {
