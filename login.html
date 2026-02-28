@@ -36,16 +36,16 @@
             <div class="col-md-6 justify-content-start">
                  <h1 class="mt-5 h1">Hello Lasallian!</h1>
                 <h6 class="mb-4 h4">Please login to continue</h6>
-                <form>
+                <form action="dashboard.php"  method="post">
 
                     <div class="mb-3">
-                        <label for="email" class="form-label field-label">Student ID Number or Student Name</label>
-                        <input type="email" class="form-control field" id="email">
+                        <label for="stdnum" class="form-label field-label">Student ID Number</label>
+                        <input type="text" class="form-control field" id="stdnum" name="stdnum">
                     </div>
 
                     <div class="mb-3">
                         <label for="password" class="form-label field-label">Password</label>
-                        <input type="password" class="form-control field" id="password">
+                        <input type="password" class="form-control field" id="password" name="password">
                     </div>
 
                     <button type="submit" class="btn btn-size fw-bold dm-sans" style="background-color: #936639; color: white;">LOGIN</button>
