@@ -53,28 +53,32 @@
     $row = sqlsrv_fetch_array($resultid, SQLSRV_FETCH_ASSOC);
     $id = $row['USER_ID'];
 
-    // Get next IMG_ID
-    $sqlimgid = "SELECT MAX(IMG_ID) AS MAX_ID FROM dbo.[USER_IMG]";
-    $resultimgid = sqlsrv_query($conn, $sqlimgid);
-    $rowimgid = sqlsrv_fetch_array($resultimgid, SQLSRV_FETCH_ASSOC);
-    $imgid = $rowimgid["MAX_ID"]+1;
-
     // Image Upload
-    $destination = "uploads/";
-    $imageName = basename($_FILES['image']['name']);
-    $targetimagePath = $destination . $imageName;
-
     $allowTypes = array('jpg');
-    $checkImage = pathinfo($targetimagePath, PATHINFO_EXTENSION);
+    $checkImage = '';
+    $targetimagePath = '';
 
-    if (in_array(strtolower($checkImage), $allowTypes)) {
-        $movetoUploads = move_uploaded_file($_FILES['image']['tmp_name'], $targetimagePath);
-        if ($movetoUploads == true) {
-            $insertIMAGES = "INSERT INTO USER_IMG ([IMG_ID], [IMG_NAME], [FILE_PATH], [USER_ID]) VALUES
+    if (!empty($_FILES['image']['name'])) {
+        $destination = "uploads/";
+        $imageName = basename($_FILES['image']['name']);
+        $targetimagePath = $destination . $imageName;
+        $checkImage = pathinfo($targetimagePath, PATHINFO_EXTENSION);
+
+        if (in_array(strtolower($checkImage), $allowTypes)) {
+            $movetoUploads = move_uploaded_file($_FILES['image']['tmp_name'], $targetimagePath);
+            if ($movetoUploads == true) {
+                // Get next IMG_ID
+                $sqlimgid = "SELECT MAX(IMG_ID) AS MAX_ID FROM dbo.[USER_IMG]";
+                $resultimgid = sqlsrv_query($conn, $sqlimgid);
+                $rowimgid = sqlsrv_fetch_array($resultimgid, SQLSRV_FETCH_ASSOC);
+                $imgid = $rowimgid["MAX_ID"] + 1;
+
+                $insertIMAGES = "INSERT INTO USER_IMG ([IMG_ID], [IMG_NAME], [FILE_PATH], [USER_ID]) VALUES
                                                 ('$imgid', '$imageName', '$targetimagePath', '$id')";
-            $resultIMAGES = sqlsrv_query($conn, $insertIMAGES);
-            if ($resultIMAGES == false) {
-                die(print_r(sqlsrv_errors(), true));
+                $resultIMAGES = sqlsrv_query($conn, $insertIMAGES);
+                if ($resultIMAGES == false) {
+                    die(print_r(sqlsrv_errors(), true));
+                }
             }
         }
     }
@@ -85,58 +89,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration</title>
+    <title>Account Created</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/regis.css">
+    <link rel="stylesheet" href="assets/css/regis_success.css">
 </head>
 <body>
 
-    <div class="container mt-4">
-        <img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Pipeline Logo">
-    </div>
-    <div>
-        <hr class="hr-style">
-    </div>
+    <div class="id-card">
 
-    <div class="container d-flex justify-content-between align-items-center" style="padding-top: 50px;">
-
-        <!-- Left side: Uploaded Image Preview -->
-        <div class="col-md-5 text-center">
-            <?php if (in_array(strtolower($checkImage), $allowTypes)): ?>
-                <img src="<?php echo $targetimagePath; ?>" class="img-regis img-fluid" alt="Uploaded Photo">
-            <?php else: ?>
-                <img src="assets/img/regis_img.png" class="img-regis img-fluid" alt="regis_img">
-            <?php endif; ?>
+        <!-- Header -->
+        <div class="id-card-header">
+            <div class="brand">PIPELINE</div>
+            <div class="card-title-block">
+                <div class="date-issue">&#10022; Date of issue <?php echo date("m. d. Y"); ?> &#10022;</div>
+                <div class="card-title">ACCOUNT CREATED</div>
+            </div>
         </div>
 
-        <!-- Right side: Summary -->
-        <div class="col-md-6">
-            <h1 class="text-start mb-4 h1">Account Created</h1>
+        <!-- Body -->
+        <div class="id-card-body">
 
-            <div class="mb-2">
-                <span class="field-label">Name:</span> <?php echo $firstname . ' ' . $lastname; ?>
+            <!-- Photo -->
+            <div class="id-photo-box">
+                <?php if ($targetimagePath != '' && in_array(strtolower($checkImage), $allowTypes)): ?>
+                    <img src="<?php echo $targetimagePath; ?>" alt="Profile Photo">
+                <?php else: ?>
+                    <img src="assets/img/regis_img.png" alt="Profile Photo">
+                <?php endif; ?>
             </div>
-            <div class="mb-2">
-                <span class="field-label">Student Number:</span> <?php echo $std_number; ?>
+
+            <!-- Fields -->
+            <div class="id-fields">
+                <div class="id-field">
+                    <div class="id-field-label">Name.</div>
+                    <div class="id-field-value large"><?php echo strtoupper($firstname . " " . $lastname); ?></div>
+                </div>
+                <div class="id-field">
+                    <div class="id-field-label">Student Number.</div>
+                    <div class="id-field-value"><?php echo $std_number; ?></div>
+                </div>
+                <div class="id-field">
+                    <div class="id-field-label">Course Year Section.</div>
+                    <div class="id-field-value"><?php echo $cys; ?></div>
+                </div>
+                <div class="id-field">
+                    <div class="id-field-label">Username.</div>
+                    <div class="id-field-value"><?php echo $username; ?></div>
+                </div>
+                <div class="id-field">
+                    <div class="id-field-label">Email.</div>
+                    <div class="id-field-value" style="font-size:14px"><?php echo $email; ?></div>
+                </div>
             </div>
-            <div class="mb-2">
-                <span class="field-label">Course Section:</span> <?php echo $cys; ?>
-            </div>
-            <div class="mb-2">
-                <span class="field-label">Username:</span> <?php echo $username; ?>
-            </div>
-            <div class="mb-2">
-                <span class="field-label">Email:</span> <?php echo $email; ?>
-            </div>
-             <p class="mt-4">Your account has been successfully created!</p>
-            <a href="login.html" class="btn btn-primary w-50 btn-create">OK</a>
+
+            <!-- Watermark -->
+            <div class="id-watermark">P</div>
+
         </div>
-    </div>
-     
 
+        <!-- Footer -->
+        <div class="id-card-footer">
+            <span class="tagline">&#10022; Your campus marketplace &#10022;</span>
+            <a href="login.html">OK</a>
+        </div>
+
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>

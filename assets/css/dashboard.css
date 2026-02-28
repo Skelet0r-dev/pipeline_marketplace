@@ -32,8 +32,8 @@
 
 /* Profile picture - small circle */
 .img-profile {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     object-fit: cover;
     display: block;
@@ -81,4 +81,58 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+/* ── Elevated Navbar ── */
+.dash-navbar {
+    background: linear-gradient(135deg, #283618 0%, #606c38 60%, #a7b87a 100%);
+    padding: 14px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dash-navbar .img-logo {
+    max-width: 120px;
+    height: auto;
+    filter: brightness(0) invert(1);
+}
+
+.dash-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.dash-greeting {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dash-hello {
+    font-family: "DM Sans", sans-serif;
+    color: #dde5b6;
+    font-size: 15px;
+}
+
+.dash-name {
+    font-family: "DM Sans", sans-serif;
+    color: #fefae0;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.dash-header-bar {
+    height: 3px;
+    background: linear-gradient(90deg, #283618, #606c38, #dde5b6);
+}
+
+.dash-tagline {
+    font-family: "DM Sans", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #606c38;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
 }

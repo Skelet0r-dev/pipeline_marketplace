@@ -1,58 +1,216 @@
-.body {
-  background-color: #fefae0;
-  color: #333;
+/* ── Base ── */
+* { box-sizing: border-box; }
+
+body, .body {
+    background-color: #fefae0;
+    font-family: "DM Sans", sans-serif;
+    margin: 0;
+    min-height: 100vh;
 }
 
-.field{
-  background-color: #fefae0;
-  color: #333;
-  border: 1px solid #000000;
-  width: 70%;
+/* ── Header ── */
+.login-header {
+    background: linear-gradient(135deg, #283618 0%, #606c38 60%, #a7b87a 100%);
+    padding: 16px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.field-label{
-  font-family: "DM Sans", sans-serif;
-  color: #936639;
+.img-logo-light {
+    max-width: 120px;
+    height: auto;
+    filter: brightness(0) invert(1);
 }
 
-.dm-sans {
-  font-family: "DM Sans", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
+.header-links {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-.h1{
-  font-size: 2.5rem;
-  font-family: "DM Sans", sans-serif;
-  color: #283618;
+.header-link {
+    color: #dde5b6;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-decoration: none;
+    transition: color 0.2s;
 }
 
-.h4{
-  font-size: 1.25rem;
-  font-family: "DM Sans", sans-serif;
-  color: #936639;
+.header-link:hover {
+    color: #fff;
 }
 
-.img-logo{
-  max-width: 10%;
-  height: auto;
+.header-sep {
+    color: #dde5b6;
+    font-size: 13px;
 }
 
-.img-login{
-  max-width: 100%;
-  height: 100%;
-  border-radius: 15px;
+/* ── Wrapper ── */
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 70px);
+    padding: 40px 20px;
 }
 
-.btn-size{
-  width: 70%;
+/* ── Card ── */
+.login-card {
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(40, 54, 24, 0.15);
+    display: flex;
+    overflow: hidden;
+    width: 860px;
+    max-width: 100%;
 }
 
-.hr-style {
-  height: 4px;
-  background-color: black;
-  border: none; 
-  opacity: 1;
+/* ── Left: Form ── */
+.login-left {
+    flex: 1;
+    padding: 48px 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
+.login-form-header {
+    margin-bottom: 28px;
+}
+
+.form-label-small {
+    font-size: 11px;
+    font-weight: 700;
+    color: #606c38;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+}
+
+.login-title {
+    font-size: 36px;
+    font-weight: 800;
+    color: #283618;
+    margin: 0 0 4px 0;
+}
+
+.login-sub {
+    font-size: 14px;
+    color: #936639;
+    margin: 0;
+}
+
+/* ── Labels ── */
+.login-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #606c38;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+}
+
+/* ── Inputs ── */
+.login-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid #dde5b6;
+    border-radius: 10px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 14px;
+    color: #283618;
+    background: #fefae0;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.login-input:focus {
+    border-color: #606c38;
+    background: #fff;
+}
+
+.login-input::placeholder {
+    color: #aab57a;
+}
+
+/* ── Login button ── */
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #606c38, #283618);
+    color: #fefae0;
+    border: none;
+    border-radius: 10px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.btn-login:hover {
+    opacity: 0.88;
+}
+
+/* ── HR ── */
+.login-hr {
+    height: 1px;
+    background-color: #dde5b6;
+    border: none;
+    opacity: 1;
+    margin: 20px 0;
+}
+
+/* ── Footer links ── */
+.login-footer-links {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #555;
+}
+
+.login-link {
+    color: #606c38;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-link:hover {
+    color: #283618;
+    text-decoration: underline;
+}
+
+/* ── Divider ── */
+.login-divider {
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, #606c38, transparent);
+    align-self: stretch;
+    flex-shrink: 0;
+}
+
+/* ── Right: Image ── */
+.login-right {
+    width: 380px;
+    flex-shrink: 0;
+    background: linear-gradient(160deg, #dde5b6 0%, #fefae0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+}
+
+.login-img {
+    max-width: 100%;
+    max-height: 420px;
+    object-fit: contain;
+}
+
+/* ── Keep old classes so nothing breaks ── */
+.img-logo { max-width: 10%; height: auto; }
+.img-login { max-width: 100%; height: 100%; border-radius: 15px; }
+.field-label { font-family: "DM Sans", sans-serif; color: #936639; }
+.hr-style { height: 2px; background-color: black; border: none; opacity: 1; }

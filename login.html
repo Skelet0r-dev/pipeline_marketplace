@@ -12,68 +12,63 @@
 </head>
 <body class="body">
 
-    <div class="container mt-4 d-flex justify-content-between align-items-center">
-        <img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Pipeline Logo">
-    
-        <div>
-            <a href="login_admin.html" class="field-label">ABOUT US</a>
-            <p style="display: inline-block; margin: 0 10px;" class="field-label">|</p>
-            <a href="login_admin.html" class="field-label">ADMIN LOGIN</a>
+    <!-- Header -->
+    <div class="login-header">
+        <img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo-light" alt="Pipeline Logo">
+        <div class="header-links">
+            <a href="login_admin.html" class="header-link">ABOUT US</a>
+            <span class="header-sep">|</span>
+            <a href="login_admin.html" class="header-link">ADMIN LOGIN</a>
         </div>
     </div>
 
-    <div>
-        <hr 
-        style="height: 2px;
-        background-color: black;
-        border: none; 
-        opacity: 1;">
-    </div>
+    <!-- Main -->
+    <div class="login-wrapper">
+        <div class="login-card">
 
-    <div class="container mt-4">
-       
-        <div class="row justify-content-between">
-            <div class="col-md-6 justify-content-start">
-                 <h1 class="mt-5 h1">Hello Lasallian!</h1>
-                <h6 class="mb-4 h4">Please login to continue</h6>
-                <form action="dashboard.php"  method="post">
+            <!-- Left: Form -->
+            <div class="login-left">
+                <div class="login-form-header">
+                    <div class="form-label-small">&#10022; WELCOME BACK &#10022;</div>
+                    <h1 class="login-title">Hello Lasallian!</h1>
+                    <p class="login-sub">Please login to continue</p>
+                </div>
+
+                <form action="dashboard.php" method="post">
 
                     <div class="mb-3">
-                        <label for="stdnum" class="form-label field-label">Student ID Number</label>
-                        <input type="text" class="form-control field" id="stdnum" name="stdnum">
+                        <label for="stdnum" class="login-label">Student ID Number</label>
+                        <input type="text" class="login-input" id="stdnum" name="stdnum" placeholder="202012345" required>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="password" class="form-label field-label">Password</label>
-                        <input type="password" class="form-control field" id="password" name="password">
+                    <div class="mb-4">
+                        <label for="password" class="login-label">Password</label>
+                        <input type="password" class="login-input" id="password" name="password" required>
                     </div>
 
-                    <button type="submit" class="btn btn-size fw-bold dm-sans" style="background-color: #936639; color: white;">LOGIN</button>
-                    <hr style="height: 1px;
-                    background-color: black;
-                    border: none; 
-                    opacity: 1;">
+                    <button type="submit" class="btn-login">LOGIN</button>
 
                 </form>
 
-                <div class="d-flex justify-content-between col-md-12">
-                    <a href="#" style="color: #936639;">Forgot password?</a>
-                <p class="text-center">Don't have an account? <a href="regis.html" style="color: #936639;">Sign up here</a></p>
+                <hr class="login-hr">
+
+                <div class="login-footer-links">
+                    <a href="#" class="login-link">Forgot password?</a>
+                    <p class="mb-0">Don't have an account? <a href="regis.html" class="login-link">Sign up here</a></p>
                 </div>
             </div>
 
-            <div class="col-md-6" style="padding-left: 100px;">
-                    <img src="assets/img/login_image_wframe.png" class="img-login" alt="Pipeline Logo">
+            <!-- Divider -->
+            <div class="login-divider"></div>
 
+            <!-- Right: Image -->
+            <div class="login-right">
+                <img src="assets/img/login_image_wframe.png" class="login-img" alt="Login Image">
             </div>
 
-            </div>
-                
         </div>
+    </div>
 
-
-            
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
 </html>

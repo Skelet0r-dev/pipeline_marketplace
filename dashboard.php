@@ -47,10 +47,7 @@ if ($resultprofile === false) {
 $rowprofile = sqlsrv_fetch_array($resultprofile);
 $file_path = $rowprofile['FILE_PATH'];
 $firstname = $rowpassword['FIRST_NAME'];
-
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -62,103 +59,86 @@ $firstname = $rowpassword['FIRST_NAME'];
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
-    <link rel ="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
 </head>
 <body class="body">
-   <div class="container mt-4 d-flex justify-content-between align-items-center">
-    <img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Pipeline Logo">
 
-        <div class="d-flex align-items-center gap-1">
-            <p class="field-label mb-0">Hello,</p>
-
-            <div class="gap-3 d-flex align-items-center">
-            <p class="fw-bold mb-0"><?php echo $firstname?></p>
-            <img src="<?php echo $file_path ?>" class="img-profile" alt="Profile Picture">
-            </div>  
+    <!-- Elevated Navbar -->
+    <div class="dash-navbar">
+        <img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Pipeline Logo">
+        <div class="dash-nav-right">
+            <div class="dash-greeting">
+                <span class="dash-hello">Hello,</span>
+                <span class="dash-name"><?php echo $firstname; ?></span>
+            </div>
+            <img src="<?php echo $file_path; ?>" class="img-profile" alt="Profile Picture">
         </div>
-
     </div>
 
-    <hr style="height: 2px;
-        background-color: black;
-        border: none; 
-        opacity: 1;">
+    <div class="dash-header-bar"></div>
 
+    <div class="container mt-4">
+        <div class="row mt-4 align-items-center">
 
-<div class="container mt-4">
-    <!-- Main Content Row: Categories (Left) + Video (Right) -->
-    <div class="row mt-4 align-items-center">
-        <!-- Categories on the Left -->
-        <div class="col d-flex flex-column">
-            <!-- Heading -->
-            <h1 class="h1 mt-4">Everything You Need,</h1>
-            <h1 class="h1">Within Campus Reach</h1>
+            <!-- Categories on the Left -->
+            <div class="col d-flex flex-column">
+                <div class="dash-tagline">&#10022; YOUR CAMPUS MARKETPLACE &#10022;</div>
+                <h1 class="h1 mt-2">Everything You Need,</h1>
+                <h1 class="h1">Within Campus Reach</h1>
 
-            <!-- Row 1 -->
-            <div class="row justify-content-start gap-4 mt-4">
-                <div class="col-auto d-flex flex-column align-items-center square-acad">
-                    <img src="assets/img/academics.svg" class="img-acad" alt="Academics Icon">
-                    <p class="p-acad mb-0">Academics</p>
+                <!-- Row 1 -->
+                <div class="d-flex gap-3 mt-4">
+                    <div class="d-flex flex-column align-items-center justify-content-center square-acad">
+                        <img src="assets/img/academics.svg" class="img-acad" alt="Academics Icon">
+                        <p class="p-acad mb-0">Academics</p>
+                    </div>
+                    <div class="d-flex flex-column align-items-center justify-content-center square-tech">
+                        <img src="assets/img/keyboard.svg" class="img-tech" alt="Keyboard Icon">
+                        <p class="p-tech mb-0">Electronics and Tech</p>
+                    </div>
+                    <div class="d-flex flex-column align-items-center justify-content-center square-clothing">
+                        <img src="assets/img/shirts.svg" class="img" alt="Shirt">
+                        <p class="p-clothing mb-0">Clothing & Apparel</p>
+                    </div>
+                    <div class="d-flex flex-column align-items-center justify-content-center square-hobbies">
+                        <img src="assets/img/labubus.svg" class="img" alt="Labubu">
+                        <p class="p-hobbies mb-0">Hobbies & Lifestyle</p>
+                    </div>
                 </div>
 
-                <div class="col-auto d-flex flex-column align-items-center square-tech">
-                    <img src="assets/img/keyboard.svg" class="img-tech" alt="Keyboard Icon">
-                    <p class="p-tech mb-0">Electronics and Tech</p>
-                </div>
-
-                <div class="col-auto d-flex flex-column align-items-center square-clothing">
-                    <img src="assets/img/shirts.svg" class="img" alt="Shirt">
-                    <p class="p-clothing mb-0">Clothing & Apparel</p>
-                </div>
-
-                <div class="col-auto d-flex flex-column align-items-center square-hobbies">
-                    <img src="assets/img/labubus.svg" class="img" alt="Labubu">
-                    <p class="p-hobbies mb-0">Hobbies & Lifestyle</p>
+                <!-- Row 2 -->
+                <div class="d-flex gap-3 mt-3">
+                    <div class="d-flex flex-column align-items-center justify-content-center square-food">
+                        <img src="assets/img/cookies.svg" class="img" alt="Cookies Icon">
+                        <p class="p-cookies mb-0">Food</p>
+                    </div>
+                    <div class="d-flex flex-column align-items-center justify-content-center square-events">
+                        <img src="assets/img/tickets.svg" class="img" alt="Tickets Icon">
+                        <p class="p-events mb-0">Events & Tickets</p>
+                    </div>
+                    <div class="d-flex flex-column align-items-center justify-content-center square-specific">
+                        <img src="assets/img/electronics.svg" class="img" alt="Electronics Icon">
+                        <p class="p-specific mb-0">Course-Specific</p>
+                    </div>
+                    <div class="d-flex flex-column align-items-center justify-content-center square-allitems">
+                        <img src="assets/img/cart.svg" class="img" alt="Cart Icon">
+                        <p class="p-allitems mb-0">All Items</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Row 2 -->
-            <div class="row justify-content-start gap-4 mt-4">
-                <div class="col-auto d-flex flex-column align-items-center square-food">
-                    <img src="assets/img/cookies.svg" class="img" alt="Cookies Icon">
-                    <p class="p-cookies mb-0">Food</p>
-                </div>
-
-                <div class="col-auto d-flex flex-column align-items-center square-events">
-                    <img src="assets/img/tickets.svg" class="img" alt="Tickets Icon">
-                    <p class="p-events mb-0">Events & Tickets</p>
-                </div>
-
-                <div class="col-auto d-flex flex-column align-items-center square-specific">
-                    <img src="assets/img/electronics.svg" class="img" alt="Electronics Icon">
-                    <p class="p-specific mb-0">Course-Specific</p>
-                </div>
-
-                <div class="col-auto d-flex flex-column align-items-center square-allitems">
-                    <img src="assets/img/cart.svg" class="img" alt="Cart Icon">
-                    <p class="p-allitems mb-0">All Items</p>
+            <!-- Video on the Right -->
+            <div class="col-auto d-flex align-items-center">
+                <div class="video-crop">
+                    <video src="assets/img/dashboard-final.mp4" autoplay muted loop playsinline poster="thumbnail.jpg">
+                        Your browser does not support the video tag.
+                    </video>
                 </div>
             </div>
-        </div>
 
-        <!-- Video on the Right -->
-        <div class="col-auto d-flex align-items-center">
-            <video
-                src="assets/img/dashboard-final.mp4"
-                autoplay
-                muted
-                loop
-                playsinline
-                poster="thumbnail.jpg"
-                style="width: 360px; max-width: 100%; height: auto;"
-            >
-                Your browser does not support the video tag.
-            </video>
         </div>
     </div>
-</div>
 
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
 </html>

@@ -11,91 +11,94 @@
     <link rel="stylesheet" href="assets/css/regis.css">
 </head>
 <body>
-    <div class="container mt-4">
-        <img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Pipeline Logo">
+
+    <!-- Header -->
+    <div class="regis-header">
+        <img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo-light" alt="Pipeline Logo">
+        <div class="header-tagline">&#10022; Your campus marketplace &#10022;</div>
     </div>
 
-    <div>
-        <hr class="hr-style">
-    </div>
+    <!-- Main card -->
+    <div class="regis-wrapper">
+        <div class="regis-card">
 
-    <form action="regis.php" method="POST" enctype="multipart/form-data">
-        <div class="container mt-6 d-flex justify-content-between align-items-center" style="padding-top: 50px;">
+            <!-- FORM wraps everything so file input is included -->
+            <form action="regis.php" method="POST" enctype="multipart/form-data" style="display:contents;">
 
-            <!-- Left side: Image -->
-            <div class="col-md-5">
-                <img src="assets/img/regis_img.png" class="img-regis img-fluid" id="imagePreview" alt="regis_img">
-
-                <div class="text-center mt-4">
-                    <label for="image" class="btn btn-primary w-75 btn-create" style="cursor: pointer;">
-                        UPLOAD IMAGE
-                    </label>
-                    <input type="file" name="image" id="image" accept=".jpg" style="display: none;" onchange="previewImage(this)">
-                    <p class="mt-2 text-muted" id="fileName">No file chosen</p>
+                <!-- Left: photo -->
+                <div class="regis-left">
+                    <div class="photo-preview-box">
+                        <img src="assets/img/regis_img.png" id="imagePreview" alt="Preview">
+                    </div>
+                    <label for="image" class="upload-btn">UPLOAD IMAGE</label>
+                    <input type="file" name="image" id="image" accept=".jpg" style="display:none;" onchange="previewImage(this)">
+                    <p class="file-name" id="fileName">No file chosen</p>
                 </div>
-            </div>
 
-            <!-- Right side: Form -->
-            <div class="col-md-6">
-                <h1 class="text-start mb-4 h1">Create an Account</h1>
+                <!-- Divider -->
+                <div class="regis-divider"></div>
 
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between gap-3">
+                <!-- Right: form fields -->
+                <div class="regis-right">
+                    <div class="regis-form-header">
+                        <div class="form-label-small">&#10022; NEW ACCOUNT &#10022;</div>
+                        <h1 class="regis-title">Create an Account</h1>
+                    </div>
+
+                    <div class="d-flex gap-3 mb-3">
                         <div class="w-100">
-                            <label for="f_name" class="form-label field-label">First Name</label>
-                            <input type="text" class="form-control" id="f_name" name="f_name" placeholder="Juan" required>
+                            <label class="field-label">First Name</label>
+                            <input type="text" class="regis-input" name="f_name" placeholder="Juan" required>
                         </div>
                         <div class="w-100">
-                            <label for="l_name" class="form-label field-label">Last Name</label>
-                            <input type="text" class="form-control" id="l_name" name="l_name" placeholder="Dela Cruz" required>
+                            <label class="field-label">Last Name</label>
+                            <input type="text" class="regis-input" name="l_name" placeholder="Dela Cruz" required>
                         </div>
                     </div>
-                </div>
 
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between gap-3">
+                    <div class="d-flex gap-3 mb-3">
                         <div class="w-100">
-                            <label for="stdnum" class="form-label field-label">Student Number</label>
-                            <input type="text" class="form-control" id="stdnum" name="stdnum" placeholder="202012345" required>
+                            <label class="field-label">Student Number</label>
+                            <input type="text" class="regis-input" name="stdnum" placeholder="202012345" required>
                         </div>
                         <div class="w-100">
-                            <label for="cys" class="form-label field-label">Course Year Section</label>
-                            <input type="text" class="form-control" id="cys" name="cys" placeholder="CEE11" required>
+                            <label class="field-label">Course Year Section</label>
+                            <input type="text" class="regis-input" name="cys" placeholder="CEE11" required>
                         </div>
                     </div>
+
+                    <div class="mb-3">
+                        <label class="field-label">Username</label>
+                        <input type="text" class="regis-input" name="username" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="field-label">School Email Address</label>
+                        <input type="email" class="regis-input" name="email" placeholder="djc2345@dlsud.edu.ph" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="field-label">Password</label>
+                        <input type="password" class="regis-input" name="password" required>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <button type="reset" class="btn-cancel w-50" onclick="resetPreview()">Cancel</button>
+                        <button type="submit" class="btn-register w-50">Register</button>
+                    </div>
+
                 </div>
 
-                <div class="mb-3">
-                    <label for="username" class="form-label field-label">Username</label>
-                    <input type="text" class="form-control" id="username" name="username" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="email" class="form-label field-label">School Email Address</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="djc2345@dlsud.edu.ph" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="password" class="form-label field-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" required>
-                </div>
-
-                <div class="d-flex justify-content-end gap-3">
-                    <button type="reset" class="btn btn-secondary w-50 btn-cancel" onclick="resetPreview()">Cancel</button>
-                    <button type="submit" class="btn btn-primary w-50 btn-create">Register</button>
-                </div>
-            </div>
+            </form>
         </div>
-    </form>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-
     <script>
         function previewImage(input) {
             document.getElementById('fileName').innerHTML = input.files[0].name;
             document.getElementById('imagePreview').src = URL.createObjectURL(input.files[0]);
         }
-
         function resetPreview() {
             document.getElementById('fileName').innerHTML = 'No file chosen';
             document.getElementById('imagePreview').src = 'assets/img/regis_img.png';

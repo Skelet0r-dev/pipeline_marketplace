@@ -1,65 +1,197 @@
-.body-adminlogin {
+/* ── Base ── */
+* { box-sizing: border-box; }
+
+body, .body-adminlogin {
     background-color: #283618;
-    color: white;
+    font-family: "DM Sans", sans-serif;
+    margin: 0;
+    min-height: 100vh;
 }
 
-.img-logo{
-  max-width: 10%;
-  height: auto;
+/* ── Header ── */
+.admin-header {
+    background: linear-gradient(135deg, #1a2410 0%, #283618 60%, #606c38 100%);
+    padding: 16px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #606c38;
 }
 
-.img-login{
-  max-width: 100%;
-  height: 100%;
-  border-radius: 15px;
+.img-logo-admin {
+    max-width: 120px;
+    height: auto;
 }
 
-.btn-size{
-  width: 70%;
+.admin-header-tag {
+    font-size: 12px;
+    color: #dde5b6;
+    letter-spacing: 2px;
+    font-style: italic;
 }
 
-
-.field{
-  border: 1px solid #fefae0;
-  width: 70%;
-  background-color: #283618;
-  
+/* ── Wrapper ── */
+.admin-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 70px);
+    padding: 40px 20px;
 }
 
-.field-label{
-  font-family: "DM Sans", sans-serif;
-  color: #dde5b6;
+/* ── Card ── */
+.admin-card {
+    background: #344e1a;
+    border-radius: 24px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+    display: flex;
+    overflow: hidden;
+    width: 860px;
+    max-width: 100%;
+    border: 1px solid #606c38;
 }
 
-.dm-sans {
-  font-family: "DM Sans", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
+/* ── Left: Image ── */
+.admin-left {
+    width: 380px;
+    flex-shrink: 0;
+    background: linear-gradient(160deg, #1a2410 0%, #283618 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
 }
 
-.h1{
-  font-size: 2.5rem;
-  font-family: "DM Sans", sans-serif;
-  color: #fefae0;
-
- 
+.admin-img {
+    max-width: 100%;
+    max-height: 420px;
+    object-fit: contain;
+    border-radius: 16px;
 }
 
-.h4{
-  font-size: 1.25rem;
-  font-family: "DM Sans", sans-serif;
-  color: #dde5b6;
+/* ── Divider ── */
+.admin-divider {
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, #606c38, transparent);
+    align-self: stretch;
+    flex-shrink: 0;
 }
 
-.btn-color{
-    background-color: #dde5b6;
+/* ── Right: Form ── */
+.admin-right {
+    flex: 1;
+    padding: 48px 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.admin-form-header {
+    margin-bottom: 28px;
+}
+
+.admin-label-small {
+    font-size: 11px;
+    font-weight: 700;
+    color: #a7b87a;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+}
+
+.admin-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: #dde5b6;
+    margin: 0 0 4px 0;
+}
+
+.admin-sub {
+    font-size: 14px;
+    color: #a7b87a;
+    margin: 0;
+}
+
+/* ── Labels ── */
+.admin-field-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #a7b87a;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+}
+
+/* ── Inputs ── */
+.admin-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid #606c38;
+    border-radius: 10px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 14px;
+    color: #dde5b6;
+    background: #283618;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.admin-input:focus {
+    border-color: #dde5b6;
+    background: #1a2410;
+}
+
+.admin-input::placeholder {
+    color: #606c38;
+}
+
+/* ── Login button ── */
+.btn-admin-login {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #dde5b6, #a7b87a);
     color: #283618;
+    border: none;
+    border-radius: 10px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: opacity 0.2s;
 }
 
-.hr-style {
-  height: 2px;
-  background-color: white;
-  border: none; 
-  opacity: 1;
+.btn-admin-login:hover {
+    opacity: 0.88;
 }
+
+/* ── HR ── */
+.admin-hr {
+    height: 1px;
+    background-color: #606c38;
+    border: none;
+    opacity: 1;
+    margin: 20px 0;
+}
+
+/* ── Back link ── */
+.admin-back {
+    margin: 0;
+    font-size: 13px;
+}
+
+.admin-link {
+    color: #a7b87a;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.admin-link:hover {
+    color: #dde5b6;
+    text-decoration: underline;
+}
+
+/* ── Keep old classes ── */
+.img-logo { max-width: 10%; height: auto; }
+.img-login { max-width: 100%; height: 100%; border-radius: 15px; }
+.hr-style { height: 2px; background-color: white; border: none; opacity: 1; }
