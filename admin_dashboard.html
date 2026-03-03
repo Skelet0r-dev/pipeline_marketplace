@@ -12,15 +12,14 @@
 <!-- ── SIDEBAR ── -->
 <aside class="sidebar">
     <div class="sidebar-logo">
-        <div class="brand">PIPELINE</div>
-        <div class="sub">✦ ADMIN PORTAL ✦</div>
+        <img src="assets/img/pipeline_logo_light.png" class="sidebar-logo-img" alt="Pipeline Logo">
     </div>
 
     <div class="sidebar-admin">
-        <div class="admin-avatar">AD</div>
+        <div class="admin-avatar" id="adminAvatar">AD</div>
         <div class="admin-info">
-            <div class="name">Admin</div>
-            <div class="role">SUPER ADMIN</div>
+            <div class="name" id="adminName">Admin</div>
+            <div class="role"> ADMIN</div>
         </div>
     </div>
 
@@ -108,7 +107,7 @@
             </div>
             <div class="stat-card teal">
                 <div class="stat-icon">✅</div>
-                <div class="stat-label">Marked Sold</div>
+                <div class="stat-label">Marked as Sold</div>
                 <div class="stat-value">892</div>
                 <div class="stat-change">↑ +61 this month</div>
             </div>
@@ -367,9 +366,20 @@
 </main>
 
 <script>
+    // Date
     const d = new Date();
     document.getElementById('dateDisplay').textContent =
         d.toLocaleDateString('en-PH', { weekday:'short', year:'numeric', month:'short', day:'numeric' });
+
+    // Read admin name from URL
+    const params = new URLSearchParams(window.location.search);
+    const adminName = params.get('admin');
+    if (adminName) {
+        document.getElementById('adminName').textContent = adminName;
+        // Update avatar initials
+        const initials = adminName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+        document.getElementById('adminAvatar').textContent = initials;
+    }
 </script>
 
 </body>
