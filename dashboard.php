@@ -82,7 +82,6 @@ $firstname = $rowpassword['FIRST_NAME'];
 
             <!-- Categories on the Left -->
             <div class="col d-flex flex-column">
-                <div class="dash-tagline">&#10022; YOUR CAMPUS MARKETPLACE &#10022;</div>
                 <h1 class="h1 mt-2">Everything You Need,</h1>
                 <h1 class="h1">Within Campus Reach</h1>
 

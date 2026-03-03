@@ -41,7 +41,7 @@
                 <!-- Right: form fields -->
                 <div class="regis-right">
                     <div class="regis-form-header">
-                        <div class="form-label-small">&#10022; NEW ACCOUNT &#10022;</div>
+                        <div class="form-label-small">👥 NEW ACCOUNT</div>
                         <h1 class="regis-title">Create an Account</h1>
                     </div>
 
@@ -69,7 +69,7 @@
 
                     <div class="mb-3">
                         <label class="field-label">Username</label>
-                        <input type="text" class="regis-input" name="username" required>
+                        <input type="text" class="regis-input" name="username" placeholder="juan_delacruz" required>
                     </div>
 
                     <div class="mb-3">
@@ -83,7 +83,7 @@
                     </div>
 
                     <div class="d-flex gap-3">
-                        <button type="reset" class="btn-cancel w-50" onclick="resetPreview()">Cancel</button>
+                        <a href="login.html" class="btn-cancel w-50 text-center text-decoration-none">Cancel</a>
                         <button type="submit" class="btn-register w-50">Register</button>
                     </div>
 
@@ -99,10 +99,7 @@
             document.getElementById('fileName').innerHTML = input.files[0].name;
             document.getElementById('imagePreview').src = URL.createObjectURL(input.files[0]);
         }
-        function resetPreview() {
-            document.getElementById('fileName').innerHTML = 'No file chosen';
-            document.getElementById('imagePreview').src = 'assets/img/regis_img.png';
-        }
+
     </script>
 
 </body>
