@@ -37,6 +37,10 @@
             <span class="nav-badge">12</span>
         </a>
         <a class="nav-item" href="#">
+            <span class="icon">🕐</span> Pending Listings
+            <span class="nav-badge">8</span>
+        </a>
+        <a class="nav-item" href="#">
             <span class="icon">⚠️</span> Reports
             <span class="nav-badge">5</span>
         </a>
@@ -376,7 +380,6 @@
     const adminName = params.get('admin');
     if (adminName) {
         document.getElementById('adminName').textContent = adminName;
-        // Update avatar initials
         const initials = adminName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
         document.getElementById('adminAvatar').textContent = initials;
     }
