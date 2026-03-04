@@ -8,6 +8,8 @@ body, .body {
     min-height: 100vh;
 }
 
+
+
 /* ── Header ── */
 .login-header {
     background: linear-gradient(135deg, #283618 0%, #606c38 60%, #a7b87a 100%);
@@ -15,6 +17,7 @@ body, .body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-size: 200px;
 }
 
 .img-logo-light {
@@ -52,19 +55,20 @@ body, .body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: calc(100vh - 70px);
+    min-height: calc(100vh - 100px);  /* fills the viewport minus 100px */
     padding: 40px 20px;
 }
 
-/* ── Card ── */
 .login-card {
     background: #fff;
     border-radius: 24px;
     box-shadow: 0 8px 32px rgba(40, 54, 24, 0.15);
     display: flex;
     overflow: hidden;
-    width: 860px;
+    width: 1280px;     
     max-width: 100%;
+    min-height: 400px;   
+    padding: 40px;      
 }
 
 /* ── Left: Form ── */
@@ -89,7 +93,7 @@ body, .body {
 }
 
 .login-title {
-    font-size: 36px;
+    font-size: 56px;
     font-weight: 800;
     color: #283618;
     margin: 0 0 4px 0;
@@ -97,15 +101,15 @@ body, .body {
 
 .login-sub {
     font-size: 14px;
-    color: #936639;
+    color: #606c38;
     margin: 0;
 }
 
 /* ── Labels ── */
 .login-label {
-    font-size: 11px;
+    font-size: 16px;
     font-weight: 700;
-    color: #606c38;
+    color:  #936639;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     display: block;
@@ -194,19 +198,22 @@ body, .body {
 
 /* ── Right: Image ── */
 .login-right {
-    width: 380px;
-    flex-shrink: 0;
+    width: 560px;
+    height: auto;
     background: linear-gradient(160deg, #dde5b6 0%, #fefae0 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border-radius: 12px;
+    display: flex;            
+    justify-content: center;  
     padding: 32px;
+    align-items: center;     
 }
-
 .login-img {
+
     max-width: 100%;
     max-height: 420px;
     object-fit: contain;
+    border-radius: 10px;
+    display: block;          
 }
 
 /* ── Keep old classes so nothing breaks ── */
