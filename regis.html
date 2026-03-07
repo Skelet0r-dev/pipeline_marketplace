@@ -4,28 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/regis.css">
+
 </head>
 <body>
 
-    <!-- Header -->
     <div class="regis-header">
         <img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo-light" alt="Pipeline Logo">
         <div class="header-tagline">&#10022; Your campus marketplace &#10022;</div>
     </div>
 
-    <!-- Main card -->
     <div class="regis-wrapper">
-        <div class="regis-card">
+        <form action="regis.php" method="POST" enctype="multipart/form-data" id="regisForm" novalidate class="regis-card">
 
-            <!-- FORM wraps everything so file input is included -->
-            <form action="regis.php" method="POST" enctype="multipart/form-data" style="display:contents;">
-
-                <!-- Left: photo -->
+                <!-- Left: Photo -->
                 <div class="regis-left">
                     <div class="photo-preview-box">
                         <img src="assets/img/avatar.png" id="imagePreview" alt="Preview">
@@ -35,71 +31,239 @@
                     <p class="file-name" id="fileName">No file chosen</p>
                 </div>
 
-                <!-- Divider -->
                 <div class="regis-divider"></div>
 
-                <!-- Right: form fields -->
+                <!-- Right: Fields -->
                 <div class="regis-right">
                     <div class="regis-form-header">
                         <div class="form-label-small">👥 NEW ACCOUNT</div>
                         <h1 class="regis-title">Create an Account</h1>
                     </div>
 
+                    <div class="cooldown-box" id="cooldownBox">
+                        🔒 Too many failed attempts. Wait <span id="countdownText">60s</span> before trying again.
+                    </div>
+                    <div class="attempt-warn" id="attemptWarn"></div>
+
                     <div class="d-flex gap-3 mb-3">
                         <div class="w-100">
                             <label class="field-label">First Name</label>
-                            <input type="text" class="regis-input" name="f_name" placeholder="Juan" required>
+                            <input type="text" class="regis-input" name="f_name" id="f_name" placeholder="Juan" required>
+                            <div class="field-error" id="err-f_name">First name is required.</div>
                         </div>
                         <div class="w-100">
                             <label class="field-label">Last Name</label>
-                            <input type="text" class="regis-input" name="l_name" placeholder="Dela Cruz" required>
+                            <input type="text" class="regis-input" name="l_name" id="l_name" placeholder="Dela Cruz" required>
+                            <div class="field-error" id="err-l_name">Last name is required.</div>
                         </div>
                     </div>
 
                     <div class="d-flex gap-3 mb-3">
                         <div class="w-100">
                             <label class="field-label">Student Number</label>
-                            <input type="text" class="regis-input" name="stdnum" placeholder="202012345" required>
+                            <input type="text" class="regis-input" name="stdnum" id="stdnum" placeholder="202012345" maxlength="9" required>
+                            <div class="field-error" id="err-stdnum">Must be exactly 9 digits.</div>
                         </div>
                         <div class="w-100">
                             <label class="field-label">Course Year Section</label>
-                            <input type="text" class="regis-input" name="cys" placeholder="CEE11" required>
+                            <input type="text" class="regis-input" name="cys" id="cys" placeholder="CEE11" required>
+                            <div class="field-error" id="err-cys">Course Year Section is required.</div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="field-label">Username</label>
-                        <input type="text" class="regis-input" name="username"  required>
+                    <div class="d-flex gap-3 mb-3">
+                        <div class="w-100">
+                            <label class="field-label">Sex</label>
+                            <select class="regis-select" name="sex" id="sex" required>
+                                <option value="" disabled selected>Select...</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Prefer Not To Say">Prefer Not To Say</option>
+                            </select>
+                            <div class="field-error" id="err-sex">Please select your sex.</div>
+                        </div>
+                        <div class="w-100">
+                            <label class="field-label">Username</label>
+                            <input type="text" class="regis-input" name="username" id="username" required>
+                            <div class="field-error" id="err-username">Username is required.</div>
+                        </div>
                     </div>
 
                     <div class="mb-3">
                         <label class="field-label">School Email Address</label>
-                        <input type="email" class="regis-input" name="email" placeholder="djc2345@dlsud.edu.ph" required>
+                        <input type="email" class="regis-input" name="email" id="email" placeholder="djc2345@dlsud.edu.ph" required>
+                        <div class="field-error" id="err-email">Enter a valid email address.</div>
                     </div>
 
                     <div class="mb-4">
                         <label class="field-label">Password</label>
-                        <input type="password" class="regis-input" name="password" required>
+                        <input type="password" class="regis-input" name="password" id="password" maxlength="16" required>
+                        <div class="pw-bar" id="pwBar"></div>
+                        <div class="pw-label" id="pwLabel"></div>
+                        <div class="field-error" id="err-password">8–16 chars with uppercase, lowercase, number, and symbol.</div>
                     </div>
 
                     <div class="d-flex gap-3">
                         <a href="login.html" class="btn-cancel w-50 text-center text-decoration-none">Cancel</a>
-                        <button type="submit" class="btn-register w-50">Register</button>
+                        <button type="submit" class="btn-register w-50" id="submitBtn">Register</button>
                     </div>
 
                 </div>
 
-            </form>
-        </div>
+        </form>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        var MAX_ATTEMPTS = 3;
+        var COOLDOWN_MS  = 60000;
+        var cooldownTick = null;
+        var fields = ['f_name','l_name','stdnum','cys','sex','username','email','password'];
+
         function previewImage(input) {
             document.getElementById('fileName').innerHTML = input.files[0].name;
             document.getElementById('imagePreview').src = URL.createObjectURL(input.files[0]);
         }
 
+        // CYS auto-uppercase
+        document.getElementById('cys').addEventListener('input', function() {
+            var pos = this.selectionStart;
+            this.value = this.value.toUpperCase();
+            this.setSelectionRange(pos, pos);
+        });
+
+        // Student number: digits only
+        document.getElementById('stdnum').addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 9);
+        });
+
+        // Password strength
+        document.getElementById('password').addEventListener('input', function() {
+            var pw = this.value;
+            var score = 0;
+            var colors = ['#dc3545','#fd7e14','#ffc107','#20c997','#28a745'];
+            var labels = ['Very Weak','Weak','Fair','Strong','Very Strong'];
+            if(pw.length >= 8)          score++;
+            if(/[A-Z]/.test(pw))        score++;
+            if(/[a-z]/.test(pw))        score++;
+            if(/[0-9]/.test(pw))        score++;
+            if(/[^A-Za-z0-9]/.test(pw)) score++;
+
+            var bar   = document.getElementById('pwBar');
+            var label = document.getElementById('pwLabel');
+            if(pw.length === 0) {
+                bar.style.width = '0%'; bar.style.background = '#ccc';
+                label.textContent = ''; label.style.color = '';
+            } else {
+                bar.style.width = (score * 20) + '%';
+                bar.style.background = colors[score - 1];
+                label.textContent = labels[score - 1];
+                label.style.color = colors[score - 1];
+            }
+        });
+
+        function isStrongPassword(pw) {
+            return pw.length >= 8 && pw.length <= 16 &&
+                   /[A-Z]/.test(pw) && /[a-z]/.test(pw) &&
+                   /[0-9]/.test(pw) && /[^A-Za-z0-9]/.test(pw);
+        }
+
+        function validateField(id) {
+            var el  = document.getElementById(id);
+            var val = el.value.trim();
+            var ok  = true;
+
+            if(id === 'stdnum')        ok = /^\d{9}$/.test(val);
+            else if(id === 'email')    ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+            else if(id === 'password') ok = isStrongPassword(el.value);
+            else                       ok = val !== '';
+
+            el.classList.toggle('is-ok',  ok);
+            el.classList.toggle('is-bad', !ok);
+            document.getElementById('err-' + id).classList.toggle('show', !ok);
+            return ok;
+        }
+
+        // Attach blur/change listeners to all fields
+        for(var i = 0; i < fields.length; i++) {
+            (function(id) {
+                var el = document.getElementById(id);
+                var evt = (el.tagName === 'SELECT') ? 'change' : 'input';
+                el.addEventListener('blur', function() { validateField(id); });
+                el.addEventListener(evt, function() {
+                    if(el.classList.contains('is-bad') || el.classList.contains('is-ok')) {
+                        validateField(id);
+                    }
+                });
+            })(fields[i]);
+        }
+
+        // Attempt tracking
+        function getAttempts() {
+            try { return JSON.parse(sessionStorage.getItem('regis_att') || '{"count":0,"until":0}'); }
+            catch(e) { return {count:0, until:0}; }
+        }
+        function saveAttempts(d) { sessionStorage.setItem('regis_att', JSON.stringify(d)); }
+
+        function startCooldown(until) {
+            var box = document.getElementById('cooldownBox');
+            var ticker = document.getElementById('countdownText');
+            document.getElementById('submitBtn').disabled = true;
+            box.classList.add('show');
+            if(cooldownTick) clearInterval(cooldownTick);
+            cooldownTick = setInterval(function() {
+                var left = Math.ceil((until - Date.now()) / 1000);
+                if(left <= 0) {
+                    clearInterval(cooldownTick);
+                    box.classList.remove('show');
+                    document.getElementById('submitBtn').disabled = false;
+                    document.getElementById('attemptWarn').classList.remove('show');
+                    var d = getAttempts(); d.count = 0; d.until = 0; saveAttempts(d);
+                } else {
+                    ticker.textContent = left + 's';
+                }
+            }, 500);
+        }
+
+        // Resume cooldown on page load
+        (function() {
+            var d = getAttempts();
+            if(d.until > Date.now()) startCooldown(d.until);
+        })();
+
+        document.getElementById('regisForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var d = getAttempts();
+            if(d.until > Date.now()) { startCooldown(d.until); return; }
+
+            var allOk = true;
+            for(var i = 0; i < fields.length; i++) {
+                if(!validateField(fields[i])) allOk = false;
+            }
+
+            if(!allOk) {
+                // Only count attempt if password is the issue
+                if(!isStrongPassword(document.getElementById('password').value)) {
+                    d.count++;
+                    var warn = document.getElementById('attemptWarn');
+                    var left = MAX_ATTEMPTS - d.count;
+                    if(d.count >= MAX_ATTEMPTS) {
+                        d.until = Date.now() + COOLDOWN_MS;
+                        saveAttempts(d);
+                        startCooldown(d.until);
+                        warn.classList.remove('show');
+                    } else {
+                        saveAttempts(d);
+                        warn.textContent = '⚠️ ' + left + ' attempt' + (left !== 1 ? 's' : '') + ' remaining before cooldown.';
+                        warn.classList.add('show');
+                    }
+                }
+                return;
+            }
+
+            d.count = 0; d.until = 0; saveAttempts(d);
+            this.submit();
+        });
     </script>
 
 </body>

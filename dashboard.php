@@ -1,77 +1,130 @@
 <?php
-$serverName = ".\SQLEXPRESS";
-$connectionOptions = [
-    "Database" => "pipeline_db",
-    "Uid" => "", 
-    "PWD" => "",
+session_start();
+
+$serverName=".\SQLEXPRESS";
+$connectionOptions=[
+    "Database"=>"pipeline_db",
+    "Uid"=>"",
+    "PWD"=>""
 ];
-$conn = sqlsrv_connect($serverName, $connectionOptions);
-$stdnum = $_POST['stdnum'];
-$password = $_POST['password'];
+$conn=sqlsrv_connect($serverName,$connectionOptions);
+if($conn==false)
+    die(print_r(sqlsrv_errors(),true));
 
-$sql = "SELECT *
-        FROM dbo.[USERS] 
-        WHERE STD_NUM = '$stdnum'";
-$result = sqlsrv_query($conn, $sql);
-$rowname = sqlsrv_fetch_array($result);
-if ($rowname == null) {
-    echo "<script>
-                alert('Student Number not found!');
-                window.history.back();
-              </script>";
-        exit;
+$MAX_ATTEMPTS=3;
+$COOLDOWN_SEC=60;
+$error='';
+$locked=false;
+
+if(!isset($_SESSION['login_attempts'])) $_SESSION['login_attempts']=0;
+if(!isset($_SESSION['locked_until']))   $_SESSION['locked_until']=0;
+
+// Check if locked
+if($_SESSION['locked_until'] > time()){
+    $locked=true;
+    $remaining=$_SESSION['locked_until'] - time();
+    $error='Too many failed attempts. Please wait '.$remaining.' second(s) before trying again.';
+} else {
+    if($_SESSION['locked_until'] > 0){
+        $_SESSION['login_attempts']=0;
+        $_SESSION['locked_until']=0;
+    }
 }
 
-$sqlpassword = "SELECT *
-                FROM dbo.[USERS] 
-                WHERE STD_NUM = '$stdnum' AND PASSWORD = '$password'";
-$resultpassword = sqlsrv_query($conn, $sqlpassword);
-$rowpassword = sqlsrv_fetch_array($resultpassword);
-if ($rowpassword == null) {
-    echo "<script>
-                alert('Wrong Password!');
-                window.history.back();
-              </script>";
-        exit;
-}
-$loginId = $rowpassword['USER_ID'];
+$file_path='';
+$firstname='';
 
-$sqlprofile = "SELECT *
-                FROM dbo.[USER_IMG] 
-                WHERE USER_ID = '$loginId'";
-$resultprofile = sqlsrv_query($conn, $sqlprofile);
-if ($resultprofile === false) {
-    die("PROFILE QUERY ERROR:<br>" . print_r(sqlsrv_errors(), true));
+if(!$locked && isset($_POST['stdnum'])){
+    $stdnum=trim($_POST['stdnum']);
+    $password=$_POST['password'];
+
+    // Check student number
+    $sql="SELECT * FROM dbo.[USERS] WHERE STD_NUM='$stdnum'";
+    $result=sqlsrv_query($conn,$sql);
+    $rowname=sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
+
+    if($rowname==null){
+        $_SESSION['login_attempts']++;
+        $left=$MAX_ATTEMPTS - $_SESSION['login_attempts'];
+        if($_SESSION['login_attempts']>=$MAX_ATTEMPTS){
+            $_SESSION['locked_until']=time()+$COOLDOWN_SEC;
+            $locked=true;
+            $error='Too many failed attempts. Please wait '.$COOLDOWN_SEC.' second(s) before trying again.';
+        } else {
+            $error='Student number not found. '.$left.' attempt'.($left!=1?'s':'').' remaining.';
+        }
+    } else {
+        // Check password
+        $sqlpassword="SELECT * FROM dbo.[USERS] WHERE STD_NUM='$stdnum' AND PASSWORD='$password'";
+        $resultpassword=sqlsrv_query($conn,$sqlpassword);
+        $rowpassword=sqlsrv_fetch_array($resultpassword,SQLSRV_FETCH_ASSOC);
+
+        if($rowpassword==null){
+            $_SESSION['login_attempts']++;
+            $left=$MAX_ATTEMPTS - $_SESSION['login_attempts'];
+            if($_SESSION['login_attempts']>=$MAX_ATTEMPTS){
+                $_SESSION['locked_until']=time()+$COOLDOWN_SEC;
+                $locked=true;
+                $error='Too many failed attempts. Please wait '.$COOLDOWN_SEC.' second(s) before trying again.';
+            } else {
+                $error='Wrong password. '.$left.' attempt'.($left!=1?'s':'').' remaining.';
+            }
+        } else {
+            // Success — store session
+            $_SESSION['login_attempts']=0;
+            $_SESSION['locked_until']=0;
+            $_SESSION['user_id']=$rowpassword['USER_ID'];
+
+            $loginId=$rowpassword['USER_ID'];
+            $firstname=$rowpassword['FIRST_NAME'];
+
+            $sqlprofile="SELECT * FROM dbo.[USER_IMG] WHERE USER_ID='$loginId'";
+            $resultprofile=sqlsrv_query($conn,$sqlprofile);
+            if($resultprofile===false)
+                die(print_r(sqlsrv_errors(),true));
+            $rowprofile=sqlsrv_fetch_array($resultprofile,SQLSRV_FETCH_ASSOC);
+            $file_path=$rowprofile['FILE_PATH'];
+        }
+    }
 }
 
-$rowprofile = sqlsrv_fetch_array($resultprofile);
-$file_path = $rowprofile['FILE_PATH'];
-$firstname = $rowpassword['FIRST_NAME'];
+// Not posted and not logged in — go back to login
+if(!isset($_POST['stdnum']) && $firstname==''){
+    header("Location: login.php");
+    exit;
+}
+
+sqlsrv_close($conn);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title><?php echo $firstname!='' ? 'Dashboard' : 'Login'; ?></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+    <?php if($firstname!=''): ?>
     <link rel="stylesheet" href="assets/css/dashboard.css">
+    <?php else: ?>
+    <link rel="stylesheet" href="assets/css/login.css">
+    <?php endif; ?>
 </head>
 <body class="body">
 
-    <!-- Elevated Navbar -->
+<?php if($firstname!=''): ?>
+
+    <!-- ── DASHBOARD ── -->
     <div class="dash-navbar">
         <img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Pipeline Logo">
         <div class="dash-nav-right">
             <div class="dash-greeting">
                 <span class="dash-hello">Hello,</span>
-                <span class="dash-name"><?php echo $firstname; ?></span>
+                <span class="dash-name"><?php echo htmlspecialchars($firstname); ?></span>
             </div>
-            <img src="<?php echo $file_path; ?>" class="img-profile" alt="Profile Picture">
+            <img src="<?php echo htmlspecialchars($file_path); ?>" class="img-profile" alt="Profile Picture">
         </div>
     </div>
 
@@ -80,12 +133,10 @@ $firstname = $rowpassword['FIRST_NAME'];
     <div class="container mt-4">
         <div class="row mt-4 align-items-center">
 
-            <!-- Categories on the Left -->
             <div class="col d-flex flex-column">
                 <h1 class="h1 mt-2">Everything You Need,</h1>
                 <h1 class="h1">Within Campus Reach</h1>
 
-                <!-- Row 1 -->
                 <div class="d-flex gap-3 mt-4">
                     <div class="d-flex flex-column align-items-center justify-content-center square-acad">
                         <img src="assets/img/academics.svg" class="img-acad" alt="Academics Icon">
@@ -105,7 +156,6 @@ $firstname = $rowpassword['FIRST_NAME'];
                     </div>
                 </div>
 
-                <!-- Row 2 -->
                 <div class="d-flex gap-3 mt-3">
                     <div class="d-flex flex-column align-items-center justify-content-center square-food">
                         <img src="assets/img/cookies.svg" class="img" alt="Cookies Icon">
@@ -126,7 +176,6 @@ $firstname = $rowpassword['FIRST_NAME'];
                 </div>
             </div>
 
-            <!-- Video on the Right -->
             <div class="col-auto d-flex align-items-center">
                 <div class="video-crop">
                     <video src="assets/img/dashboard-final.mp4" autoplay muted loop playsinline poster="thumbnail.jpg">
@@ -138,6 +187,74 @@ $firstname = $rowpassword['FIRST_NAME'];
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<?php else: ?>
+
+    <!-- ── LOGIN FORM WITH ERROR ── -->
+    <div class="login-header">
+        <img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo-light" alt="Pipeline Logo">
+        <div class="header-links">
+            <a href="login_admin.html" class="header-link">ABOUT US</a>
+            <span class="header-sep">|</span>
+            <a href="login_admin.html" class="header-link">ADMIN LOGIN</a>
+        </div>
+    </div>
+
+    <div class="login-wrapper">
+        <div class="login-card">
+
+            <div class="login-left">
+                <div class="login-form-header">
+                    <div class="form-label-small">👤 WELCOME BACK</div>
+                    <h1 class="login-title">Hello Lasallian!</h1>
+                    <p class="login-sub">Please login to continue</p>
+                </div>
+
+                <div class="login-error"><?php echo htmlspecialchars($error); ?></div>
+
+                <form action="dashboard.php" method="POST">
+
+                    <div class="mb-3">
+                        <label class="login-label">Student ID Number</label>
+                        <input type="text" class="login-input" name="stdnum" placeholder="202012345" maxlength="9" value="<?php echo isset($_POST['stdnum'])?htmlspecialchars($_POST['stdnum']):''; ?>" <?php echo $locked?'disabled':''; ?>>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="login-label">Password</label>
+                        <input type="password" class="login-input" name="password" <?php echo $locked?'disabled':''; ?>>
+                    </div>
+
+                    <button type="submit" class="btn-login" <?php echo $locked?'disabled':''; ?>>LOGIN</button>
+
+                </form>
+
+                <hr class="login-hr">
+
+                <div class="login-footer-links">
+                    <a href="#" class="login-link">Forgot password?</a>
+                    <p class="mb-0">Don't have an account? <a href="regis.html" class="login-link">Sign up here</a></p>
+                </div>
+            </div>
+
+            <div class="login-divider"></div>
+
+            <div class="login-right" style="padding-left: 80px;">
+                <img src="assets/img/login_image_wframe.png" class="login-img" alt="Login Image">
+            </div>
+
+        </div>
+    </div>
+
+<?php endif; ?>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var stdnumInput = document.getElementsByName('stdnum')[0];
+        if(stdnumInput){
+            stdnumInput.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '').slice(0, 9);
+            });
+        }
+    </script>
+
 </body>
 </html>

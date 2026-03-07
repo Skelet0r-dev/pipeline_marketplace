@@ -55,7 +55,7 @@ body, .body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: calc(100vh - 100px);  /* fills the viewport minus 100px */
+    min-height: calc(100vh - 100px);
     padding: 40px 20px;
 }
 
@@ -65,10 +65,10 @@ body, .body {
     box-shadow: 0 8px 32px rgba(40, 54, 24, 0.15);
     display: flex;
     overflow: hidden;
-    width: 1280px;     
+    width: 1280px;
     max-width: 100%;
-    min-height: 400px;   
-    padding: 40px;      
+    min-height: 400px;
+    padding: 40px;
 }
 
 /* ── Left: Form ── */
@@ -109,7 +109,7 @@ body, .body {
 .login-label {
     font-size: 16px;
     font-weight: 700;
-    color:  #936639;
+    color: #936639;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     display: block;
@@ -139,6 +139,10 @@ body, .body {
     color: #aab57a;
 }
 
+.login-input.input-bad {
+    border-color: #dc3545;
+}
+
 /* ── Login button ── */
 .btn-login {
     width: 100%;
@@ -157,6 +161,11 @@ body, .body {
 
 .btn-login:hover {
     opacity: 0.88;
+}
+
+.btn-login:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* ── HR ── */
@@ -202,18 +211,18 @@ body, .body {
     height: auto;
     background: linear-gradient(160deg, #dde5b6 0%, #fefae0 100%);
     border-radius: 12px;
-    display: flex;            
-    justify-content: center;  
+    display: flex;
+    justify-content: center;
     padding: 32px;
-    align-items: center;     
+    align-items: center;
 }
-.login-img {
 
+.login-img {
     max-width: 100%;
     max-height: 420px;
     object-fit: contain;
     border-radius: 10px;
-    display: block;          
+    display: block;
 }
 
 /* ── Keep old classes so nothing breaks ── */
@@ -221,3 +230,47 @@ body, .body {
 .img-login { max-width: 100%; height: 100%; border-radius: 15px; }
 .field-label { font-family: "DM Sans", sans-serif; color: #936639; }
 .hr-style { height: 2px; background-color: black; border: none; opacity: 1; }
+
+/* ── Inline field errors ── */
+.login-field-error {
+    color: #dc3545;
+    font-size: 11.5px;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+/* ── Wrong credentials error ── */
+.login-error {
+    background: #fff5f5;
+    border-left: 4px solid #dc3545;
+    color: #dc3545;
+    border-radius: 6px;
+    padding: 8px 14px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* ── Cooldown banner ── */
+.login-cooldown {
+    display: none;
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #7d5a00;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    font-weight: 500;
+}
+.login-cooldown.show { display: block; }
+
+/* ── Attempt warning ── */
+.login-attempt-warn {
+    display: none;
+    color: #dc3545;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+.login-attempt-warn.show { display: block; }

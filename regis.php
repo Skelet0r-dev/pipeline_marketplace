@@ -1,96 +1,147 @@
 <?php
-    $serverName = ".\SQLEXPRESS";
-    $connectionOptions = [
-        "Database" => "pipeline_db",
-        "Uid" => "", 
-        "PWD" => "",
-    ];
-    $conn = sqlsrv_connect($serverName, $connectionOptions);
+$serverName=".\SQLEXPRESS";
+$connectionOptions=[
+    "Database"=>"pipeline_db",
+    "Uid"=>"",
+    "PWD"=>""
+];
+$conn=sqlsrv_connect($serverName, $connectionOptions);
+if($conn==false)
+    die(print_r(sqlsrv_errors(),true));
 
-    if (!$conn) {
-        die("Connection failed: " . sqlsrv_errors());
-    }
+$firstname  = trim($_POST['f_name']);
+$lastname   = trim($_POST['l_name']);
+$stdnum     = trim($_POST['stdnum']);
+$cys        = strtoupper(trim($_POST['cys']));
+$sex        = trim($_POST['sex']);
+$username   = trim($_POST['username']);
+$email      = trim($_POST['email']);
+$password   = $_POST['password'];
 
-    $firstname = $_POST['f_name'];
-    $lastname = $_POST['l_name'];
-    $std_number = $_POST['stdnum'];
-    $cys = $_POST['cys'];
-    $username = $_POST['username'];
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+// ── Server-side validation ──
+$errors = [];
 
-    $sqlcheck = "SELECT * 
-                 FROM dbo.[USERS] 
-                 WHERE [STD_NUM] = '$std_number'";
-    $resultcheck = sqlsrv_query($conn, $sqlcheck);
-    if ($resultcheck === false) {
-        die(print_r(sqlsrv_errors(), true));
-    }
-    if (sqlsrv_fetch($resultcheck) === true) {
-        echo "<script>
-                alert('There is already an account with this Student Number');
-                window.history.back();
-              </script>";
-        exit;
-    }
+if(empty($firstname))  $errors[] = "First name is required.";
+if(empty($lastname))   $errors[] = "Last name is required.";
+if(empty($username))   $errors[] = "Username is required.";
+if(empty($sex))        $errors[] = "Sex is required.";
 
-    $sqlinsert = "INSERT INTO dbo.[USERS] ([FIRST_NAME], [LAST_NAME], [STD_NUM], [CYS], [USERNAME], [EMAIL], [PASSWORD]) 
-                  VALUES ('$firstname', '$lastname', '$std_number', '$cys', '$username', '$email', '$password')";
+if(!preg_match('/^\d{9}$/', $stdnum))
+    $errors[] = "Student number must be exactly 9 digits.";
 
-    $resultinsert = sqlsrv_query($conn, $sqlinsert);
-    if ($resultinsert === false) {
-        die(print_r(sqlsrv_errors(), true));
-    }
+if(!filter_var($email, FILTER_VALIDATE_EMAIL))
+    $errors[] = "Please enter a valid email address.";
 
-    $sqlid = "SELECT USER_ID 
-              FROM dbo.[USERS] 
-              WHERE [STD_NUM] = '$std_number'";
+$pwlen = strlen($password);
+if($pwlen < 8 || $pwlen > 16)          $errors[] = "Password must be 8 to 16 characters.";
+if(!preg_match('/[A-Z]/', $password))  $errors[] = "Password needs at least one uppercase letter.";
+if(!preg_match('/[a-z]/', $password))  $errors[] = "Password needs at least one lowercase letter.";
+if(!preg_match('/[0-9]/', $password))  $errors[] = "Password needs at least one number.";
+if(!preg_match('/[^A-Za-z0-9]/', $password)) $errors[] = "Password needs at least one symbol.";
 
-    $resultid = sqlsrv_query($conn, $sqlid);
-    if ($resultid === false) {
-        die(print_r(sqlsrv_errors(), true));
-    }
-    $row = sqlsrv_fetch_array($resultid, SQLSRV_FETCH_ASSOC);
-    $id = $row['USER_ID'];
+$allowedsex = ['Male','Female','Prefer Not To Say'];
+if(!in_array($sex, $allowedsex))
+    $errors[] = "Invalid value for sex.";
 
-    // Image Upload
-    $allowTypes = array('jpg');
-    $checkImage = '';
-    $targetimagePath = '';
+if(!empty($errors)){
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration Error</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/regis.css">
+</head>
+<body>
+    <div class="error-card">
+        <h2>⚠ Registration Error</h2>
+        <ul class="error-list">
+            <?php foreach($errors as $err){ echo '<li>'.htmlspecialchars($err).'</li>'; } ?>
+        </ul>
+        <a href="javascript:history.back()" class="btn-back">← Go Back</a>
+    </div>
+</body>
+</html>
+<?php
+    exit;
+}
 
-    if (!empty($_FILES['image']['name'])) {
-        $destination = "uploads/";
-        $imageName = basename($_FILES['image']['name']);
-        $targetimagePath = $destination . $imageName;
-        $checkImage = pathinfo($targetimagePath, PATHINFO_EXTENSION);
+// ── Check if student number already exists ──
+$sql="SELECT * FROM dbo.[USERS] WHERE [STD_NUM]='$stdnum'";
+$result=sqlsrv_query($conn,$sql);
+if($result===false) die(print_r(sqlsrv_errors(),true));
 
-        if (in_array(strtolower($checkImage), $allowTypes)) {
-            $movetoUploads = move_uploaded_file($_FILES['image']['tmp_name'], $targetimagePath);
-            if ($movetoUploads == true) {
-                // Get next IMG_ID
-                $sqlimgid = "SELECT MAX(IMG_ID) AS MAX_ID FROM dbo.[USER_IMG]";
-                $resultimgid = sqlsrv_query($conn, $sqlimgid);
-                $rowimgid = sqlsrv_fetch_array($resultimgid, SQLSRV_FETCH_ASSOC);
-                $imgid = $rowimgid["MAX_ID"] + 1;
+if(sqlsrv_fetch($result)===true){
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration Error</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/regis.css">
+</head>
+<body>
+    <div class="error-card">
+        <h2>⚠ Registration Error</h2>
+        <ul class="error-list">
+            <li>An account with this student number already exists.</li>
+        </ul>
+        <a href="javascript:history.back()" class="btn-back">← Go Back</a>
+    </div>
+</body>
+</html>
+<?php
+    exit;
+}
 
-                $insertIMAGES = "INSERT INTO USER_IMG ([IMG_ID], [IMG_NAME], [FILE_PATH], [USER_ID]) VALUES
-                                                ('$imgid', '$imageName', '$targetimagePath', '$id')";
-                $resultIMAGES = sqlsrv_query($conn, $insertIMAGES);
-                if ($resultIMAGES == false) {
-                    die(print_r(sqlsrv_errors(), true));
-                }
-            }
+// ── Insert new user ──
+$sql="INSERT INTO dbo.[USERS] ([FIRST_NAME],[LAST_NAME],[STD_NUM],[CYS],[SEX],[USERNAME],[EMAIL],[PASSWORD])
+      VALUES ('$firstname','$lastname','$stdnum','$cys','$sex','$username','$email','$password')";
+$result=sqlsrv_query($conn,$sql);
+if($result===false) die(print_r(sqlsrv_errors(),true));
+
+// ── Get new user ID ──
+$sql="SELECT USER_ID FROM dbo.[USERS] WHERE [STD_NUM]='$stdnum'";
+$result=sqlsrv_query($conn,$sql);
+if($result===false) die(print_r(sqlsrv_errors(),true));
+$row=sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
+$id=$row['USER_ID'];
+
+// ── Image upload ──
+$allowtypes = ['jpg'];
+$checkimage = '';
+$imagepath  = '';
+
+if(!empty($_FILES['image']['name'])){
+    $destination = "uploads/";
+    $imagename   = basename($_FILES['image']['name']);
+    $imagepath   = $destination.$imagename;
+    $checkimage  = strtolower(pathinfo($imagepath, PATHINFO_EXTENSION));
+
+    if(in_array($checkimage, $allowtypes)){
+        if(move_uploaded_file($_FILES['image']['tmp_name'], $imagepath)){
+            $sql="INSERT INTO USER_IMG ([IMG_NAME],[FILE_PATH],[USER_ID]) VALUES ('$imagename','$imagepath','$id')";
+            $result=sqlsrv_query($conn,$sql);
+            if($result===false) die(print_r(sqlsrv_errors(),true));
         }
     }
+}
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account Created</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
@@ -100,7 +151,6 @@
 
     <div class="id-card">
 
-        <!-- Header -->
         <div class="id-card-header">
             <div class="brand">PIPELINE</div>
             <div class="card-title-block">
@@ -109,48 +159,47 @@
             </div>
         </div>
 
-        <!-- Body -->
         <div class="id-card-body">
 
-            <!-- Photo -->
             <div class="id-photo-box">
-                <?php if ($targetimagePath != '' && in_array(strtolower($checkImage), $allowTypes)): ?>
-                    <img src="<?php echo $targetimagePath; ?>" alt="Profile Photo">
+                <?php if($imagepath != '' && in_array($checkimage, $allowtypes)): ?>
+                    <img src="<?php echo htmlspecialchars($imagepath); ?>" alt="Profile Photo">
                 <?php else: ?>
                     <img src="assets/img/regis_img.png" alt="Profile Photo">
                 <?php endif; ?>
             </div>
 
-            <!-- Fields -->
             <div class="id-fields">
                 <div class="id-field">
                     <div class="id-field-label">Name.</div>
-                    <div class="id-field-value large"><?php echo strtoupper($firstname . " " . $lastname); ?></div>
+                    <div class="id-field-value large"><?php echo htmlspecialchars(strtoupper($firstname.' '.$lastname)); ?></div>
                 </div>
                 <div class="id-field">
                     <div class="id-field-label">Student Number.</div>
-                    <div class="id-field-value"><?php echo $std_number; ?></div>
+                    <div class="id-field-value"><?php echo htmlspecialchars($stdnum); ?></div>
                 </div>
                 <div class="id-field">
                     <div class="id-field-label">Course Year Section.</div>
-                    <div class="id-field-value"><?php echo $cys; ?></div>
+                    <div class="id-field-value"><?php echo htmlspecialchars($cys); ?></div>
+                </div>
+                <div class="id-field">
+                    <div class="id-field-label">Sex.</div>
+                    <div class="id-field-value"><?php echo htmlspecialchars($sex); ?></div>
                 </div>
                 <div class="id-field">
                     <div class="id-field-label">Username.</div>
-                    <div class="id-field-value"><?php echo $username; ?></div>
+                    <div class="id-field-value"><?php echo htmlspecialchars($username); ?></div>
                 </div>
                 <div class="id-field">
                     <div class="id-field-label">Email.</div>
-                    <div class="id-field-value" style="font-size:14px"><?php echo $email; ?></div>
+                    <div class="id-field-value" style="font-size:14px"><?php echo htmlspecialchars($email); ?></div>
                 </div>
             </div>
 
-            <!-- Watermark -->
             <div class="id-watermark">P</div>
 
         </div>
 
-        <!-- Footer -->
         <div class="id-card-footer">
             <span class="tagline">&#10022; Your campus marketplace &#10022;</span>
             <a href="login.html">OK</a>
@@ -158,6 +207,7 @@
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+<?php sqlsrv_close($conn); ?>
