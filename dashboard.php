@@ -134,7 +134,10 @@ sqlsrv_close($conn);
                         <span class="dropdown-profile-name"><?php echo htmlspecialchars($firstname); ?></span>
                     </div>
 
-                    <a href="storefront.php" class="dropdown-item-custom">
+                    <a href="dashboard.php" class="dropdown-item-custom">
+                        <span class="item-icon">🏬</span> Browse Products
+                    </a>
+                    <a href="storefront.html" class="dropdown-item-custom">
                         <span class="item-icon">🏪</span> My Storefront
                     </a>
                     <a href="profile.php" class="dropdown-item-custom">
