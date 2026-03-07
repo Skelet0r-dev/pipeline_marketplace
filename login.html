@@ -15,9 +15,30 @@
     <div class="login-header">
         <img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo-light" alt="Pipeline Logo">
         <div class="header-links">
-            <a href="login_admin.html" class="header-link">ABOUT US</a>
+            <a href="#" class="header-link" data-bs-toggle="modal" data-bs-target="#aboutModal">ABOUT US</a>
             <span class="header-sep">|</span>
             <a href="login_admin.html" class="header-link">ADMIN LOGIN</a>
+        </div>
+    </div>
+
+    <!-- About Us Modal -->
+    <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 16px; border: none; font-family: 'DM Sans', sans-serif;">
+                <div class="modal-header" style="border-bottom: 1px solid #dde5b6; padding: 24px 28px 16px;">
+                    <h5 class="modal-title" id="aboutModalLabel" style="font-weight: 800; font-size: 22px; color: #283618;">
+                        About Pipeline
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 24px 28px; color: #3a3a3a; font-size: 15px; line-height: 1.75;">
+                    Pipeline is a campus-exclusive peer-to-peer marketplace created for the students of 
+                    <strong style="color: #283618;">De La Salle University–Dasmariñas (DLSU-D)</strong>. 
+                    The platform is designed to provide a convenient and organized space where students can 
+                    buy and sell items within the university community. By connecting students directly with 
+                    one another, Pipeline aims to make everyday campus transactions simpler, faster, and more accessible.
+                </div>
+            </div>
         </div>
     </div>
 
@@ -50,7 +71,7 @@
                 <hr class="login-hr">
 
                 <div class="login-footer-links">
-                    <a href="#" class="login-link">Forgot password?</a>
+                    <a href="forgot_password.html" class="login-link">Forgot password?</a>
                     <p class="mb-0">Don't have an account? <a href="regis.html" class="login-link">Sign up here</a></p>
                 </div>
             </div>
