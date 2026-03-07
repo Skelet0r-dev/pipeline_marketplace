@@ -38,7 +38,6 @@ if(!$locked && isset($_POST['stdnum'])){
     $stdnum=trim($_POST['stdnum']);
     $password=$_POST['password'];
 
-    // Check student number
     $sql="SELECT * FROM dbo.[USERS] WHERE STD_NUM='$stdnum'";
     $result=sqlsrv_query($conn,$sql);
     $rowname=sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
@@ -54,7 +53,6 @@ if(!$locked && isset($_POST['stdnum'])){
             $error='Student number not found. '.$left.' attempt'.($left!=1?'s':'').' remaining.';
         }
     } else {
-        // Check password
         $sqlpassword="SELECT * FROM dbo.[USERS] WHERE STD_NUM='$stdnum' AND PASSWORD='$password'";
         $resultpassword=sqlsrv_query($conn,$sqlpassword);
         $rowpassword=sqlsrv_fetch_array($resultpassword,SQLSRV_FETCH_ASSOC);
@@ -70,7 +68,6 @@ if(!$locked && isset($_POST['stdnum'])){
                 $error='Wrong password. '.$left.' attempt'.($left!=1?'s':'').' remaining.';
             }
         } else {
-            // Success — store session
             $_SESSION['login_attempts']=0;
             $_SESSION['locked_until']=0;
             $_SESSION['user_id']=$rowpassword['USER_ID'];
@@ -88,7 +85,6 @@ if(!$locked && isset($_POST['stdnum'])){
     }
 }
 
-// Not posted and not logged in — go back to login
 if(!isset($_POST['stdnum']) && $firstname==''){
     header("Location: login.php");
     exit;
@@ -124,7 +120,43 @@ sqlsrv_close($conn);
                 <span class="dash-hello">Hello,</span>
                 <span class="dash-name"><?php echo htmlspecialchars($firstname); ?></span>
             </div>
-            <img src="<?php echo htmlspecialchars($file_path); ?>" class="img-profile" alt="Profile Picture">
+
+            <!-- Profile picture with dropdown -->
+            <div class="profile-wrapper">
+                <img src="<?php echo htmlspecialchars($file_path); ?>"
+                     class="img-profile"
+                     alt="Profile Picture"
+                     id="profileBtn">
+
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-profile-header">
+                        <img src="<?php echo htmlspecialchars($file_path); ?>" alt="Profile">
+                        <span class="dropdown-profile-name"><?php echo htmlspecialchars($firstname); ?></span>
+                    </div>
+
+                    <a href="storefront.php" class="dropdown-item-custom">
+                        <span class="item-icon">🏪</span> My Storefront
+                    </a>
+                    <a href="profile.php" class="dropdown-item-custom">
+                        <span class="item-icon">👤</span> My Profile
+                    </a>
+                    <a href="my_listings.php" class="dropdown-item-custom">
+                        <span class="item-icon">📦</span> My Listings
+                    </a>
+                    <a href="purchases.php" class="dropdown-item-custom">
+                        <span class="item-icon">🛍️</span> Purchases
+                    </a>
+                    <a href="settings.php" class="dropdown-item-custom">
+                        <span class="item-icon">⚙️</span> Settings
+                    </a>
+
+                    <div class="dropdown-divider-custom"></div>
+
+                    <a href="login.html" class="dropdown-item-custom logout">
+                        <span class="item-icon">🚪</span> Log Out
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -193,9 +225,30 @@ sqlsrv_close($conn);
     <div class="login-header">
         <img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo-light" alt="Pipeline Logo">
         <div class="header-links">
-            <a href="login_admin.html" class="header-link">ABOUT US</a>
+            <a href="#" class="header-link" data-bs-toggle="modal" data-bs-target="#aboutModal">ABOUT US</a>
             <span class="header-sep">|</span>
             <a href="login_admin.html" class="header-link">ADMIN LOGIN</a>
+        </div>
+    </div>
+
+    <!-- About Us Modal -->
+    <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 16px; border: none; font-family: 'DM Sans', sans-serif;">
+                <div class="modal-header" style="border-bottom: 1px solid #dde5b6; padding: 24px 28px 16px;">
+                    <h5 class="modal-title" id="aboutModalLabel" style="font-weight: 800; font-size: 22px; color: #283618;">
+                        About Pipeline
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 24px 28px; color: #3a3a3a; font-size: 15px; line-height: 1.75;">
+                    Pipeline is a campus-exclusive peer-to-peer marketplace created for the students of
+                    <strong style="color: #283618;">De La Salle University–Dasmariñas (DLSU-D)</strong>.
+                    The platform is designed to provide a convenient and organized space where students can
+                    buy and sell items within the university community. By connecting students directly with
+                    one another, Pipeline aims to make everyday campus transactions simpler, faster, and more accessible.
+                </div>
+            </div>
         </div>
     </div>
 
@@ -230,7 +283,7 @@ sqlsrv_close($conn);
                 <hr class="login-hr">
 
                 <div class="login-footer-links">
-                    <a href="#" class="login-link">Forgot password?</a>
+                    <a href="forgot_password.html" class="login-link">Forgot password?</a>
                     <p class="mb-0">Don't have an account? <a href="regis.html" class="login-link">Sign up here</a></p>
                 </div>
             </div>
@@ -248,10 +301,30 @@ sqlsrv_close($conn);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Student ID input filter
         var stdnumInput = document.getElementsByName('stdnum')[0];
         if(stdnumInput){
             stdnumInput.addEventListener('input', function() {
                 this.value = this.value.replace(/\D/g, '').slice(0, 9);
+            });
+        }
+
+        // Profile dropdown toggle
+        var profileBtn = document.getElementById('profileBtn');
+        var profileDropdown = document.getElementById('profileDropdown');
+
+        if(profileBtn && profileDropdown){
+            profileBtn.addEventListener('click', function(e){
+                e.stopPropagation();
+                profileDropdown.classList.toggle('show');
+            });
+
+            document.addEventListener('click', function(){
+                profileDropdown.classList.remove('show');
+            });
+
+            profileDropdown.addEventListener('click', function(e){
+                e.stopPropagation();
             });
         }
     </script>

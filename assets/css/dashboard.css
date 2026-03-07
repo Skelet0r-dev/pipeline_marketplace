@@ -32,11 +32,19 @@
 
 /* Profile picture - small circle */
 .img-profile {
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     object-fit: cover;
+    border: 2px solid #dde5b6;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s;
     display: block;
+}
+
+.img-profile:hover {
+    border-color: #fff;
+    transform: scale(1.05);
 }
 
 /* All squares share the same base layout */
@@ -135,4 +143,102 @@
     color: #606c38;
     letter-spacing: 2px;
     margin-bottom: 4px;
+}
+
+/* ── Profile Dropdown ── */
+.profile-wrapper {
+    position: relative;
+}
+
+.profile-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(40, 54, 24, 0.18);
+    min-width: 210px;
+    z-index: 1000;
+    overflow: hidden;
+    animation: dropIn 0.18s ease;
+}
+
+.profile-dropdown.show {
+    display: block;
+}
+
+@keyframes dropIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-profile-header {
+    background: linear-gradient(135deg, #283618, #606c38);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dropdown-profile-header img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #dde5b6;
+}
+
+.dropdown-profile-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fefae0;
+    font-family: "DM Sans", sans-serif;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdown-item-custom {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #283618;
+    text-decoration: none;
+    transition: background 0.15s;
+    font-family: "DM Sans", sans-serif;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+}
+
+.dropdown-item-custom:hover {
+    background: #f4f7ee;
+    color: #283618;
+}
+
+.dropdown-item-custom .item-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.dropdown-divider-custom {
+    height: 1px;
+    background: #eee;
+    margin: 2px 0;
+}
+
+.dropdown-item-custom.logout {
+    color: #c0392b;
+}
+
+.dropdown-item-custom.logout:hover {
+    background: #fff5f5;
+    color: #c0392b;
 }
