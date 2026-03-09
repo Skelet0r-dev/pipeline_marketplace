@@ -34,6 +34,21 @@ if($_SESSION['locked_until'] > time()){
 $file_path='';
 $firstname='';
 
+// Load user from session if navigating directly (not via login form)
+if(!isset($_POST['stdnum']) && isset($_SESSION['user_id'])){
+    $loginId=$_SESSION['user_id'];
+    $sqlsess="SELECT * FROM dbo.[USERS] WHERE USER_ID='$loginId'";
+    $resultsess=sqlsrv_query($conn,$sqlsess);
+    $rowsess=sqlsrv_fetch_array($resultsess,SQLSRV_FETCH_ASSOC);
+    if($rowsess){
+        $firstname=$rowsess['FIRST_NAME'];
+        $sqlprofile="SELECT * FROM dbo.[USER_IMG] WHERE USER_ID='$loginId'";
+        $resultprofile=sqlsrv_query($conn,$sqlprofile);
+        $rowprofile=sqlsrv_fetch_array($resultprofile,SQLSRV_FETCH_ASSOC);
+        $file_path=$rowprofile['FILE_PATH'];
+    }
+}
+
 if(!$locked && isset($_POST['stdnum'])){
     $stdnum=trim($_POST['stdnum']);
     $password=$_POST['password'];
@@ -86,7 +101,7 @@ if(!$locked && isset($_POST['stdnum'])){
 }
 
 if(!isset($_POST['stdnum']) && $firstname==''){
-    header("Location: login.php");
+    header("Location: dashboard.php");
     exit;
 }
 
@@ -137,7 +152,7 @@ sqlsrv_close($conn);
                     <a href="dashboard.php" class="dropdown-item-custom">
                         <span class="item-icon">🏬</span> Browse Products
                     </a>
-                    <a href="storefront.html" class="dropdown-item-custom">
+                    <a href="storefront.php" class="dropdown-item-custom">
                         <span class="item-icon">🏪</span> My Storefront
                     </a>
                     <a href="profile.php" class="dropdown-item-custom">
@@ -155,7 +170,7 @@ sqlsrv_close($conn);
 
                     <div class="dropdown-divider-custom"></div>
 
-                    <a href="login.html" class="dropdown-item-custom logout">
+                    <a href="logout.php" class="dropdown-item-custom logout">
                         <span class="item-icon">🚪</span> Log Out
                     </a>
                 </div>
