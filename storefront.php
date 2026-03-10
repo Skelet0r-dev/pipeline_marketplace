@@ -61,6 +61,7 @@ if(isset($_POST['add_listing'])){
     $status='Available';
     $college=isset($_POST['college']) ? trim($_POST['college']) : '';
     $meetup=trim($_POST['meetup_spot']);
+    $payment=trim($_POST['payment_method']);
 
     // If course-specific, append college to category
     $categoryval=$category;
@@ -69,8 +70,8 @@ if(isset($_POST['add_listing'])){
     }
 
     // Insert listing
-    $sqladd="INSERT INTO dbo.[LISTINGS] (USER_ID,TITLE,DESCRIPTION,PRICE,CATEGORY,CONDITION,STATUS,MEETUP_SPOT)
-             VALUES ('$loginId','$title','$description','$price','$categoryval','$condition','$status','$meetup')";
+    $sqladd="INSERT INTO dbo.[LISTINGS] (USER_ID,TITLE,DESCRIPTION,PRICE,CATEGORY,CONDITION,STATUS,MEETUP_SPOT,PAYMENT_METHOD)
+             VALUES ('$loginId','$title','$description','$price','$categoryval','$condition','$status','$meetup','$payment')";
     $resultadd=sqlsrv_query($conn,$sqladd);
 
     if($resultadd){
@@ -138,6 +139,7 @@ if(isset($_POST['edit_listing'])){
     $status=$_POST['edit_status'];
     $college=isset($_POST['edit_college']) ? trim($_POST['edit_college']) : '';
     $meetup=trim($_POST['edit_meetup_spot']);
+    $payment=trim($_POST['edit_payment_method']);
 
     // If course-specific, append college
     $categoryval=$category;
@@ -149,7 +151,7 @@ if(isset($_POST['edit_listing'])){
     $sqlupdate="UPDATE dbo.[LISTINGS]
                 SET TITLE='$title', DESCRIPTION='$description', PRICE='$price',
                     CATEGORY='$categoryval', CONDITION='$condition', STATUS='$status',
-                    MEETUP_SPOT='$meetup'
+                    MEETUP_SPOT='$meetup', PAYMENT_METHOD='$payment'
                 WHERE LISTING_ID='$editid' AND USER_ID='$loginId'";
     $resultupdate=sqlsrv_query($conn,$sqlupdate);
 
@@ -232,7 +234,6 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                     <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon">🏬</span> Browse Products</a>
                     <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">🏪</span> My Storefront</a>
                     <a href="profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
-                    <a href="my_listings.php" class="dropdown-item-custom"><span class="item-icon">📦</span> My Listings</a>
                     <a href="purchases.php" class="dropdown-item-custom"><span class="item-icon">🛍️</span> Purchases</a>
                     <a href="settings.php" class="dropdown-item-custom"><span class="item-icon">⚙️</span> Settings</a>
                     <div class="dropdown-divider-custom"></div>
@@ -259,7 +260,7 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                     <h2 class="sf-name"><?php echo htmlspecialchars($fullname); ?></h2>
                     <span class="sf-badge">🎓 <?php echo htmlspecialchars($cys); ?></span>
                 </div>
-                <p class="sf-handle">@<?php echo strtolower(str_replace(' ','.',htmlspecialchars($fullname))); ?> · DLSU-D</p>
+                <p class="sf-handle">@<?php echo strtolower(str_replace(' ','.',htmlspecialchars($fullname))); ?> </p>
 
                 <div class="sf-stats">
                     <div class="sf-stat">
@@ -314,6 +315,7 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
             $imgpath=$item['IMG'] ? $item['IMG'] : 'assets/img/no_image.png';
             $condclass=$item['CONDITION']=='New' ? 'cond-new' : ($item['CONDITION']=='Like New' ? 'cond-great' : 'cond-good');
             $meetup=isset($item['MEETUP_SPOT']) ? htmlspecialchars($item['MEETUP_SPOT']) : '—';
+            $payment=isset($item['PAYMENT_METHOD']) && $item['PAYMENT_METHOD']!='' ? htmlspecialchars($item['PAYMENT_METHOD']) : '—';
             $desc=htmlspecialchars($item['DESCRIPTION'] ? $item['DESCRIPTION'] : '');
             $dateposted=$item['DATE_POSTED'] ? ($item['DATE_POSTED'] instanceof DateTime ? $item['DATE_POSTED']->format('M d, Y') : date('M d, Y', strtotime($item['DATE_POSTED']))) : '—';
             echo '<div class="sf-card" ';
@@ -324,6 +326,7 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
             echo 'data-condition="'.htmlspecialchars($item['CONDITION']).'" ';
             echo 'data-condclass="'.$condclass.'" ';
             echo 'data-meetup="'.$meetup.'" ';
+            echo 'data-payment="'.$payment.'" ';
             echo 'data-desc="'.$desc.'" ';
             echo 'data-date="'.$dateposted.'" ';
             echo 'data-img="'.htmlspecialchars($imgpath).'" ';
@@ -366,6 +369,7 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
             $imgpath=$item['IMG'] ? $item['IMG'] : 'assets/img/no_image.png';
             $condclass=$item['CONDITION']=='New' ? 'cond-new' : ($item['CONDITION']=='Like New' ? 'cond-great' : 'cond-good');
             $meetup=isset($item['MEETUP_SPOT']) ? htmlspecialchars($item['MEETUP_SPOT']) : '—';
+            $payment=isset($item['PAYMENT_METHOD']) && $item['PAYMENT_METHOD']!='' ? htmlspecialchars($item['PAYMENT_METHOD']) : '—';
             $desc=htmlspecialchars($item['DESCRIPTION'] ? $item['DESCRIPTION'] : '');
             $dateposted=$item['DATE_POSTED'] ? ($item['DATE_POSTED'] instanceof DateTime ? $item['DATE_POSTED']->format('M d, Y') : date('M d, Y', strtotime($item['DATE_POSTED']))) : '—';
             echo '<div class="sf-card" ';
@@ -376,6 +380,7 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
             echo 'data-condition="'.htmlspecialchars($item['CONDITION']).'" ';
             echo 'data-condclass="'.$condclass.'" ';
             echo 'data-meetup="'.$meetup.'" ';
+            echo 'data-payment="'.$payment.'" ';
             echo 'data-desc="'.$desc.'" ';
             echo 'data-date="'.$dateposted.'" ';
             echo 'data-img="'.htmlspecialchars($imgpath).'" ';
@@ -445,6 +450,10 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                                     <div class="detail-meta-row">
                                         <span class="detail-meta-label">📍 Meet-up Spot</span>
                                         <span class="detail-meta-val" id="detailMeetup"></span>
+                                    </div>
+                                    <div class="detail-meta-row">
+                                        <span class="detail-meta-label">💳 Preferred Payment</span>
+                                        <span class="detail-meta-val" id="detailPayment"></span>
                                     </div>
                                     <div class="detail-meta-row">
                                         <span class="detail-meta-label">📅 Date Posted</span>
@@ -566,6 +575,18 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                                 <select name="edit_status" id="editStatus" class="listing-select" required>
                                     <option value="Available">Available</option>
                                     <option value="Sold">Sold</option>
+                                </select>
+                            </div>
+
+                            <!-- Payment Method -->
+                            <div class="mt-2">
+                                <label class="listing-label">Preferred Payment Method</label>
+                                <select name="edit_payment_method" id="editPayment" class="listing-select" required>
+                                    <option value="" disabled>Select payment method</option>
+                                    <option value="Cash upon Meetup"> Cash upon Meetup</option>
+                                    <option value="GCash"> GCash</option>
+                                    <option value="Maya"> Maya</option>
+                                    <option value="Bank Transfer"> Bank Transfer</option>
                                 </select>
                             </div>
 
@@ -704,6 +725,18 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                                 </select>
                             </div>
 
+                            <!-- Payment Method -->
+                            <div class="mt-2">
+                                <label class="listing-label">Preferred Payment Method</label>
+                                <select name="payment_method" class="listing-select" required>
+                                    <option value="" disabled selected>Select payment method</option>
+                                    <option value="Cash upon Meetup"> Cash upon Meetup</option>
+                                    <option value="GCash"> GCash</option>
+                                    <option value="Maya"> Maya</option>
+                                    <option value="Bank Transfer"> Bank Transfer</option>
+                                </select>
+                            </div>
+
                             <!-- Hidden default status -->
                             <input type="hidden" name="status" value="Available">
 
@@ -790,6 +823,7 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
             var condition= card.getAttribute('data-condition');
             var condclass= card.getAttribute('data-condclass');
             var meetup   = card.getAttribute('data-meetup');
+            var payment  = card.getAttribute('data-payment');
             var desc     = card.getAttribute('data-desc');
             var date     = card.getAttribute('data-date');
             var img      = card.getAttribute('data-img');
@@ -800,6 +834,7 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
             document.getElementById('detailPrice').textContent = '₱' + price;
             document.getElementById('detailCategory').textContent = category;
             document.getElementById('detailMeetup').textContent = meetup;
+            document.getElementById('detailPayment').textContent = payment ? payment : '—';
             document.getElementById('detailDate').textContent = date;
             document.getElementById('detailImg').src = img;
             document.getElementById('detailDesc').textContent = desc !== '' ? desc : 'No description provided.';
@@ -847,6 +882,7 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
             var category = card.getAttribute('data-category');
             var condition= card.getAttribute('data-condition');
             var meetup   = card.getAttribute('data-meetup');
+            var payment  = card.getAttribute('data-payment');
             var desc     = card.getAttribute('data-desc');
             var img      = card.getAttribute('data-img');
             var status   = card.getAttribute('data-status');
@@ -874,6 +910,7 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
             setSelectValue(document.getElementById('editCondition'), condition);
             setSelectValue(document.getElementById('editMeetup'), meetup);
             setSelectValue(document.getElementById('editStatus'), status);
+            setSelectValue(document.getElementById('editPayment'), payment);
 
             // Reset upload box
             document.getElementById('editListingImgInput').value = '';
