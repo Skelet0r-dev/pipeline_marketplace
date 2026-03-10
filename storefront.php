@@ -27,6 +27,7 @@ $firstname=$user['FIRST_NAME'];
 $lastname=$user['LAST_NAME'];
 $fullname=$firstname.' '.$lastname;
 $cys=$user['CYS'];
+$username=$user['USERNAME']; // ← FIXED: get actual username from DB
 
 
 // Get profile image
@@ -52,7 +53,7 @@ $modal_error='';
 // Pick up flash success from session (set after redirect)
 $modal_success=isset($_SESSION['flash_success']) ? $_SESSION['flash_success'] : '';
 unset($_SESSION['flash_success']);
-if(isset($_POST['add_listing'])){
+if(isset($_POST['add_listing']) && $_POST['add_listing']=='1'){
     $title=trim($_POST['title']);
     $description=trim($_POST['description']);
     $price=trim($_POST['price']);
@@ -69,10 +70,11 @@ if(isset($_POST['add_listing'])){
         $categoryval='Course-Specific ('.$college.')';
     }
 
-    // Insert listing
+    // Insert listing (parameterized to handle apostrophes and prevent SQL injection)
     $sqladd="INSERT INTO dbo.[LISTINGS] (USER_ID,TITLE,DESCRIPTION,PRICE,CATEGORY,CONDITION,STATUS,MEETUP_SPOT,PAYMENT_METHOD)
-             VALUES ('$loginId','$title','$description','$price','$categoryval','$condition','$status','$meetup','$payment')";
-    $resultadd=sqlsrv_query($conn,$sqladd);
+             VALUES (?,?,?,?,?,?,?,?,?)";
+    $paramsadd=[$loginId,$title,$description,$price,$categoryval,$condition,$status,$meetup,$payment];
+    $resultadd=sqlsrv_query($conn,$sqladd,$paramsadd);
 
     if($resultadd){
         // Get the new listing ID
@@ -104,7 +106,8 @@ if(isset($_POST['add_listing'])){
         exit;
 
     } else {
-        $modal_error='Failed to add listing. Please try again.';
+        $errors=sqlsrv_errors();
+        $modal_error='SQL Error: '.($errors ? $errors[0]['message'] : 'Unknown');
     }
 }
 
@@ -147,13 +150,14 @@ if(isset($_POST['edit_listing'])){
         $categoryval='Course-Specific ('.$college.')';
     }
 
-    // Update listing — only owner can edit
+    // Update listing — parameterized to handle apostrophes
     $sqlupdate="UPDATE dbo.[LISTINGS]
-                SET TITLE='$title', DESCRIPTION='$description', PRICE='$price',
-                    CATEGORY='$categoryval', CONDITION='$condition', STATUS='$status',
-                    MEETUP_SPOT='$meetup', PAYMENT_METHOD='$payment'
-                WHERE LISTING_ID='$editid' AND USER_ID='$loginId'";
-    $resultupdate=sqlsrv_query($conn,$sqlupdate);
+                SET TITLE=?, DESCRIPTION=?, PRICE=?,
+                    CATEGORY=?, CONDITION=?, STATUS=?,
+                    MEETUP_SPOT=?, PAYMENT_METHOD=?
+                WHERE LISTING_ID=? AND USER_ID=?";
+    $paramsupdate=[$title,$description,$price,$categoryval,$condition,$status,$meetup,$payment,$editid,$loginId];
+    $resultupdate=sqlsrv_query($conn,$sqlupdate,$paramsupdate);
 
     if($resultupdate){
         // Handle new image if uploaded
@@ -260,7 +264,9 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                     <h2 class="sf-name"><?php echo htmlspecialchars($fullname); ?></h2>
                     <span class="sf-badge">🎓 <?php echo htmlspecialchars($cys); ?></span>
                 </div>
-                <p class="sf-handle">@<?php echo strtolower(str_replace(' ','.',htmlspecialchars($fullname))); ?> </p>
+
+                <!-- FIXED: display actual USERNAME from database instead of generating from full name -->
+                <p class="sf-handle">@<?php echo htmlspecialchars($username); ?></p>
 
                 <div class="sf-stats">
                     <div class="sf-stat">
@@ -758,9 +764,10 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
 
                     </div>
                 </div>
+                <input type="hidden" name="add_listing" value="1">
                 <div class="modal-footer">
                     <button type="button" class="btn-cancel-listing" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" name="add_listing" class="btn-add-listing">Post Listing</button>
+                    <button type="submit" class="btn-add-listing">Post Listing</button>
                 </div>
                 </form>
             </div>
