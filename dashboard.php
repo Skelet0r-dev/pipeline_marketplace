@@ -185,41 +185,58 @@ sqlsrv_close($conn);
                 <h1 class="h1">Within Campus Reach</h1>
 
                 <div class="d-flex gap-3 mt-4">
-                    <div class="d-flex flex-column align-items-center justify-content-center square-acad">
-                        <img src="assets/img/academics.svg" class="img-acad" alt="Academics Icon">
-                        <p class="p-acad mb-0">Academics</p>
-                    </div>
-                    <div class="d-flex flex-column align-items-center justify-content-center square-tech">
-                        <img src="assets/img/keyboard.svg" class="img-tech" alt="Keyboard Icon">
-                        <p class="p-tech mb-0">Electronics and Tech</p>
-                    </div>
-                    <div class="d-flex flex-column align-items-center justify-content-center square-clothing">
-                        <img src="assets/img/shirts.svg" class="img" alt="Shirt">
-                        <p class="p-clothing mb-0">Clothing & Apparel</p>
-                    </div>
-                    <div class="d-flex flex-column align-items-center justify-content-center square-hobbies">
-                        <img src="assets/img/labubus.svg" class="img" alt="Labubu">
-                        <p class="p-hobbies mb-0">Hobbies & Lifestyle</p>
-                    </div>
+                    <!-- ── Each square is now a clickable link to browse.php?cat=... ── -->
+                    <a href="browse.php?cat=Academics" class="category-link">
+                        <div class="d-flex flex-column align-items-center justify-content-center square-acad">
+                            <img src="assets/img/academics.svg" class="img-acad" alt="Academics Icon">
+                            <p class="p-acad mb-0">Academics</p>
+                        </div>
+                    </a>
+                    <a href="browse.php?cat=Electronics and Tech" class="category-link">
+                        <div class="d-flex flex-column align-items-center justify-content-center square-tech">
+                            <img src="assets/img/keyboard.svg" class="img-tech" alt="Keyboard Icon">
+                            <p class="p-tech mb-0">Electronics and Tech</p>
+                        </div>
+                    </a>
+                    <a href="browse.php?cat=Clothing %26 Apparel" class="category-link">
+                        <div class="d-flex flex-column align-items-center justify-content-center square-clothing">
+                            <img src="assets/img/shirts.svg" class="img" alt="Shirt">
+                            <p class="p-clothing mb-0">Clothing & Apparel</p>
+                        </div>
+                    </a>
+                    <a href="browse.php?cat=Hobbies %26 Lifestyle" class="category-link">
+                        <div class="d-flex flex-column align-items-center justify-content-center square-hobbies">
+                            <img src="assets/img/labubus.svg" class="img" alt="Labubu">
+                            <p class="p-hobbies mb-0">Hobbies & Lifestyle</p>
+                        </div>
+                    </a>
                 </div>
 
                 <div class="d-flex gap-3 mt-3">
-                    <div class="d-flex flex-column align-items-center justify-content-center square-food">
-                        <img src="assets/img/cookies.svg" class="img" alt="Cookies Icon">
-                        <p class="p-cookies mb-0">Food</p>
-                    </div>
-                    <div class="d-flex flex-column align-items-center justify-content-center square-events">
-                        <img src="assets/img/tickets.svg" class="img" alt="Tickets Icon">
-                        <p class="p-events mb-0">Events & Tickets</p>
-                    </div>
-                    <div class="d-flex flex-column align-items-center justify-content-center square-specific">
-                        <img src="assets/img/electronics.svg" class="img" alt="Electronics Icon">
-                        <p class="p-specific mb-0">Course-Specific</p>
-                    </div>
-                    <div class="d-flex flex-column align-items-center justify-content-center square-allitems">
-                        <img src="assets/img/cart.svg" class="img" alt="Cart Icon">
-                        <p class="p-allitems mb-0">All Items</p>
-                    </div>
+                    <a href="browse.php?cat=Food" class="category-link">
+                        <div class="d-flex flex-column align-items-center justify-content-center square-food">
+                            <img src="assets/img/cookies.svg" class="img" alt="Cookies Icon">
+                            <p class="p-cookies mb-0">Food</p>
+                        </div>
+                    </a>
+                    <a href="browse.php?cat=Events %26 Tickets" class="category-link">
+                        <div class="d-flex flex-column align-items-center justify-content-center square-events">
+                            <img src="assets/img/tickets.svg" class="img" alt="Tickets Icon">
+                            <p class="p-events mb-0">Events & Tickets</p>
+                        </div>
+                    </a>
+                    <a href="browse.php?cat=Course-Specific" class="category-link">
+                        <div class="d-flex flex-column align-items-center justify-content-center square-specific">
+                            <img src="assets/img/electronics.svg" class="img" alt="Electronics Icon">
+                            <p class="p-specific mb-0">Course-Specific</p>
+                        </div>
+                    </a>
+                    <a href="browse.php?cat=all" class="category-link">
+                        <div class="d-flex flex-column align-items-center justify-content-center square-allitems">
+                            <img src="assets/img/cart.svg" class="img" alt="Cart Icon">
+                            <p class="p-allitems mb-0">All Items</p>
+                        </div>
+                    </a>
                 </div>
             </div>
 
