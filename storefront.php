@@ -237,7 +237,7 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                     </div>
                     <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon">🏬</span> Browse Products</a>
                     <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">🏪</span> My Storefront</a>
-                    <a href="profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
+                    <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
                     <a href="purchases.php" class="dropdown-item-custom"><span class="item-icon">🛍️</span> Purchases</a>
                     <a href="settings.php" class="dropdown-item-custom"><span class="item-icon">⚙️</span> Settings</a>
                     <div class="dropdown-divider-custom"></div>

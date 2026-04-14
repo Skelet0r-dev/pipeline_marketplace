@@ -1,0 +1,40 @@
+/* browse.css */
+.body {
+    background-color: #fefae0;
+    font-family: "DM Sans", sans-serif;
+}
+
+.browse-title {
+    color: #283618;
+    font-size: 32px;
+}
+
+.browse-card {
+    border: none;
+    box-shadow: 0 4px 15px rgba(40,54,24,0.08);
+}
+
+.seller-name {
+    font-size: 12px;
+    color: #606c38;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+/* Inherit condition badges from storefront.css style */
+.cond-new { background: #e8f4fd; color: #0a5fa8; }
+.cond-likenew { background: #e6f4ea; color: #1e6b2e; }
+.cond-used { background: #fff8e1; color: #a07000; }
+
+.sf-card-cond {
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 20px;
+    padding: 2px 10px;
+}
+
+/* Ensure images fit perfectly in the grid */
+.sf-card-img-wrap {
+    aspect-ratio: 1/1;
+    background-color: #f0f0f0;
+}

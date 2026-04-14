@@ -155,7 +155,7 @@ sqlsrv_close($conn);
                     <a href="storefront.php" class="dropdown-item-custom">
                         <span class="item-icon">🏪</span> My Storefront
                     </a>
-                    <a href="profile.php" class="dropdown-item-custom">
+                    <a href="edit_profile.php" class="dropdown-item-custom">
                         <span class="item-icon">👤</span> My Profile
                     </a>
                     <a href="purchases.php" class="dropdown-item-custom">
