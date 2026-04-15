@@ -1,0 +1,518 @@
+/* ============================================================
+   listing.css  –  Pipeline Full Listing Page
+   Companion to listing.php  |  uses dashboard.css for navbar
+   ============================================================ */
+
+/* ── Page base ── */
+.body {
+    background-color: #fefae0;
+    font-family: "DM Sans", sans-serif;
+}
+
+/* ── Breadcrumb bar ── */
+.listing-breadcrumb-bar {
+    background: #fff;
+    border-bottom: 1px solid #e8e8e8;
+    padding: 10px 0;
+}
+
+.lbc-link {
+    color: #606c38;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: color 0.15s;
+}
+.lbc-link:hover { color: #283618; }
+
+.lbc-active {
+    color: #283618;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.breadcrumb-item + .breadcrumb-item::before { color: #aaa; }
+
+/* ── Main container ── */
+.listing-container {
+    max-width: 1100px;
+    padding: 36px 16px 60px;
+}
+
+/* ── Listing card (two-column layout) ── */
+.listing-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 24px rgba(40,54,24,0.10);
+    overflow: hidden;
+    padding: 32px;
+    margin-bottom: 32px;
+}
+
+@media (max-width: 768px) {
+    .listing-card { grid-template-columns: 1fr; gap: 24px; }
+}
+
+/* ── Gallery ── */
+.listing-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.listing-main-img-wrap {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #f4f1e8;
+    aspect-ratio: 1 / 1;
+}
+
+.listing-main-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.35s ease;
+}
+
+.listing-main-img-wrap:hover .listing-main-img {
+    transform: scale(1.04);
+}
+
+.listing-sold-ribbon {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: #c0392b;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    border-radius: 8px;
+    padding: 5px 14px;
+}
+
+.listing-thumbs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.listing-thumb {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.18s, transform 0.18s;
+}
+
+.listing-thumb.active,
+.listing-thumb:hover {
+    border-color: #606c38;
+    transform: scale(1.06);
+}
+
+/* ── Details panel ── */
+.listing-details {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Seller card */
+.listing-seller-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #f7f9f3;
+    border-radius: 14px;
+    padding: 14px 16px;
+}
+
+.listing-seller-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #dde5b6;
+    flex-shrink: 0;
+}
+
+.listing-seller-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.listing-seller-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #283618;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.listing-seller-handle {
+    font-size: 12px;
+    color: #606c38;
+    font-weight: 600;
+}
+
+.listing-seller-cys {
+    font-size: 11px;
+    color: #999;
+}
+
+.listing-contact-btn {
+    background: #283618;
+    color: #fefae0;
+    text-decoration: none;
+    border-radius: 30px;
+    padding: 8px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: background 0.15s, transform 0.15s;
+}
+
+.listing-contact-btn:hover {
+    background: #606c38;
+    color: #fefae0;
+    transform: scale(1.04);
+}
+
+/* Meta row (badges) */
+.listing-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.listing-cat-badge {
+    background: rgba(40,54,24,0.10);
+    color: #283618;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 20px;
+    padding: 4px 12px;
+    letter-spacing: 0.3px;
+}
+
+.listing-cond {
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 20px;
+    padding: 4px 12px;
+}
+
+.cond-new      { background: #e8f4fd; color: #0a5fa8; }
+.cond-likenew  { background: #e6f4ea; color: #1e6b2e; }
+.cond-used     { background: #fff8e1; color: #a07000; }
+
+.listing-status-sold {
+    background: #fde8e6;
+    color: #c0392b;
+    font-size: 11px;
+    font-weight: 800;
+    border-radius: 20px;
+    padding: 4px 12px;
+    letter-spacing: 0.5px;
+}
+
+/* Title & price */
+.listing-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: #283618;
+    margin: 0;
+    line-height: 1.25;
+}
+
+.listing-price {
+    font-size: 28px;
+    font-weight: 800;
+    color: #606c38;
+    margin: 0;
+}
+
+/* Description */
+.listing-desc {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.65;
+    margin: 0;
+}
+
+/* Info grid */
+.listing-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.listing-info-item {
+    background: #f7f9f3;
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.listing-info-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #8a9a6a;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.listing-info-val {
+    font-size: 14px;
+    font-weight: 600;
+    color: #283618;
+}
+
+/* ── Like button ── */
+.listing-social-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-top: 1px solid #f0ede3;
+    padding-top: 14px;
+}
+
+.listing-like-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f7f9f3;
+    border: 2px solid #e0e8d0;
+    border-radius: 40px;
+    padding: 10px 20px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #606c38;
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, transform 0.15s;
+}
+
+.listing-like-btn:hover {
+    background: #eef3e5;
+    transform: scale(1.04);
+}
+
+.listing-like-btn.liked {
+    background: #fff0f0;
+    border-color: #e87373;
+    color: #c0392b;
+}
+
+.like-heart {
+    font-size: 20px;
+    line-height: 1;
+    transition: transform 0.2s cubic-bezier(.34,1.56,.64,1);
+}
+
+.listing-like-btn:active .like-heart {
+    transform: scale(1.35);
+}
+
+.like-count {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.like-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: inherit;
+}
+
+/* ── Comments section ── */
+.listing-comments-section {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 24px rgba(40,54,24,0.08);
+    padding: 28px 32px 32px;
+}
+
+.comments-heading {
+    font-size: 20px;
+    font-weight: 800;
+    color: #283618;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.comments-count {
+    background: #283618;
+    color: #fefae0;
+    font-size: 13px;
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-weight: 700;
+}
+
+/* Comment list */
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+    max-height: 480px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}
+
+.comments-empty {
+    font-size: 14px;
+    color: #aaa;
+    text-align: center;
+    padding: 24px 0;
+    margin: 0;
+}
+
+/* Individual comment */
+.comment-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.comment-item-new {
+    animation: commentIn 0.3s both ease;
+}
+
+@keyframes commentIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.comment-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #dde5b6;
+    flex-shrink: 0;
+}
+
+.comment-bubble {
+    flex: 1;
+    background: #f7f9f3;
+    border-radius: 0 14px 14px 14px;
+    padding: 12px 16px;
+    min-width: 0;
+}
+
+.comment-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+}
+
+.comment-user {
+    font-size: 13px;
+    font-weight: 700;
+    color: #283618;
+}
+
+.comment-handle {
+    font-size: 12px;
+    color: #606c38;
+    font-weight: 600;
+}
+
+.comment-time {
+    font-size: 11px;
+    color: #bbb;
+    margin-left: auto;
+}
+
+.comment-text {
+    font-size: 14px;
+    color: #444;
+    margin: 0;
+    line-height: 1.6;
+    word-break: break-word;
+}
+
+/* Comment form */
+.comment-form-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    border-top: 1px solid #f0ede3;
+    padding-top: 20px;
+}
+
+.comment-input-wrap {
+    flex: 1;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+.comment-input {
+    flex: 1;
+    background: #f7f9f3;
+    border: 1.5px solid #dde5b6;
+    border-radius: 14px;
+    padding: 12px 16px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 14px;
+    color: #283618;
+    resize: none;
+    outline: none;
+    transition: border-color 0.18s;
+    min-height: 46px;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.comment-input:focus {
+    border-color: #606c38;
+    background: #fff;
+}
+
+.comment-input::placeholder { color: #bbb; }
+
+.comment-submit-btn {
+    background: #283618;
+    color: #fefae0;
+    border: none;
+    border-radius: 14px;
+    padding: 11px 22px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+    flex-shrink: 0;
+}
+
+.comment-submit-btn:hover  { background: #606c38; transform: scale(1.04); }
+.comment-submit-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+.comment-char-count {
+    font-size: 11px;
+    color: #bbb;
+    text-align: right;
+    margin-top: 6px;
+    margin-bottom: 0;
+}

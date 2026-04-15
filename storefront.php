@@ -1,4 +1,10 @@
 <?php
+// ============================================================
+// storefront.php  –  Pipeline My Storefront
+// Changes from original:
+//   1. "Mark as Available" button on sold items (reversible)
+//   2. New "Activity" tab showing likes & comments on your listings
+// ============================================================
 session_start();
 
 if(!isset($_SESSION['user_id'])){
@@ -27,14 +33,13 @@ $firstname=$user['FIRST_NAME'];
 $lastname=$user['LAST_NAME'];
 $fullname=$firstname.' '.$lastname;
 $cys=$user['CYS'];
-$username=$user['USERNAME']; // ← FIXED: get actual username from DB
-
+$username=$user['USERNAME'];
 
 // Get profile image
 $sqlimg="SELECT FILE_PATH FROM dbo.[USER_IMG] WHERE USER_ID='$loginId'";
 $resultimg=sqlsrv_query($conn,$sqlimg);
 $rowimg=sqlsrv_fetch_array($resultimg,SQLSRV_FETCH_ASSOC);
-$file_path=$rowimg['FILE_PATH'];
+$file_path=$rowimg['FILE_PATH'] ?? 'assets/img/default_avatar.png';
 
 // Get listing count
 $sqlcount="SELECT COUNT(*) AS CNT FROM dbo.[LISTINGS] WHERE USER_ID='$loginId' AND STATUS='Available'";
@@ -48,11 +53,12 @@ $resultsold=sqlsrv_query($conn,$sqlsold);
 $rowsold=sqlsrv_fetch_array($resultsold,SQLSRV_FETCH_ASSOC);
 $sold_count=$rowsold['CNT'];
 
-// Handle Add Listing POST
-$modal_error='';
-// Pick up flash success from session (set after redirect)
+// ── Flash success from session ──────────────────────────────
 $modal_success=isset($_SESSION['flash_success']) ? $_SESSION['flash_success'] : '';
 unset($_SESSION['flash_success']);
+
+// ── Handle Add Listing POST ─────────────────────────────────
+$modal_error='';
 if(isset($_POST['add_listing']) && $_POST['add_listing']=='1'){
     $title=trim($_POST['title']);
     $description=trim($_POST['description']);
@@ -64,32 +70,27 @@ if(isset($_POST['add_listing']) && $_POST['add_listing']=='1'){
     $meetup=trim($_POST['meetup_spot']);
     $payment=trim($_POST['payment_method']);
 
-    // If course-specific, append college to category
     $categoryval=$category;
     if($category=='Course-Specific' && $college!=''){
         $categoryval='Course-Specific ('.$college.')';
     }
 
-    // Insert listing (parameterized to handle apostrophes and prevent SQL injection)
     $sqladd="INSERT INTO dbo.[LISTINGS] (USER_ID,TITLE,DESCRIPTION,PRICE,CATEGORY,CONDITION,STATUS,MEETUP_SPOT,PAYMENT_METHOD)
              VALUES (?,?,?,?,?,?,?,?,?)";
     $paramsadd=[$loginId,$title,$description,$price,$categoryval,$condition,$status,$meetup,$payment];
     $resultadd=sqlsrv_query($conn,$sqladd,$paramsadd);
 
     if($resultadd){
-        // Get the new listing ID
         $sqllastid="SELECT TOP 1 LISTING_ID FROM dbo.[LISTINGS] WHERE USER_ID='$loginId' ORDER BY LISTING_ID DESC";
         $resultlastid=sqlsrv_query($conn,$sqllastid);
         $rowlastid=sqlsrv_fetch_array($resultlastid,SQLSRV_FETCH_ASSOC);
         $newlistingid=$rowlastid['LISTING_ID'];
 
-        // Handle image upload
         if(isset($_FILES['listing_img']) && $_FILES['listing_img']['error']==0){
             $imgname=$_FILES['listing_img']['name'];
             $imgtmp=$_FILES['listing_img']['tmp_name'];
             $imgext=strtolower(pathinfo($imgname,PATHINFO_EXTENSION));
             $allowed=['jpg','jpeg','png','webp'];
-
             if(in_array($imgext,$allowed)){
                 $newname='listing_'.$newlistingid.'_'.time().'.'.$imgext;
                 $uploadpath='listings/'.$newname;
@@ -104,24 +105,18 @@ if(isset($_POST['add_listing']) && $_POST['add_listing']=='1'){
         $_SESSION['flash_success']='Listing added successfully!';
         header("Location: storefront.php");
         exit;
-
     } else {
         $errors=sqlsrv_errors();
         $modal_error='SQL Error: '.($errors ? $errors[0]['message'] : 'Unknown');
     }
 }
 
-// Handle Delete Listing POST
+// ── Handle Delete Listing POST ──────────────────────────────
 if(isset($_POST['delete_listing'])){
     $deleteid=trim($_POST['edit_listing_id']);
-
-    // Only owner can delete
-    $sqldelete="DELETE FROM dbo.[LISTING_IMG] WHERE LISTING_ID='$deleteid'";
-    sqlsrv_query($conn,$sqldelete);
-
+    sqlsrv_query($conn,"DELETE FROM dbo.[LISTING_IMG] WHERE LISTING_ID='$deleteid'");
     $sqldeletelisting="DELETE FROM dbo.[LISTINGS] WHERE LISTING_ID='$deleteid' AND USER_ID='$loginId'";
     $resultdelete=sqlsrv_query($conn,$sqldeletelisting);
-
     if($resultdelete){
         sqlsrv_close($conn);
         $_SESSION['flash_success']='Listing deleted successfully.';
@@ -131,6 +126,8 @@ if(isset($_POST['delete_listing'])){
         $edit_error='Failed to delete listing. Please try again.';
     }
 }
+
+// ── Handle Edit Listing POST ────────────────────────────────
 $edit_error='';
 if(isset($_POST['edit_listing'])){
     $editid=trim($_POST['edit_listing_id']);
@@ -144,13 +141,11 @@ if(isset($_POST['edit_listing'])){
     $meetup=trim($_POST['edit_meetup_spot']);
     $payment=trim($_POST['edit_payment_method']);
 
-    // If course-specific, append college
     $categoryval=$category;
     if($category=='Course-Specific' && $college!=''){
         $categoryval='Course-Specific ('.$college.')';
     }
 
-    // Update listing — parameterized to handle apostrophes
     $sqlupdate="UPDATE dbo.[LISTINGS]
                 SET TITLE=?, DESCRIPTION=?, PRICE=?,
                     CATEGORY=?, CONDITION=?, STATUS=?,
@@ -160,36 +155,44 @@ if(isset($_POST['edit_listing'])){
     $resultupdate=sqlsrv_query($conn,$sqlupdate,$paramsupdate);
 
     if($resultupdate){
-        // Handle new image if uploaded
         if(isset($_FILES['edit_listing_img']) && $_FILES['edit_listing_img']['error']==0){
             $imgname=$_FILES['edit_listing_img']['name'];
             $imgtmp=$_FILES['edit_listing_img']['tmp_name'];
             $imgext=strtolower(pathinfo($imgname,PATHINFO_EXTENSION));
             $allowed=['jpg','jpeg','png','webp'];
-
             if(in_array($imgext,$allowed)){
                 $newname='listing_'.$editid.'_'.time().'.'.$imgext;
                 $uploadpath='listings/'.$newname;
                 if(move_uploaded_file($imgtmp,$uploadpath)){
-                    // Delete old image record and insert new
                     sqlsrv_query($conn,"DELETE FROM dbo.[LISTING_IMG] WHERE LISTING_ID='$editid'");
                     $sqlimgupdate="INSERT INTO dbo.[LISTING_IMG] (LISTING_ID,FILE_PATH,IS_PRIMARY) VALUES ('$editid','$uploadpath','1')";
                     sqlsrv_query($conn,$sqlimgupdate);
                 }
             }
         }
-
         sqlsrv_close($conn);
         $_SESSION['flash_success']='Listing updated successfully!';
         header("Location: storefront.php");
         exit;
-
     } else {
         $edit_error='Failed to update listing. Please try again.';
     }
 }
 
-// Get active listings
+// ── NEW: Handle "Mark as Available" (reverse sold) ──────────
+if(isset($_POST['mark_available'])){
+    $markId = (int)trim($_POST['mark_listing_id']);
+    $sqlMark = "UPDATE dbo.[LISTINGS] SET STATUS='Available' WHERE LISTING_ID=? AND USER_ID=?";
+    $resMark = sqlsrv_query($conn, $sqlMark, [$markId, $loginId]);
+    if($resMark){
+        sqlsrv_close($conn);
+        $_SESSION['flash_success'] = 'Listing is now Available again.';
+        header("Location: storefront.php");
+        exit;
+    }
+}
+
+// ── Fetch active listings ───────────────────────────────────
 $sqllistings="SELECT L.*, I.FILE_PATH AS IMG
               FROM dbo.[LISTINGS] L
               LEFT JOIN dbo.[LISTING_IMG] I ON L.LISTING_ID=I.LISTING_ID AND I.IS_PRIMARY=1
@@ -197,13 +200,58 @@ $sqllistings="SELECT L.*, I.FILE_PATH AS IMG
               ORDER BY L.DATE_POSTED DESC";
 $resultlistings=sqlsrv_query($conn,$sqllistings);
 
-// Get sold listings
+// ── Fetch sold listings ─────────────────────────────────────
 $sqlsoldlist="SELECT L.*, I.FILE_PATH AS IMG
               FROM dbo.[LISTINGS] L
               LEFT JOIN dbo.[LISTING_IMG] I ON L.LISTING_ID=I.LISTING_ID AND I.IS_PRIMARY=1
               WHERE L.USER_ID='$loginId' AND L.STATUS='Sold'
               ORDER BY L.DATE_POSTED DESC";
 $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
+
+// ── Fetch activity: likes on your listings ──────────────────
+// (join with LISTING_LIKES and LISTING_COMMENTS tables)
+$sqlLikes = "SELECT LL.LIKE_ID, LL.CREATED_AT,
+                    L.TITLE, L.LISTING_ID,
+                    U.FIRST_NAME, U.LAST_NAME, U.USERNAME,
+                    UI.FILE_PATH AS AVATAR
+             FROM dbo.[LISTING_LIKES] LL
+             JOIN dbo.[LISTINGS] L ON LL.LISTING_ID = L.LISTING_ID
+             JOIN dbo.[USERS] U    ON LL.USER_ID = U.USER_ID
+             LEFT JOIN dbo.[USER_IMG] UI ON LL.USER_ID = UI.USER_ID
+             WHERE L.USER_ID = '$loginId'
+             ORDER BY LL.CREATED_AT DESC";
+$resLikes = sqlsrv_query($conn, $sqlLikes);
+$activityLikes = [];
+if($resLikes){
+    while($row = sqlsrv_fetch_array($resLikes, SQLSRV_FETCH_ASSOC)){
+        $row['CREATED_AT'] = $row['CREATED_AT'] instanceof DateTime
+            ? $row['CREATED_AT']->format('M d, Y g:i A')
+            : date('M d, Y g:i A');
+        $activityLikes[] = $row;
+    }
+}
+
+// ── Fetch activity: comments on your listings ───────────────
+$sqlComments = "SELECT LC.COMMENT_ID, LC.COMMENT_TEXT, LC.CREATED_AT,
+                       L.TITLE, L.LISTING_ID,
+                       U.FIRST_NAME, U.LAST_NAME, U.USERNAME,
+                       UI.FILE_PATH AS AVATAR
+                FROM dbo.[LISTING_COMMENTS] LC
+                JOIN dbo.[LISTINGS] L ON LC.LISTING_ID = L.LISTING_ID
+                JOIN dbo.[USERS] U    ON LC.USER_ID = U.USER_ID
+                LEFT JOIN dbo.[USER_IMG] UI ON LC.USER_ID = UI.USER_ID
+                WHERE L.USER_ID = '$loginId'
+                ORDER BY LC.CREATED_AT DESC";
+$resComments = sqlsrv_query($conn, $sqlComments);
+$activityComments = [];
+if($resComments){
+    while($row = sqlsrv_fetch_array($resComments, SQLSRV_FETCH_ASSOC)){
+        $row['CREATED_AT'] = $row['CREATED_AT'] instanceof DateTime
+            ? $row['CREATED_AT']->format('M d, Y g:i A')
+            : date('M d, Y g:i A');
+        $activityComments[] = $row;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -251,23 +299,16 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
     <!-- Profile Section -->
     <div class="sf-profile-section">
         <div class="sf-profile-row">
-
-            <!-- Avatar -->
             <div class="sf-avatar-wrap">
                 <img src="<?php echo htmlspecialchars($file_path); ?>" class="sf-avatar" alt="Storefront Avatar">
                 <div class="sf-verified">✓</div>
             </div>
-
-            <!-- Info -->
             <div class="sf-info">
                 <div class="sf-name-row">
                     <h2 class="sf-name"><?php echo htmlspecialchars($fullname); ?></h2>
                     <span class="sf-badge">🎓 <?php echo htmlspecialchars($cys); ?></span>
                 </div>
-
-                <!-- FIXED: display actual USERNAME from database instead of generating from full name -->
                 <p class="sf-handle">@<?php echo htmlspecialchars($username); ?></p>
-
                 <div class="sf-stats">
                     <div class="sf-stat">
                         <span class="sf-stat-num"><?php echo $listing_count; ?></span>
@@ -285,12 +326,9 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                     </div>
                 </div>
             </div>
-
-            <!-- Actions -->
             <div class="sf-actions">
                 <button class="sf-btn-add" data-bs-toggle="modal" data-bs-target="#addListingModal">＋ Add Listing</button>
             </div>
-
         </div>
     </div>
 
@@ -299,6 +337,12 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
         <div class="sf-tabs">
             <button class="sf-tab active" data-tab="listings">🏷️ Listings</button>
             <button class="sf-tab" data-tab="sold">✅ Sold</button>
+            <button class="sf-tab" data-tab="activity">
+                ❤️ Activity
+                <?php if(!empty($activityLikes) || !empty($activityComments)): ?>
+                <span class="sf-tab-badge"><?php echo count($activityLikes)+count($activityComments); ?></span>
+                <?php endif; ?>
+            </button>
             <button class="sf-tab" data-tab="reviews">⭐ Reviews</button>
         </div>
     </div>
@@ -378,8 +422,9 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
             $payment=isset($item['PAYMENT_METHOD']) && $item['PAYMENT_METHOD']!='' ? htmlspecialchars($item['PAYMENT_METHOD']) : '—';
             $desc=htmlspecialchars($item['DESCRIPTION'] ? $item['DESCRIPTION'] : '');
             $dateposted=$item['DATE_POSTED'] ? ($item['DATE_POSTED'] instanceof DateTime ? $item['DATE_POSTED']->format('M d, Y') : date('M d, Y', strtotime($item['DATE_POSTED']))) : '—';
+            $listingId = $item['LISTING_ID'];
             echo '<div class="sf-card" ';
-            echo 'data-id="'.$item['LISTING_ID'].'" ';
+            echo 'data-id="'.$listingId.'" ';
             echo 'data-title="'.htmlspecialchars($item['TITLE']).'" ';
             echo 'data-price="'.number_format($item['PRICE'],2).'" ';
             echo 'data-category="'.htmlspecialchars($item['CATEGORY']).'" ';
@@ -398,6 +443,11 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
             echo '<span class="sf-card-cat">'.htmlspecialchars($item['CATEGORY']).'</span>';
             echo '<div class="sf-card-hover">';
             echo '<button class="sf-card-edit-btn" onclick="event.stopPropagation(); openEditModal(this.closest(\'.sf-card\'))">✏️ Edit</button>';
+            // ── NEW: Mark as Available button ──
+            echo '<form method="POST" action="storefront.php" style="display:inline;" onclick="event.stopPropagation()">';
+            echo '<input type="hidden" name="mark_listing_id" value="'.$listingId.'">';
+            echo '<button type="submit" name="mark_available" class="sf-card-relist-btn" onclick="return confirm(\'Mark this item as Available again?\')">↩️ Relist</button>';
+            echo '</form>';
             echo '</div>';
             echo '</div>';
             echo '<div class="sf-card-body">';
@@ -416,6 +466,66 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
             echo '</div>';
         }
         ?>
+        </div>
+    </div>
+
+    <!-- ── ACTIVITY TAB (likes + comments on your listings) ── -->
+    <div class="sf-content d-none" id="tab-activity">
+        <div class="sf-activity-wrap">
+
+            <!-- Likes feed -->
+            <div class="sf-activity-col">
+                <h4 class="sf-activity-heading">❤️ Likes</h4>
+                <?php if(empty($activityLikes)): ?>
+                <div class="sf-activity-empty">No likes yet on your listings.</div>
+                <?php else: ?>
+                <div class="sf-activity-list">
+                    <?php foreach($activityLikes as $like): ?>
+                    <div class="sf-activity-item">
+                        <img src="<?php echo htmlspecialchars($like['AVATAR'] ?? 'assets/img/default_avatar.png'); ?>"
+                             class="sf-activity-avatar" alt="Avatar">
+                        <div class="sf-activity-body">
+                            <span class="sf-activity-user"><?php echo htmlspecialchars($like['FIRST_NAME'].' '.$like['LAST_NAME']); ?></span>
+                            <span class="sf-activity-handle">@<?php echo htmlspecialchars($like['USERNAME']); ?></span>
+                            liked your listing
+                            <a href="listing.php?id=<?php echo $like['LISTING_ID']; ?>" class="sf-activity-listing-link">
+                                <?php echo htmlspecialchars($like['TITLE']); ?>
+                            </a>
+                        </div>
+                        <span class="sf-activity-time"><?php echo htmlspecialchars($like['CREATED_AT']); ?></span>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
+            </div>
+
+            <!-- Comments feed -->
+            <div class="sf-activity-col">
+                <h4 class="sf-activity-heading">💬 Comments</h4>
+                <?php if(empty($activityComments)): ?>
+                <div class="sf-activity-empty">No comments yet on your listings.</div>
+                <?php else: ?>
+                <div class="sf-activity-list">
+                    <?php foreach($activityComments as $comment): ?>
+                    <div class="sf-activity-item sf-activity-item-comment">
+                        <img src="<?php echo htmlspecialchars($comment['AVATAR'] ?? 'assets/img/default_avatar.png'); ?>"
+                             class="sf-activity-avatar" alt="Avatar">
+                        <div class="sf-activity-body">
+                            <span class="sf-activity-user"><?php echo htmlspecialchars($comment['FIRST_NAME'].' '.$comment['LAST_NAME']); ?></span>
+                            <span class="sf-activity-handle">@<?php echo htmlspecialchars($comment['USERNAME']); ?></span>
+                            commented on
+                            <a href="listing.php?id=<?php echo $comment['LISTING_ID']; ?>" class="sf-activity-listing-link">
+                                <?php echo htmlspecialchars($comment['TITLE']); ?>
+                            </a>
+                            <p class="sf-activity-comment-text">"<?php echo htmlspecialchars(mb_substr($comment['COMMENT_TEXT'],0,120)); ?><?php echo mb_strlen($comment['COMMENT_TEXT'])>120?'…':''; ?>"</p>
+                        </div>
+                        <span class="sf-activity-time"><?php echo htmlspecialchars($comment['CREATED_AT']); ?></span>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
+            </div>
+
         </div>
     </div>
 
@@ -466,6 +576,8 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                                         <span class="detail-meta-val" id="detailDate"></span>
                                     </div>
                                 </div>
+                                <!-- Quick link to full listing page -->
+                                <a href="" class="detail-view-full-btn" id="detailViewFull">View Full Listing →</a>
                             </div>
                         </div>
                     </div>
@@ -491,8 +603,6 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                     <?php endif; ?>
 
                     <div class="row g-3">
-
-                        <!-- Left column -->
                         <div class="col-md-7">
 
                             <div class="mb-3">
@@ -535,7 +645,6 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                                 </div>
                             </div>
 
-                            <!-- College dropdown for Course-Specific -->
                             <div class="mt-2 college-row-hidden" id="editCollegeRow">
                                 <label class="listing-label">College</label>
                                 <select name="edit_college" id="editCollege" class="listing-select">
@@ -552,7 +661,6 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                                 </select>
                             </div>
 
-                            <!-- Meetup Spot -->
                             <div class="mt-2">
                                 <label class="listing-label">Preferred Meet-up Spot</label>
                                 <select name="edit_meetup_spot" id="editMeetup" class="listing-select" required>
@@ -575,7 +683,6 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                                 </select>
                             </div>
 
-                            <!-- Status -->
                             <div class="mt-2">
                                 <label class="listing-label">Status</label>
                                 <select name="edit_status" id="editStatus" class="listing-select" required>
@@ -584,7 +691,6 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                                 </select>
                             </div>
 
-                            <!-- Payment Method -->
                             <div class="mt-2">
                                 <label class="listing-label">Preferred Payment Method</label>
                                 <select name="edit_payment_method" id="editPayment" class="listing-select" required>
@@ -598,7 +704,6 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
 
                         </div>
 
-                        <!-- Right column: image -->
                         <div class="col-md-5 d-flex flex-column justify-content-start">
                             <label class="listing-label">Item Photo</label>
                             <div class="img-upload-box" id="editUploadBox" onclick="document.getElementById('editListingImgInput').click()">
@@ -610,21 +715,20 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                                 </div>
                                 <img src="" class="img-preview" id="editImgPreview" alt="Preview">
                             </div>
-                            <!-- Current image preview -->
                             <div class="edit-current-img-wrap">
                                 <p class="listing-label mt-2">Current Photo</p>
                                 <img src="" id="editCurrentImg" class="edit-current-img" alt="Current">
                             </div>
                         </div>
-
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" name="delete_listing" class="btn-delete-listing" onclick="return confirmDelete()">🗑️ Delete Listing</button>
-                    <div class="ms-auto d-flex gap-2">
-                        <button type="button" class="btn-cancel-listing" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" name="edit_listing" class="btn-add-listing">Save Changes</button>
-                    </div>
+                    <form method="POST" action="storefront.php" onsubmit="return confirmDelete()" style="margin:0;">
+                        <input type="hidden" name="edit_listing_id" id="deleteListingId">
+                        <button type="submit" name="delete_listing" class="btn-delete-listing">🗑️ Delete</button>
+                    </form>
+                    <button type="button" class="btn-cancel-listing" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" name="edit_listing" class="btn-add-listing">Save Changes</button>
                 </div>
                 </form>
             </div>
@@ -636,7 +740,7 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addListingModalLabel">＋ Add New Listing</h5>
+                    <h5 class="modal-title" id="addListingModalLabel">＋ New Listing</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="storefront.php" method="POST" enctype="multipart/form-data">
@@ -647,23 +751,21 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                     <?php endif; ?>
 
                     <div class="row g-3">
-
-                        <!-- Left column -->
                         <div class="col-md-7">
 
                             <div class="mb-3">
                                 <label class="listing-label">Item Title</label>
-                                <input type="text" name="title" class="listing-input" placeholder="e.g. Calculus Textbook 2nd Ed." maxlength="100" required>
+                                <input type="text" name="title" class="listing-input" maxlength="100" required placeholder="e.g. Calculus Textbook 9th Ed.">
                             </div>
 
                             <div class="mb-3">
                                 <label class="listing-label">Description</label>
-                                <textarea name="description" class="listing-textarea" placeholder="Describe your item — condition details, inclusions, etc."></textarea>
+                                <textarea name="description" class="listing-textarea" placeholder="Describe the item (condition details, included items, etc.)"></textarea>
                             </div>
 
                             <div class="mb-3">
                                 <label class="listing-label">Price (₱)</label>
-                                <input type="number" name="price" class="listing-input" placeholder="0.00" min="0" step="0.01" required>
+                                <input type="number" name="price" class="listing-input" min="0" step="0.01" required placeholder="0.00">
                             </div>
 
                             <div class="row g-2">
@@ -691,7 +793,6 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                                 </div>
                             </div>
 
-                            <!-- College dropdown, shown only for Course-Specific -->
                             <div class="mt-2 college-row-hidden" id="collegeRow">
                                 <label class="listing-label">College</label>
                                 <select name="college" class="listing-select" id="collegeSelect">
@@ -708,7 +809,6 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                                 </select>
                             </div>
 
-                            <!-- Preferred Meetup Spot -->
                             <div class="mt-2">
                                 <label class="listing-label">Preferred Meet-up Spot</label>
                                 <select name="meetup_spot" class="listing-select" required>
@@ -731,7 +831,6 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                                 </select>
                             </div>
 
-                            <!-- Payment Method -->
                             <div class="mt-2">
                                 <label class="listing-label">Preferred Payment Method</label>
                                 <select name="payment_method" class="listing-select" required>
@@ -743,12 +842,9 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                                 </select>
                             </div>
 
-                            <!-- Hidden default status -->
                             <input type="hidden" name="status" value="Available">
-
                         </div>
 
-                        <!-- Right column: image upload -->
                         <div class="col-md-5 d-flex flex-column justify-content-start">
                             <label class="listing-label">Item Photo</label>
                             <div class="img-upload-box" id="uploadBox" onclick="document.getElementById('listingImgInput').click()">
@@ -761,7 +857,6 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
                                 <img src="" class="img-preview" id="imgPreview" alt="Preview">
                             </div>
                         </div>
-
                     </div>
                 </div>
                 <input type="hidden" name="add_listing" value="1">
@@ -802,7 +897,7 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
             });
         });
 
-        // Image preview
+        // Image preview (add listing)
         var listingImgInput = document.getElementById('listingImgInput');
         var imgPreview = document.getElementById('imgPreview');
         var uploadBox = document.getElementById('uploadBox');
@@ -835,6 +930,7 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
             var date     = card.getAttribute('data-date');
             var img      = card.getAttribute('data-img');
             var status   = card.getAttribute('data-status');
+            var id       = card.getAttribute('data-id');
 
             document.getElementById('detailModalTitle').textContent = title;
             document.getElementById('detailTitle').textContent = title;
@@ -845,6 +941,7 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
             document.getElementById('detailDate').textContent = date;
             document.getElementById('detailImg').src = img;
             document.getElementById('detailDesc').textContent = desc !== '' ? desc : 'No description provided.';
+            document.getElementById('detailViewFull').href = 'listing.php?id=' + id;
 
             var condEl = document.getElementById('detailCond');
             condEl.textContent = condition;
@@ -862,6 +959,8 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
             var modal = new bootstrap.Modal(document.getElementById('itemDetailModal'));
             modal.show();
         }
+
+        // Category → college toggle (add modal)
         var categorySelect = document.getElementById('categorySelect');
         var collegeRow = document.getElementById('collegeRow');
         var collegeSelect = document.getElementById('collegeSelect');
@@ -895,12 +994,12 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
             var status   = card.getAttribute('data-status');
 
             document.getElementById('editListingId').value   = id;
+            document.getElementById('deleteListingId').value = id;
             document.getElementById('editTitle').value       = title;
             document.getElementById('editDescription').value = desc;
             document.getElementById('editPrice').value       = price;
             document.getElementById('editCurrentImg').src    = img;
 
-            // Set category - handle Course-Specific (COLLEGE) format
             var catSelect = document.getElementById('editCategory');
             var catVal = category;
             if(category.indexOf('Course-Specific') === 0){
@@ -919,7 +1018,6 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
             setSelectValue(document.getElementById('editStatus'), status);
             setSelectValue(document.getElementById('editPayment'), payment);
 
-            // Reset upload box
             document.getElementById('editListingImgInput').value = '';
             document.getElementById('editImgPreview').style.display = 'none';
             document.getElementById('editUploadPrompt').style.display = 'block';
@@ -972,7 +1070,6 @@ $resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
         });
 
     </script>
-
 </body>
 </html>
 <?php sqlsrv_close($conn); ?>

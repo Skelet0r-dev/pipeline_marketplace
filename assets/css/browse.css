@@ -11,15 +11,23 @@
 
 /* ── Dashboard category squares: make them clickable ── */
 .category-link {
-    text-decoration: none;
+    text-decoration: none !important;   /* ← removes underline */
     color: inherit;
     display: inline-block;
     transition: transform 0.18s, box-shadow 0.18s;
     border-radius: 15px;
 }
 .category-link:hover {
+    text-decoration: none !important;
     transform: translateY(-4px) scale(1.04);
     box-shadow: 0 8px 24px rgba(40,54,24,0.18);
+}
+.category-link:focus,
+.category-link:active,
+.category-link:visited {
+    text-decoration: none !important;
+    color: inherit;
+    outline: none;
 }
 
 /* ── Browse Hero (header area) ── */
@@ -207,6 +215,24 @@
     pointer-events: none;
 }
 
+/* Like count badge on card */
+.ig-like-badge {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(255,255,255,0.85);
+    color: #c0392b;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 20px;
+    padding: 3px 10px;
+    backdrop-filter: blur(4px);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
 /* Hover overlay with "View Listing" CTA */
 .ig-overlay {
     position: absolute;
@@ -231,7 +257,7 @@
     font-size: 13px;
     border-radius: 30px;
     padding: 9px 22px;
-    text-decoration: none;
+    text-decoration: none !important;  /* ← removes underline on link */
     font-family: "DM Sans", sans-serif;
     transition: background 0.15s, transform 0.15s;
     box-shadow: 0 2px 10px rgba(0,0,0,0.15);
@@ -241,6 +267,7 @@
     background: #dde5b6;
     color: #283618;
     transform: scale(1.06);
+    text-decoration: none !important;
 }
 
 /* ── Card body ── */

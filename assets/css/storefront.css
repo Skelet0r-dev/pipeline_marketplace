@@ -830,3 +830,181 @@
     background: #fdf0ef;
     border-color: #c0392b;
 }
+/* ============================================================
+   storefront.css ADDITIONS
+   – Relist (reverse sold) button
+   – Activity tab (likes + comments feed)
+   ============================================================ */
+
+/* ── Relist button on sold cards ── */
+.sf-card-relist-btn {
+    background: #e8f4fd;
+    color: #0a5fa8;
+    border: 1.5px solid #0a5fa8;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+    display: block;
+    width: 100%;
+    margin-top: 6px;
+    text-align: center;
+}
+.sf-card-relist-btn:hover {
+    background: #cce5fa;
+    transform: scale(1.03);
+}
+
+/* ── Tab badge (notification count) ── */
+.sf-tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #c0392b;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 20px;
+    padding: 1px 7px;
+    margin-left: 5px;
+    line-height: 1.5;
+}
+
+/* ── Activity tab layout ── */
+.sf-activity-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 40px 60px;
+}
+
+@media (max-width: 768px) {
+    .sf-activity-wrap { grid-template-columns: 1fr; }
+}
+
+.sf-activity-col {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 20px rgba(40,54,24,0.08);
+    overflow: hidden;
+}
+
+.sf-activity-heading {
+    font-size: 17px;
+    font-weight: 800;
+    color: #283618;
+    padding: 20px 20px 12px;
+    border-bottom: 1px solid #f0ede3;
+    margin: 0;
+}
+
+.sf-activity-list {
+    display: flex;
+    flex-direction: column;
+    max-height: 520px;
+    overflow-y: auto;
+}
+
+.sf-activity-empty {
+    padding: 32px 20px;
+    font-size: 14px;
+    color: #aaa;
+    text-align: center;
+}
+
+.sf-activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid #f7f7f5;
+    transition: background 0.15s;
+}
+
+.sf-activity-item:last-child { border-bottom: none; }
+.sf-activity-item:hover { background: #fafdf6; }
+
+.sf-activity-item-comment { align-items: flex-start; }
+
+.sf-activity-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #dde5b6;
+    flex-shrink: 0;
+}
+
+.sf-activity-body {
+    flex: 1;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.55;
+    min-width: 0;
+}
+
+.sf-activity-user {
+    font-weight: 700;
+    color: #283618;
+    margin-right: 4px;
+}
+
+.sf-activity-handle {
+    color: #606c38;
+    font-weight: 600;
+    margin-right: 4px;
+}
+
+.sf-activity-listing-link {
+    color: #606c38;
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.15s;
+}
+.sf-activity-listing-link:hover {
+    color: #283618;
+    text-decoration: underline;
+}
+
+.sf-activity-comment-text {
+    font-size: 12px;
+    color: #777;
+    margin: 5px 0 0;
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sf-activity-time {
+    font-size: 11px;
+    color: #bbb;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* ── Detail modal: "View Full Listing" link ── */
+.detail-view-full-btn {
+    display: inline-block;
+    margin-top: 16px;
+    background: #283618;
+    color: #fefae0;
+    text-decoration: none;
+    border-radius: 30px;
+    padding: 9px 22px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: "DM Sans", sans-serif;
+    transition: background 0.15s, transform 0.15s;
+}
+.detail-view-full-btn:hover {
+    background: #606c38;
+    color: #fefae0;
+    transform: scale(1.04);
+}
