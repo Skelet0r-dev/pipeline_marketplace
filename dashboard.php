@@ -198,13 +198,13 @@ sqlsrv_close($conn);
                             <p class="p-tech mb-0">Electronics and Tech</p>
                         </div>
                     </a>
-                    <a href="browse.php?cat=Clothing %26 Apparel" class="category-link">
+                    <a href="browse.php?cat=Clothing%20%26%20Apparel" class="category-link">
                         <div class="d-flex flex-column align-items-center justify-content-center square-clothing">
                             <img src="assets/img/shirts.svg" class="img" alt="Shirt">
                             <p class="p-clothing mb-0">Clothing & Apparel</p>
                         </div>
                     </a>
-                    <a href="browse.php?cat=Hobbies %26 Lifestyle" class="category-link">
+                    <a href="browse.php?cat=Hobbies%20%26%20Lifestyle" class="category-link">
                         <div class="d-flex flex-column align-items-center justify-content-center square-hobbies">
                             <img src="assets/img/labubus.svg" class="img" alt="Labubu">
                             <p class="p-hobbies mb-0">Hobbies & Lifestyle</p>
@@ -219,7 +219,7 @@ sqlsrv_close($conn);
                             <p class="p-cookies mb-0">Food</p>
                         </div>
                     </a>
-                    <a href="browse.php?cat=Events %26 Tickets" class="category-link">
+                    <a href="browse.php?cat=Events%20%26%20Tickets" class="category-link">
                         <div class="d-flex flex-column align-items-center justify-content-center square-events">
                             <img src="assets/img/tickets.svg" class="img" alt="Tickets Icon">
                             <p class="p-events mb-0">Events & Tickets</p>

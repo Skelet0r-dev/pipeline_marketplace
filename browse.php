@@ -6,9 +6,48 @@ $serverName=".\SQLEXPRESS";
 $connectionOptions=["Database"=>"pipeline_db", "Uid"=>"", "PWD"=>""];
 $conn=sqlsrv_connect($serverName,$connectionOptions);
 
-$category = isset($_GET['cat']) ? $_GET['cat'] : 'all';
+$category = isset($_GET['cat']) ? trim($_GET['cat']) : 'all';
 $search   = isset($_GET['q'])   ? trim($_GET['q']) : '';
 $loginId  = $_SESSION['user_id'];
+
+$categoryAliases = [
+    'Clothing and Apparel'   => 'Clothing & Apparel',
+    'Hobbies and Lifestyle'  => 'Hobbies & Lifestyle',
+    'Events and Tickets'     => 'Events & Tickets',
+    'Course-Specific (CCJE)' => 'Course-Specific',
+    'Course-Specific (COED)' => 'Course-Specific',
+    'Course-Specific (COL)'  => 'Course-Specific',
+    'Course-Specific (CICS)' => 'Course-Specific',
+    'Course-Specific (COS)'  => 'Course-Specific',
+    'Course-Specific (CTHM)' => 'Course-Specific',
+    'Course-Specific (CBAA)' => 'Course-Specific',
+    'Course-Specific (CLAC)' => 'Course-Specific',
+    'Course-Specific (CEAT)' => 'Course-Specific',
+];
+
+function displayCategoryLabel($category){
+    if($category === null){
+        return '';
+    }
+
+    if(stripos($category, 'Course-Specific') === 0){
+        return $category;
+    }
+
+    $map = [
+        'Clothing and Apparel'  => 'Clothing & Apparel',
+        'Hobbies and Lifestyle' => 'Hobbies & Lifestyle',
+        'Events and Tickets'    => 'Events & Tickets'
+    ];
+
+    return $map[$category] ?? $category;
+}
+
+if(isset($categoryAliases[$category])){
+    $category = $categoryAliases[$category];
+} elseif(stripos($category, 'Course-Specific') === 0){
+    $category = 'Course-Specific';
+}
 
 // Fetch current user info for Navbar
 $sqlUser = "SELECT FIRST_NAME FROM dbo.[USERS] WHERE USER_ID='$loginId'";
@@ -33,6 +72,18 @@ $params = [];
 if($category !== 'all'){
     if($category == 'Course-Specific'){
         $sql .= " AND L.CATEGORY LIKE 'Course-Specific%'";
+    } elseif($category == 'Clothing & Apparel'){
+        $sql .= " AND L.CATEGORY IN (?, ?)";
+        $params[] = 'Clothing & Apparel';
+        $params[] = 'Clothing and Apparel';
+    } elseif($category == 'Hobbies & Lifestyle'){
+        $sql .= " AND L.CATEGORY IN (?, ?)";
+        $params[] = 'Hobbies & Lifestyle';
+        $params[] = 'Hobbies and Lifestyle';
+    } elseif($category == 'Events & Tickets'){
+        $sql .= " AND L.CATEGORY IN (?, ?)";
+        $params[] = 'Events & Tickets';
+        $params[] = 'Events and Tickets';
     } else {
         $sql .= " AND L.CATEGORY = ?";
         $params[] = $category;
@@ -255,6 +306,107 @@ $accentColor = $catColors[$category] ?? '#606c38';
 
         // Quick-view modal on card click (excluding the "View Listing" button)
         const modal = new bootstrap.Modal(document.getElementById('listingModal'));
+
+        function initializeListingModalInteractions(scope){
+            if(!scope) return;
+
+            const likeBtn = scope.querySelector('.lm-like-btn');
+            if(likeBtn && !likeBtn.dataset.bound){
+                likeBtn.dataset.bound = '1';
+                likeBtn.addEventListener('click', function(){
+                    const id = this.dataset.id;
+                    const body = new FormData();
+                    body.append('listing_id', id);
+
+                    fetch('like_toggle.php', { method:'POST', body })
+                        .then(r => r.json())
+                        .then(data => {
+                            if(data.error) return;
+                            this.classList.toggle('liked', data.liked);
+                            const heart = this.querySelector('.lm-heart');
+                            const count = this.querySelector('.lm-like-count');
+                            if(heart) heart.textContent = data.liked ? '❤️' : '🤍';
+                            if(count) count.textContent = data.count;
+                        });
+                });
+            }
+
+            const panel = scope.querySelector('#lmReportPanel');
+            const toggleBtn = scope.querySelector('#lmToggleReportBtn');
+            const cancelBtn = scope.querySelector('#lmCancelReportBtn');
+            const closeBtn = scope.querySelector('#lmCloseReportBtn');
+            const form = scope.querySelector('#lmReportForm');
+            const feedback = scope.querySelector('#lmReportFeedback');
+            const submitBtn = scope.querySelector('#lmSubmitReportBtn');
+
+            function showFeedback(message, isError){
+                if(!feedback) return;
+                feedback.hidden = false;
+                feedback.textContent = message;
+                feedback.className = 'lm-report-feedback ' + (isError ? 'is-error' : 'is-success');
+            }
+
+            if(toggleBtn && panel && !toggleBtn.dataset.bound){
+                toggleBtn.dataset.bound = '1';
+                toggleBtn.addEventListener('click', function(){
+                    panel.hidden = false;
+                });
+            }
+
+            if(cancelBtn && panel && !cancelBtn.dataset.bound){
+                cancelBtn.dataset.bound = '1';
+                cancelBtn.addEventListener('click', function(){
+                    panel.hidden = true;
+                });
+            }
+
+            if(closeBtn && panel && !closeBtn.dataset.bound){
+                closeBtn.dataset.bound = '1';
+                closeBtn.addEventListener('click', function(){
+                    panel.hidden = true;
+                });
+            }
+
+            if(form && !form.dataset.bound){
+                form.dataset.bound = '1';
+                form.addEventListener('submit', function(e){
+                    e.preventDefault();
+
+                    if(submitBtn){
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = 'Submitting...';
+                    }
+                    if(feedback){
+                        feedback.hidden = true;
+                    }
+
+                    const body = new FormData(form);
+                    body.append('ajax', '1');
+
+                    fetch('report_item.php', { method:'POST', body })
+                        .then(r => r.json())
+                        .then(data => {
+                            if(data.error){
+                                showFeedback(data.error, true);
+                                return;
+                            }
+
+                            showFeedback(data.message || 'Report submitted successfully.', false);
+                            form.reset();
+                        })
+                        .catch(() => {
+                            showFeedback('Could not submit your report right now. Please try again.', true);
+                        })
+                        .finally(() => {
+                            if(submitBtn){
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = 'Submit Report';
+                            }
+                        });
+                });
+            }
+        }
+
         document.querySelectorAll('.ig-card').forEach(card => {
             card.addEventListener('click', function(e){
                 // Don't intercept clicks on the direct link button
@@ -266,7 +418,10 @@ $accentColor = $catColors[$category] ?? '#606c38';
                 modal.show();
                 fetch('listing_modal.php?id=' + id)
                     .then(r => r.text())
-                    .then(html => { modalBody.innerHTML = html; })
+                    .then(html => {
+                        modalBody.innerHTML = html;
+                        initializeListingModalInteractions(modalBody);
+                    })
                     .catch(() => { modalBody.innerHTML = '<div class="text-center p-4 text-muted">Could not load listing.</div>'; });
             });
         });

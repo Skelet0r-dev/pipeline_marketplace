@@ -54,6 +54,13 @@
 
 @media (max-width: 768px) {
     .listing-card { grid-template-columns: 1fr; gap: 24px; }
+    .listing-seller-card { align-items: flex-start; flex-wrap: wrap; }
+    .listing-action-group { width: 100%; }
+    .listing-contact-btn,
+    .listing-report-btn { text-align: center; flex: 1; }
+    .listing-report-actions { justify-content: stretch; }
+    .listing-report-cancel,
+    .listing-report-submit { flex: 1; }
 }
 
 /* ── Gallery ── */
@@ -171,6 +178,13 @@
     color: #999;
 }
 
+.listing-action-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
 .listing-contact-btn {
     background: #283618;
     color: #fefae0;
@@ -187,6 +201,140 @@
     background: #606c38;
     color: #fefae0;
     transform: scale(1.04);
+}
+
+.listing-report-btn {
+    background: #fff;
+    color: #c0392b;
+    border: 1px solid #e8b4b0;
+    border-radius: 30px;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    transition: background 0.15s, transform 0.15s, border-color 0.15s;
+}
+
+.listing-report-btn:hover {
+    background: #fff3f2;
+    border-color: #c0392b;
+    transform: scale(1.04);
+}
+
+.listing-report-panel {
+    background: #fff8f7;
+    border: 1px solid #f1d3cf;
+    border-radius: 16px;
+    padding: 18px;
+}
+
+.listing-report-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.listing-report-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    color: #6b241b;
+}
+
+.listing-report-close {
+    border: none;
+    background: transparent;
+    color: #9b4d45;
+    font-size: 26px;
+    line-height: 1;
+}
+
+.listing-report-copy {
+    margin: 0 0 14px;
+    font-size: 13px;
+    color: #7a5c56;
+}
+
+.listing-report-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.listing-report-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #6b241b;
+}
+
+.listing-report-select,
+.listing-report-textarea {
+    width: 100%;
+    border: 1px solid #e8c1bc;
+    border-radius: 12px;
+    padding: 11px 13px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 14px;
+    color: #3d312e;
+    background: #fff;
+}
+
+.listing-report-select:focus,
+.listing-report-textarea:focus {
+    outline: none;
+    border-color: #c0392b;
+    box-shadow: 0 0 0 3px rgba(192,57,43,0.12);
+}
+
+.listing-report-textarea {
+    resize: vertical;
+    min-height: 110px;
+}
+
+.listing-report-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.listing-report-cancel,
+.listing-report-submit {
+    border-radius: 30px;
+    padding: 9px 18px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.listing-report-cancel {
+    border: 1px solid #d8cbc8;
+    background: #fff;
+    color: #6c5c59;
+}
+
+.listing-report-submit {
+    border: none;
+    background: #c0392b;
+    color: #fff;
+}
+
+.listing-report-feedback {
+    margin-top: 4px;
+    border-radius: 12px;
+    padding: 11px 13px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.listing-report-feedback.is-success {
+    background: #edf7ee;
+    color: #1e6b2e;
+}
+
+.listing-report-feedback.is-error {
+    background: #fff1ef;
+    color: #9f2f23;
 }
 
 /* Meta row (badges) */

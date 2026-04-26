@@ -673,6 +673,7 @@
             border: none;
             transition: opacity 0.2s;
             letter-spacing: 0.5px;
+            text-decoration: none;
         }
 
         .action-btn:hover { opacity: 0.85; }

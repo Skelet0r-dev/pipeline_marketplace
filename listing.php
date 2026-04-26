@@ -13,6 +13,30 @@ $conn=sqlsrv_connect($serverName,$connectionOptions);
 $loginId   = (int)$_SESSION['user_id'];
 $listingId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
+function normalizeCategoryBrowseParam($category){
+    if($category === null){
+        return 'all';
+    }
+
+    if(stripos($category, 'Course-Specific') === 0){
+        return 'Course-Specific';
+    }
+
+    $map = [
+        'Clothing and Apparel'  => 'Clothing & Apparel',
+        'Hobbies and Lifestyle' => 'Hobbies & Lifestyle',
+        'Events and Tickets'    => 'Events & Tickets'
+    ];
+
+    return $map[$category] ?? $category;
+}
+
+function displayCategoryLabel($category){
+    return normalizeCategoryBrowseParam($category) === 'Course-Specific'
+        ? $category
+        : normalizeCategoryBrowseParam($category);
+}
+
 if(!$listingId){ header("Location: dashboard.php"); exit; }
 
 // ── Fetch current user for navbar ──────────────────────────
@@ -27,7 +51,7 @@ $navFilePath = $navImg['FILE_PATH'] ?? 'assets/img/default_avatar.png';
 
 // ── Fetch listing + seller ──────────────────────────────────
 $sqlListing = "SELECT L.*,
-                      U.FIRST_NAME, U.LAST_NAME, U.USERNAME, U.CYS,
+                      U.FIRST_NAME, U.LAST_NAME, U.USERNAME, U.CYS, U.EMAIL,
                       UI.FILE_PATH AS SELLER_AVATAR
                FROM dbo.[LISTINGS] L
                JOIN dbo.[USERS] U    ON L.USER_ID = U.USER_ID
@@ -86,6 +110,9 @@ $datePosted = $listing['DATE_POSTED'] instanceof DateTime
 $condClass = 'cond-' . strtolower(str_replace([' ','-'],'',$listing['CONDITION']));
 $sellerName = htmlspecialchars($listing['FIRST_NAME'].' '.$listing['LAST_NAME']);
 $isOwner = ($loginId == (int)$listing['USER_ID']);
+$browseCategory = normalizeCategoryBrowseParam($listing['CATEGORY']);
+$categoryLabel = displayCategoryLabel($listing['CATEGORY']);
+$messageLink = 'mailto:' . rawurlencode($listing['EMAIL']) . '?subject=' . rawurlencode('Pipeline Inquiry: ' . $listing['TITLE']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -136,7 +163,7 @@ $isOwner = ($loginId == (int)$listing['USER_ID']);
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="dashboard.php" class="lbc-link">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="browse.php?cat=<?php echo urlencode($listing['CATEGORY']); ?>" class="lbc-link"><?php echo htmlspecialchars($listing['CATEGORY']); ?></a></li>
+                <li class="breadcrumb-item"><a href="browse.php?cat=<?php echo urlencode($browseCategory); ?>" class="lbc-link"><?php echo htmlspecialchars($categoryLabel); ?></a></li>
                 <li class="breadcrumb-item active lbc-active"><?php echo htmlspecialchars($listing['TITLE']); ?></li>
             </ol>
         </nav>
@@ -183,14 +210,47 @@ $isOwner = ($loginId == (int)$listing['USER_ID']);
                     <span class="listing-seller-cys"><?php echo htmlspecialchars($listing['CYS']); ?></span>
                 </div>
                 <?php if(!$isOwner): ?>
-                <a href="mailto:<?php /* add email field if needed */ ?>"
-                   class="listing-contact-btn">Message</a>
+                <div class="listing-action-group">
+                    <a href="<?php echo htmlspecialchars($messageLink); ?>"
+                       class="listing-contact-btn">Message</a>
+                    <button type="button" class="listing-report-btn" id="toggleReportBtn">Report Item</button>
+                </div>
                 <?php endif; ?>
             </div>
 
+            <?php if(!$isOwner): ?>
+            <div class="listing-report-panel" id="reportPanel" hidden>
+                <div class="listing-report-head">
+                    <h3 class="listing-report-title">Report this item</h3>
+                    <button type="button" class="listing-report-close" id="closeReportBtn" aria-label="Close report form">×</button>
+                </div>
+                <p class="listing-report-copy">Choose a reason and add details. The report will be saved for the admin review side.</p>
+                <form id="reportForm" class="listing-report-form">
+                    <input type="hidden" name="listing_id" value="<?php echo $listingId; ?>">
+                    <label class="listing-report-label" for="reportReason">Reason</label>
+                    <select id="reportReason" name="report_reason" class="listing-report-select" required>
+                        <option value="" disabled selected>Select a reason</option>
+                        <option value="Prohibited Item">Prohibited Item</option>
+                        <option value="Misleading Description">Misleading Description</option>
+                        <option value="Spam or Duplicate">Spam or Duplicate</option>
+                        <option value="Harassment or Abuse">Harassment or Abuse</option>
+                        <option value="Suspicious Pricing">Suspicious Pricing</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <label class="listing-report-label" for="reportDetails">Details</label>
+                    <textarea id="reportDetails" name="report_details" class="listing-report-textarea" rows="4" maxlength="1000" placeholder="Tell the admin what is wrong with this listing." required></textarea>
+                    <div class="listing-report-actions">
+                        <button type="button" class="listing-report-cancel" id="cancelReportBtn">Cancel</button>
+                        <button type="submit" class="listing-report-submit" id="submitReportBtn">Submit Report</button>
+                    </div>
+                    <div class="listing-report-feedback" id="reportFeedback" hidden></div>
+                </form>
+            </div>
+            <?php endif; ?>
+
             <!-- Category & Condition -->
             <div class="listing-meta-row">
-                <span class="listing-cat-badge"><?php echo htmlspecialchars($listing['CATEGORY']); ?></span>
+                <span class="listing-cat-badge"><?php echo htmlspecialchars($categoryLabel); ?></span>
                 <span class="listing-cond <?php echo $condClass; ?>"><?php echo htmlspecialchars($listing['CONDITION']); ?></span>
                 <?php if($listing['STATUS']==='Sold'): ?>
                 <span class="listing-status-sold">SOLD</span>
@@ -328,6 +388,7 @@ likeBtn.addEventListener('click', function(){
 // ── Comment submit ───────────────────────────────────────
 // Designed so the fetch URL can be replaced with an API endpoint
 const COMMENT_ENDPOINT = 'comment_post.php'; // ← swap to API URL when ready
+const REPORT_ENDPOINT = 'report_item.php';
 
 const commentInput  = document.getElementById('commentInput');
 const commentSubmit = document.getElementById('commentSubmit');
@@ -335,6 +396,84 @@ const commentsList  = document.getElementById('commentsList');
 const commentsCount = document.getElementById('commentsCount');
 const charCount     = document.getElementById('charCount');
 const listingId     = <?php echo $listingId; ?>;
+const reportPanel   = document.getElementById('reportPanel');
+const reportForm    = document.getElementById('reportForm');
+const reportFeedback = document.getElementById('reportFeedback');
+const toggleReportBtn = document.getElementById('toggleReportBtn');
+const closeReportBtn = document.getElementById('closeReportBtn');
+const cancelReportBtn = document.getElementById('cancelReportBtn');
+const submitReportBtn = document.getElementById('submitReportBtn');
+
+function setReportPanelVisibility(isVisible){
+    if(!reportPanel){
+        return;
+    }
+
+    reportPanel.hidden = !isVisible;
+    if(isVisible){
+        reportPanel.scrollIntoView({ behavior:'smooth', block:'nearest' });
+    }
+}
+
+function showReportFeedback(message, isError){
+    if(!reportFeedback){
+        return;
+    }
+
+    reportFeedback.hidden = false;
+    reportFeedback.textContent = message;
+    reportFeedback.className = 'listing-report-feedback ' + (isError ? 'is-error' : 'is-success');
+}
+
+if(toggleReportBtn){
+    toggleReportBtn.addEventListener('click', function(){
+        setReportPanelVisibility(true);
+    });
+}
+
+if(closeReportBtn){
+    closeReportBtn.addEventListener('click', function(){
+        setReportPanelVisibility(false);
+    });
+}
+
+if(cancelReportBtn){
+    cancelReportBtn.addEventListener('click', function(){
+        setReportPanelVisibility(false);
+    });
+}
+
+if(reportForm){
+    reportForm.addEventListener('submit', function(e){
+        e.preventDefault();
+
+        submitReportBtn.disabled = true;
+        submitReportBtn.textContent = 'Submitting...';
+        reportFeedback.hidden = true;
+
+        const body = new FormData(reportForm);
+        body.append('ajax', '1');
+
+        fetch(REPORT_ENDPOINT, { method:'POST', body })
+            .then(r => r.json())
+            .then(data => {
+                if(data.error){
+                    showReportFeedback(data.error, true);
+                    return;
+                }
+
+                showReportFeedback(data.message || 'Report submitted successfully.', false);
+                reportForm.reset();
+            })
+            .catch(() => {
+                showReportFeedback('Could not submit your report right now. Please try again.', true);
+            })
+            .finally(() => {
+                submitReportBtn.disabled = false;
+                submitReportBtn.textContent = 'Submit Report';
+            });
+    });
+}
 
 // Character counter
 commentInput.addEventListener('input', function(){

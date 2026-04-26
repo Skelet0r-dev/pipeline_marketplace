@@ -24,6 +24,24 @@ if($conn==false)
 
 $loginId=$_SESSION['user_id'];
 
+function normalizeCategoryLabel($category){
+    if($category === null){
+        return '';
+    }
+
+    if(stripos($category, 'Course-Specific') === 0){
+        return $category;
+    }
+
+    $map = [
+        'Clothing and Apparel'  => 'Clothing & Apparel',
+        'Hobbies and Lifestyle' => 'Hobbies & Lifestyle',
+        'Events and Tickets'    => 'Events & Tickets'
+    ];
+
+    return $map[$category] ?? $category;
+}
+
 // Get user info
 $sql="SELECT * FROM dbo.[USERS] WHERE USER_ID='$loginId'";
 $result=sqlsrv_query($conn,$sql);
@@ -368,11 +386,12 @@ if($resComments){
             $payment=isset($item['PAYMENT_METHOD']) && $item['PAYMENT_METHOD']!='' ? htmlspecialchars($item['PAYMENT_METHOD']) : '—';
             $desc=htmlspecialchars($item['DESCRIPTION'] ? $item['DESCRIPTION'] : '');
             $dateposted=$item['DATE_POSTED'] ? ($item['DATE_POSTED'] instanceof DateTime ? $item['DATE_POSTED']->format('M d, Y') : date('M d, Y', strtotime($item['DATE_POSTED']))) : '—';
+            $categoryLabel = normalizeCategoryLabel($item['CATEGORY']);
             echo '<div class="sf-card" ';
             echo 'data-id="'.$item['LISTING_ID'].'" ';
             echo 'data-title="'.htmlspecialchars($item['TITLE']).'" ';
             echo 'data-price="'.number_format($item['PRICE'],2).'" ';
-            echo 'data-category="'.htmlspecialchars($item['CATEGORY']).'" ';
+            echo 'data-category="'.htmlspecialchars($categoryLabel).'" ';
             echo 'data-condition="'.htmlspecialchars($item['CONDITION']).'" ';
             echo 'data-condclass="'.$condclass.'" ';
             echo 'data-meetup="'.$meetup.'" ';
@@ -384,7 +403,7 @@ if($resComments){
             echo 'onclick="openItemModal(this)">';
             echo '<div class="sf-card-img-wrap">';
             echo '<img src="'.htmlspecialchars($imgpath).'" class="sf-card-img-real" alt="'.htmlspecialchars($item['TITLE']).'">';
-            echo '<span class="sf-card-cat">'.htmlspecialchars($item['CATEGORY']).'</span>';
+            echo '<span class="sf-card-cat">'.htmlspecialchars($categoryLabel).'</span>';
             echo '<div class="sf-card-hover">';
             echo '<button class="sf-card-view">View Item</button>';
             echo '<button class="sf-card-edit-btn" onclick="event.stopPropagation(); openEditModal(this.closest(\'.sf-card\'))">✏️ Edit</button>';
@@ -423,11 +442,12 @@ if($resComments){
             $desc=htmlspecialchars($item['DESCRIPTION'] ? $item['DESCRIPTION'] : '');
             $dateposted=$item['DATE_POSTED'] ? ($item['DATE_POSTED'] instanceof DateTime ? $item['DATE_POSTED']->format('M d, Y') : date('M d, Y', strtotime($item['DATE_POSTED']))) : '—';
             $listingId = $item['LISTING_ID'];
+            $categoryLabel = normalizeCategoryLabel($item['CATEGORY']);
             echo '<div class="sf-card" ';
             echo 'data-id="'.$listingId.'" ';
             echo 'data-title="'.htmlspecialchars($item['TITLE']).'" ';
             echo 'data-price="'.number_format($item['PRICE'],2).'" ';
-            echo 'data-category="'.htmlspecialchars($item['CATEGORY']).'" ';
+            echo 'data-category="'.htmlspecialchars($categoryLabel).'" ';
             echo 'data-condition="'.htmlspecialchars($item['CONDITION']).'" ';
             echo 'data-condclass="'.$condclass.'" ';
             echo 'data-meetup="'.$meetup.'" ';
@@ -440,7 +460,7 @@ if($resComments){
             echo '<div class="sf-card-img-wrap sf-card-img-wrap-sold">';
             echo '<img src="'.htmlspecialchars($imgpath).'" class="sf-card-img-real sf-card-img-sold" alt="'.htmlspecialchars($item['TITLE']).'">';
             echo '<div class="sf-card-sold-overlay"><span class="sf-card-sold-badge">SOLD</span></div>';
-            echo '<span class="sf-card-cat">'.htmlspecialchars($item['CATEGORY']).'</span>';
+            echo '<span class="sf-card-cat">'.htmlspecialchars($categoryLabel).'</span>';
             echo '<div class="sf-card-hover">';
             echo '<button class="sf-card-edit-btn" onclick="event.stopPropagation(); openEditModal(this.closest(\'.sf-card\'))">✏️ Edit</button>';
             // ── NEW: Mark as Available button ──
@@ -627,10 +647,10 @@ if($resComments){
                                         <option value="" disabled>Select</option>
                                         <option value="Academics">📚 Academics</option>
                                         <option value="Electronics and Tech">💻 Electronics & Tech</option>
-                                        <option value="Clothing and Apparel">👕 Clothing & Apparel</option>
-                                        <option value="Hobbies and Lifestyle">🐇 Hobbies & Lifestyle</option>
+                                        <option value="Clothing & Apparel">👕 Clothing & Apparel</option>
+                                        <option value="Hobbies & Lifestyle">🐇 Hobbies & Lifestyle</option>
                                         <option value="Food">🍪 Food</option>
-                                        <option value="Events and Tickets">🎟️ Events & Tickets</option>
+                                        <option value="Events & Tickets">🎟️ Events & Tickets</option>
                                         <option value="Course-Specific">🔬 Course-Specific</option>
                                     </select>
                                 </div>
@@ -775,10 +795,10 @@ if($resComments){
                                         <option value="" disabled selected>Select</option>
                                         <option value="Academics">📚 Academics</option>
                                         <option value="Electronics and Tech">💻 Electronics & Tech</option>
-                                        <option value="Clothing and Apparel">👕 Clothing & Apparel</option>
-                                        <option value="Hobbies and Lifestyle">🐇 Hobbies & Lifestyle</option>
+                                        <option value="Clothing & Apparel">👕 Clothing & Apparel</option>
+                                        <option value="Hobbies & Lifestyle">🐇 Hobbies & Lifestyle</option>
                                         <option value="Food">🍪 Food</option>
-                                        <option value="Events and Tickets">🎟️ Events & Tickets</option>
+                                        <option value="Events & Tickets">🎟️ Events & Tickets</option>
                                         <option value="Course-Specific">🔬 Course-Specific</option>
                                     </select>
                                 </div>
@@ -980,6 +1000,24 @@ if($resComments){
             return confirm('Are you sure you want to delete this listing? This cannot be undone.');
         }
 
+        function normalizeCategoryValue(category) {
+            if(!category){
+                return '';
+            }
+
+            if(category.indexOf('Course-Specific') === 0){
+                return category;
+            }
+
+            var categoryMap = {
+                'Clothing and Apparel': 'Clothing & Apparel',
+                'Hobbies and Lifestyle': 'Hobbies & Lifestyle',
+                'Events and Tickets': 'Events & Tickets'
+            };
+
+            return categoryMap[category] || category;
+        }
+
         // Open edit modal and pre-fill fields
         function openEditModal(card) {
             var id       = card.getAttribute('data-id');
@@ -1001,7 +1039,7 @@ if($resComments){
             document.getElementById('editCurrentImg').src    = img;
 
             var catSelect = document.getElementById('editCategory');
-            var catVal = category;
+            var catVal = normalizeCategoryValue(category);
             if(category.indexOf('Course-Specific') === 0){
                 catVal = 'Course-Specific';
                 var collegeMatch = category.match(/\(([^)]+)\)/);

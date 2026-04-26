@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $serverName = ".\SQLEXPRESS";
 $connectionOptions = [
     "Database" => "pipeline_db",
@@ -12,18 +14,33 @@ if ($conn == false) {
 }
 
 // POST
-$username = $_POST['username'];
-$password = $_POST['password'];
+$username = isset($_POST['username']) ? trim($_POST['username']) : '';
+$password = isset($_POST['password']) ? trim($_POST['password']) : '';
+
+if ($username === '' || $password === '') {
+    echo "
+    <script>
+        alert('Please enter both admin username and password.');
+        window.location.href = 'login_admin.html';
+    </script>
+    ";
+    exit();
+}
 
 // VALIDATION
-$sql_admin = "SELECT * FROM dbo.[ADMIN_LOGIN]
-              WHERE USERNAME = '$username' AND PASSWORD = '$password'";
-$result_admin = sqlsrv_query($conn, $sql_admin);
-$row_admin = sqlsrv_fetch_array($result_admin);
+$sql_admin = "SELECT TOP 1 ADMIN_NUMBER, USERNAME, PASSWORD
+              FROM dbo.[ADMIN_LOGIN]
+              WHERE UPPER(LTRIM(RTRIM(USERNAME))) = UPPER(?)
+                AND LTRIM(RTRIM(PASSWORD)) = ?";
+$result_admin = sqlsrv_query($conn, $sql_admin, [$username, $password]);
+$row_admin = $result_admin ? sqlsrv_fetch_array($result_admin, SQLSRV_FETCH_ASSOC) : false;
 
 // LOGIN SUCCESS
 if ($row_admin) {
-    header("Location: admin_dashboard.html");
+    session_regenerate_id(true);
+    $_SESSION['admin_username'] = $row_admin['USERNAME'];
+    $_SESSION['admin_number'] = $row_admin['ADMIN_NUMBER'] ?? null;
+    header("Location: admin_dashboard.php");
     exit();
 }
 
