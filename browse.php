@@ -65,7 +65,7 @@ $sql = "SELECT L.*, I.FILE_PATH, U.FIRST_NAME, U.LAST_NAME
         FROM dbo.[LISTINGS] L
         LEFT JOIN dbo.[LISTING_IMG] I ON L.LISTING_ID = I.LISTING_ID AND I.IS_PRIMARY = 1
         JOIN dbo.[USERS] U ON L.USER_ID = U.USER_ID
-        WHERE L.STATUS = 'Available'";
+        WHERE (L.STATUS = 'Available' OR L.STATUS IS NULL OR L.STATUS = '')";
 
 $params = [];
 
