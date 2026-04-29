@@ -60,7 +60,7 @@ $resImgNav = sqlsrv_query($conn, $sqlImgNavbar);
 $navImgRow = sqlsrv_fetch_array($resImgNav, SQLSRV_FETCH_ASSOC);
 $nav_file_path = $navImgRow['FILE_PATH'] ?? 'assets/img/default_avatar.png';
 
-// BUILD THE MAIN QUERY
+// BUILD THE MAIN QUERY (treat legacy listings without status as available)
 $sql = "SELECT L.*, I.FILE_PATH, U.FIRST_NAME, U.LAST_NAME 
         FROM dbo.[LISTINGS] L
         LEFT JOIN dbo.[LISTING_IMG] I ON L.LISTING_ID = I.LISTING_ID AND I.IS_PRIMARY = 1
