@@ -1,16 +1,10 @@
 <?php
 session_start();
 
-$serverName = ".\SQLEXPRESS";
-$connectionOptions = [
-    "Database" => "pipeline_db",
-    "Uid" => "",
-    "PWD" => ""
-];
-
-$conn = sqlsrv_connect($serverName, $connectionOptions);
+require_once __DIR__ . '/db.php';
+$conn = db_connect();
 if ($conn == false) {
-    die(print_r(sqlsrv_errors(), true));
+    die(db_last_error());
 }
 
 // POST
@@ -28,12 +22,13 @@ if ($username === '' || $password === '') {
 }
 
 // VALIDATION
-$sql_admin = "SELECT TOP 1 ADMIN_NUMBER, USERNAME, PASSWORD
-              FROM dbo.[ADMIN_LOGIN]
-              WHERE UPPER(LTRIM(RTRIM(USERNAME))) = UPPER(?)
-                AND LTRIM(RTRIM(PASSWORD)) = ?";
-$result_admin = sqlsrv_query($conn, $sql_admin, [$username, $password]);
-$row_admin = $result_admin ? sqlsrv_fetch_array($result_admin, SQLSRV_FETCH_ASSOC) : false;
+$sql_admin = "SELECT ADMIN_NUMBER, USERNAME, `PASSWORD`
+              FROM ADMIN_LOGIN
+              WHERE UPPER(TRIM(USERNAME)) = UPPER(?)
+                AND TRIM(`PASSWORD`) = ?
+              LIMIT 1";
+$result_admin = db_query($conn, $sql_admin, [$username, $password]);
+$row_admin = $result_admin ? db_fetch_assoc($result_admin) : false;
 
 // LOGIN SUCCESS
 if ($row_admin) {

@@ -1,15 +1,10 @@
 <?php
 session_start();
 
-$serverName=".\SQLEXPRESS";
-$connectionOptions=[
-    "Database"=>"pipeline_db",
-    "Uid"=>"",
-    "PWD"=>""
-];
-$conn=sqlsrv_connect($serverName,$connectionOptions);
+require_once __DIR__ . '/db.php';
+$conn = db_connect();
 if($conn==false)
-    die(print_r(sqlsrv_errors(),true));
+    die(db_last_error());
 
 $MAX_ATTEMPTS=3;
 $COOLDOWN_SEC=60;
@@ -37,14 +32,14 @@ $firstname='';
 // Load user from session if navigating directly (not via login form)
 if(!isset($_POST['stdnum']) && isset($_SESSION['user_id'])){
     $loginId=$_SESSION['user_id'];
-    $sqlsess="SELECT * FROM dbo.[USERS] WHERE USER_ID='$loginId'";
-    $resultsess=sqlsrv_query($conn,$sqlsess);
-    $rowsess=sqlsrv_fetch_array($resultsess,SQLSRV_FETCH_ASSOC);
+    $sqlsess="SELECT * FROM USERS WHERE USER_ID='$loginId'";
+    $resultsess=db_query($conn,$sqlsess);
+    $rowsess=db_fetch_assoc($resultsess);
     if($rowsess){
         $firstname=$rowsess['FIRST_NAME'];
-        $sqlprofile="SELECT * FROM dbo.[USER_IMG] WHERE USER_ID='$loginId'";
-        $resultprofile=sqlsrv_query($conn,$sqlprofile);
-        $rowprofile=sqlsrv_fetch_array($resultprofile,SQLSRV_FETCH_ASSOC);
+        $sqlprofile="SELECT * FROM USER_IMG WHERE USER_ID='$loginId'";
+        $resultprofile=db_query($conn,$sqlprofile);
+        $rowprofile=db_fetch_assoc($resultprofile);
         $file_path=$rowprofile['FILE_PATH'];
     }
 }
@@ -53,9 +48,9 @@ if(!$locked && isset($_POST['stdnum'])){
     $stdnum=trim($_POST['stdnum']);
     $password=$_POST['password'];
 
-    $sql="SELECT * FROM dbo.[USERS] WHERE STD_NUM='$stdnum'";
-    $result=sqlsrv_query($conn,$sql);
-    $rowname=sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
+    $sql="SELECT * FROM USERS WHERE STD_NUM='$stdnum'";
+    $result=db_query($conn,$sql);
+    $rowname=db_fetch_assoc($result);
 
     if($rowname==null){
         $_SESSION['login_attempts']++;
@@ -68,9 +63,9 @@ if(!$locked && isset($_POST['stdnum'])){
             $error='Student number not found. '.$left.' attempt'.($left!=1?'s':'').' remaining.';
         }
     } else {
-        $sqlpassword="SELECT * FROM dbo.[USERS] WHERE STD_NUM='$stdnum' AND PASSWORD='$password'";
-        $resultpassword=sqlsrv_query($conn,$sqlpassword);
-        $rowpassword=sqlsrv_fetch_array($resultpassword,SQLSRV_FETCH_ASSOC);
+        $sqlpassword="SELECT * FROM USERS WHERE STD_NUM='$stdnum' AND `PASSWORD`='$password'";
+        $resultpassword=db_query($conn,$sqlpassword);
+        $rowpassword=db_fetch_assoc($resultpassword);
 
         if($rowpassword==null){
             $_SESSION['login_attempts']++;
@@ -90,11 +85,11 @@ if(!$locked && isset($_POST['stdnum'])){
             $loginId=$rowpassword['USER_ID'];
             $firstname=$rowpassword['FIRST_NAME'];
 
-            $sqlprofile="SELECT * FROM dbo.[USER_IMG] WHERE USER_ID='$loginId'";
-            $resultprofile=sqlsrv_query($conn,$sqlprofile);
+            $sqlprofile="SELECT * FROM USER_IMG WHERE USER_ID='$loginId'";
+            $resultprofile=db_query($conn,$sqlprofile);
             if($resultprofile===false)
-                die(print_r(sqlsrv_errors(),true));
-            $rowprofile=sqlsrv_fetch_array($resultprofile,SQLSRV_FETCH_ASSOC);
+                die(db_last_error());
+            $rowprofile=db_fetch_assoc($resultprofile);
             $file_path=$rowprofile['FILE_PATH'];
         }
     }
@@ -105,7 +100,7 @@ if(!isset($_POST['stdnum']) && $firstname==''){
     exit;
 }
 
-sqlsrv_close($conn);
+db_close($conn);
 ?>
 <!DOCTYPE html>
 <html lang="en">

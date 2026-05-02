@@ -1,13 +1,8 @@
 <?php
-$serverName=".\SQLEXPRESS";
-$connectionOptions=[
-    "Database"=>"pipeline_db",
-    "Uid"=>"",
-    "PWD"=>""
-];
-$conn=sqlsrv_connect($serverName, $connectionOptions);
+require_once __DIR__ . '/db.php';
+$conn = db_connect();
 if($conn==false)
-    die(print_r(sqlsrv_errors(),true));
+    die(db_last_error());
 
 $firstname  = trim($_POST['f_name']);
 $lastname   = trim($_POST['l_name']);
@@ -71,11 +66,11 @@ if(!empty($errors)){
 }
 
 // ── Check if student number already exists ──
-$sql="SELECT * FROM dbo.[USERS] WHERE [STD_NUM]='$stdnum'";
-$result=sqlsrv_query($conn,$sql);
-if($result===false) die(print_r(sqlsrv_errors(),true));
+$sql="SELECT * FROM USERS WHERE STD_NUM='$stdnum'";
+$result=db_query($conn,$sql);
+if($result===false) die(db_last_error());
 
-if(sqlsrv_fetch($result)===true){
+if(db_fetch($result)===true){
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -103,16 +98,16 @@ if(sqlsrv_fetch($result)===true){
 }
 
 // ── Insert new user ──
-$sql="INSERT INTO dbo.[USERS] ([FIRST_NAME],[LAST_NAME],[STD_NUM],[CYS],[SEX],[USERNAME],[EMAIL],[PASSWORD])
+$sql="INSERT INTO USERS (FIRST_NAME, LAST_NAME, STD_NUM, CYS, SEX, USERNAME, EMAIL, `PASSWORD`)
       VALUES ('$firstname','$lastname','$stdnum','$cys','$sex','$username','$email','$password')";
-$result=sqlsrv_query($conn,$sql);
-if($result===false) die(print_r(sqlsrv_errors(),true));
+$result=db_query($conn,$sql);
+if($result===false) die(db_last_error());
 
 // ── Get new user ID ──
-$sql="SELECT USER_ID FROM dbo.[USERS] WHERE [STD_NUM]='$stdnum'";
-$result=sqlsrv_query($conn,$sql);
-if($result===false) die(print_r(sqlsrv_errors(),true));
-$row=sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
+$sql="SELECT USER_ID FROM USERS WHERE STD_NUM='$stdnum'";
+$result=db_query($conn,$sql);
+if($result===false) die(db_last_error());
+$row=db_fetch_assoc($result);
 $id=$row['USER_ID'];
 
 // ── Image upload ──
@@ -128,9 +123,9 @@ if(!empty($_FILES['image']['name'])){
 
     if(in_array($checkimage, $allowtypes)){
         if(move_uploaded_file($_FILES['image']['tmp_name'], $imagepath)){
-            $sql="INSERT INTO USER_IMG ([IMG_NAME],[FILE_PATH],[USER_ID]) VALUES ('$imagename','$imagepath','$id')";
-            $result=sqlsrv_query($conn,$sql);
-            if($result===false) die(print_r(sqlsrv_errors(),true));
+            $sql="INSERT INTO USER_IMG (IMG_NAME, FILE_PATH, USER_ID) VALUES ('$imagename','$imagepath','$id')";
+            $result=db_query($conn,$sql);
+            if($result===false) die(db_last_error());
         }
     }
 }
@@ -210,4 +205,4 @@ if(!empty($_FILES['image']['name'])){
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-<?php sqlsrv_close($conn); ?>
+<?php db_close($conn); ?>
