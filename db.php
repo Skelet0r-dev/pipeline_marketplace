@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 
-$GLOBALS['DB_LAST_ERROR'] = '';
-
 function db_config(): array {
     // Defaults are for local development; override with environment variables in production.
     return [
@@ -24,7 +22,7 @@ function db_connect() {
             PDO::ATTR_EMULATE_PREPARES => false
         ]);
     } catch (PDOException $e) {
-        $GLOBALS['DB_LAST_ERROR'] = $e->getMessage();
+        db_last_error($e->getMessage());
         return false;
     }
 }
@@ -50,7 +48,7 @@ function db_query($conn, string $sql, array $params = []) {
         $stmt->execute($params);
         return $stmt;
     } catch (PDOException $e) {
-        $GLOBALS['DB_LAST_ERROR'] = $e->getMessage();
+        db_last_error($e->getMessage());
         return false;
     }
 }
@@ -67,8 +65,12 @@ function db_fetch($stmt): bool {
     return (bool) $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-function db_last_error(): string {
-    return (string) ($GLOBALS['DB_LAST_ERROR'] ?? '');
+function db_last_error(string $message = null): string {
+    static $lastError = '';
+    if ($message !== null) {
+        $lastError = $message;
+    }
+    return $lastError;
 }
 
 function db_close(&$conn): void {
