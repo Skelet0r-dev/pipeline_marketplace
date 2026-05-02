@@ -20,8 +20,7 @@ function db_connect() {
     try {
         return new PDO($dsn, $config['user'], $config['password'], [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            // Use warning mode to surface issues while keeping existing error handling paths.
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_EMULATE_PREPARES => false
         ]);
     } catch (PDOException $e) {
@@ -45,19 +44,15 @@ function db_query($conn, string $sql, array $params = []) {
         return false;
     }
 
-    $stmt = $conn->prepare($sql);
-    if (!$stmt) {
-        $GLOBALS['DB_LAST_ERROR'] = implode(' ', $conn->errorInfo());
+    try {
+        $stmt = $conn->prepare($sql);
+        $params = db_normalize_params($params);
+        $stmt->execute($params);
+        return $stmt;
+    } catch (PDOException $e) {
+        $GLOBALS['DB_LAST_ERROR'] = $e->getMessage();
         return false;
     }
-
-    $params = db_normalize_params($params);
-    if (!$stmt->execute($params)) {
-        $GLOBALS['DB_LAST_ERROR'] = implode(' ', $stmt->errorInfo());
-        return false;
-    }
-
-    return $stmt;
 }
 
 function db_fetch_assoc($stmt) {
