@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
             $sqlExist = "SELECT FILE_PATH FROM USER_IMG WHERE USER_ID = ?";
             $resExist = db_query($conn, $sqlExist, [$loginId]);
             $imageRow = $resExist ? db_fetch_assoc($resExist) : null;
-            $imageRecordExists = $imageRow !== null && $imageRow !== false;
+            $imageRecordExists = !empty($imageRow);
             
             if ($imageRecordExists) {
                 $sqlImgUpd = "UPDATE USER_IMG SET IMG_NAME = ?, FILE_PATH = ? WHERE USER_ID = ?";
