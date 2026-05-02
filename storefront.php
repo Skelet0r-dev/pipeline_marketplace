@@ -12,15 +12,10 @@ if(!isset($_SESSION['user_id'])){
     exit;
 }
 
-$serverName=".\SQLEXPRESS";
-$connectionOptions=[
-    "Database"=>"pipeline_db",
-    "Uid"=>"",
-    "PWD"=>""
-];
-$conn=sqlsrv_connect($serverName,$connectionOptions);
+require_once __DIR__ . '/db.php';
+$conn = db_connect();
 if($conn==false)
-    die(print_r(sqlsrv_errors(),true));
+    die(db_last_error());
 
 $loginId=$_SESSION['user_id'];
 
@@ -43,9 +38,9 @@ function normalizeCategoryLabel($category){
 }
 
 // Get user info
-$sql="SELECT * FROM dbo.[USERS] WHERE USER_ID='$loginId'";
-$result=sqlsrv_query($conn,$sql);
-$user=sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC);
+$sql="SELECT * FROM USERS WHERE USER_ID=?";
+$result=db_query($conn,$sql, [$loginId]);
+$user=db_fetch_assoc($result);
 
 $firstname=$user['FIRST_NAME'];
 $lastname=$user['LAST_NAME'];
@@ -54,21 +49,21 @@ $cys=$user['CYS'];
 $username=$user['USERNAME'];
 
 // Get profile image
-$sqlimg="SELECT FILE_PATH FROM dbo.[USER_IMG] WHERE USER_ID='$loginId'";
-$resultimg=sqlsrv_query($conn,$sqlimg);
-$rowimg=sqlsrv_fetch_array($resultimg,SQLSRV_FETCH_ASSOC);
+$sqlimg="SELECT FILE_PATH FROM USER_IMG WHERE USER_ID=?";
+$resultimg=db_query($conn,$sqlimg, [$loginId]);
+$rowimg=db_fetch_assoc($resultimg);
 $file_path=$rowimg['FILE_PATH'] ?? 'assets/img/default_avatar.png';
 
 // Get listing count
-$sqlcount="SELECT COUNT(*) AS CNT FROM dbo.[LISTINGS] WHERE USER_ID='$loginId' AND STATUS='Available'";
-$resultcount=sqlsrv_query($conn,$sqlcount);
-$rowcount=sqlsrv_fetch_array($resultcount,SQLSRV_FETCH_ASSOC);
+$sqlcount="SELECT COUNT(*) AS CNT FROM LISTINGS WHERE USER_ID=? AND `STATUS`='Available'";
+$resultcount=db_query($conn,$sqlcount, [$loginId]);
+$rowcount=db_fetch_assoc($resultcount);
 $listing_count=$rowcount['CNT'];
 
 // Get sold count
-$sqlsold="SELECT COUNT(*) AS CNT FROM dbo.[LISTINGS] WHERE USER_ID='$loginId' AND STATUS='Sold'";
-$resultsold=sqlsrv_query($conn,$sqlsold);
-$rowsold=sqlsrv_fetch_array($resultsold,SQLSRV_FETCH_ASSOC);
+$sqlsold="SELECT COUNT(*) AS CNT FROM LISTINGS WHERE USER_ID=? AND `STATUS`='Sold'";
+$resultsold=db_query($conn,$sqlsold, [$loginId]);
+$rowsold=db_fetch_assoc($resultsold);
 $sold_count=$rowsold['CNT'];
 
 // ── Flash success from session ──────────────────────────────
@@ -93,15 +88,15 @@ if(isset($_POST['add_listing']) && $_POST['add_listing']=='1'){
         $categoryval='Course-Specific ('.$college.')';
     }
 
-    $sqladd="INSERT INTO dbo.[LISTINGS] (USER_ID,TITLE,DESCRIPTION,PRICE,CATEGORY,CONDITION,STATUS,MEETUP_SPOT,PAYMENT_METHOD)
+    $sqladd="INSERT INTO LISTINGS (USER_ID,TITLE,DESCRIPTION,PRICE,CATEGORY,`CONDITION`,`STATUS`,MEETUP_SPOT,PAYMENT_METHOD)
              VALUES (?,?,?,?,?,?,?,?,?)";
     $paramsadd=[$loginId,$title,$description,$price,$categoryval,$condition,$status,$meetup,$payment];
-    $resultadd=sqlsrv_query($conn,$sqladd,$paramsadd);
+    $resultadd=db_query($conn,$sqladd,$paramsadd);
 
     if($resultadd){
-        $sqllastid="SELECT TOP 1 LISTING_ID FROM dbo.[LISTINGS] WHERE USER_ID='$loginId' ORDER BY LISTING_ID DESC";
-        $resultlastid=sqlsrv_query($conn,$sqllastid);
-        $rowlastid=sqlsrv_fetch_array($resultlastid,SQLSRV_FETCH_ASSOC);
+        $sqllastid="SELECT LISTING_ID FROM LISTINGS WHERE USER_ID=? ORDER BY LISTING_ID DESC LIMIT 1";
+        $resultlastid=db_query($conn,$sqllastid, [$loginId]);
+        $rowlastid=db_fetch_assoc($resultlastid);
         $newlistingid=$rowlastid['LISTING_ID'];
 
         if(isset($_FILES['listing_img']) && $_FILES['listing_img']['error']==0){
@@ -113,30 +108,29 @@ if(isset($_POST['add_listing']) && $_POST['add_listing']=='1'){
                 $newname='listing_'.$newlistingid.'_'.time().'.'.$imgext;
                 $uploadpath='listings/'.$newname;
                 if(move_uploaded_file($imgtmp,$uploadpath)){
-                    $sqlimginsert="INSERT INTO dbo.[LISTING_IMG] (LISTING_ID,FILE_PATH,IS_PRIMARY) VALUES ('$newlistingid','$uploadpath','1')";
-                    sqlsrv_query($conn,$sqlimginsert);
+                    $sqlimginsert="INSERT INTO LISTING_IMG (LISTING_ID,FILE_PATH,IS_PRIMARY) VALUES (?,?,1)";
+                    db_query($conn,$sqlimginsert, [$newlistingid, $uploadpath]);
                 }
             }
         }
 
-        sqlsrv_close($conn);
+        db_close($conn);
         $_SESSION['flash_success']='Listing added successfully!';
         header("Location: storefront.php");
         exit;
     } else {
-        $errors=sqlsrv_errors();
-        $modal_error='SQL Error: '.($errors ? $errors[0]['message'] : 'Unknown');
+        $modal_error='SQL Error: '.(db_last_error() ?: 'Unknown');
     }
 }
 
 // ── Handle Delete Listing POST ──────────────────────────────
 if(isset($_POST['delete_listing'])){
     $deleteid=trim($_POST['edit_listing_id']);
-    sqlsrv_query($conn,"DELETE FROM dbo.[LISTING_IMG] WHERE LISTING_ID='$deleteid'");
-    $sqldeletelisting="DELETE FROM dbo.[LISTINGS] WHERE LISTING_ID='$deleteid' AND USER_ID='$loginId'";
-    $resultdelete=sqlsrv_query($conn,$sqldeletelisting);
+    db_query($conn,"DELETE FROM LISTING_IMG WHERE LISTING_ID=?", [$deleteid]);
+    $sqldeletelisting="DELETE FROM LISTINGS WHERE LISTING_ID=? AND USER_ID=?";
+    $resultdelete=db_query($conn,$sqldeletelisting, [$deleteid, $loginId]);
     if($resultdelete){
-        sqlsrv_close($conn);
+        db_close($conn);
         $_SESSION['flash_success']='Listing deleted successfully.';
         header("Location: storefront.php");
         exit;
@@ -164,13 +158,13 @@ if(isset($_POST['edit_listing'])){
         $categoryval='Course-Specific ('.$college.')';
     }
 
-    $sqlupdate="UPDATE dbo.[LISTINGS]
+    $sqlupdate="UPDATE LISTINGS
                 SET TITLE=?, DESCRIPTION=?, PRICE=?,
-                    CATEGORY=?, CONDITION=?, STATUS=?,
+                    CATEGORY=?, `CONDITION`=?, `STATUS`=?,
                     MEETUP_SPOT=?, PAYMENT_METHOD=?
                 WHERE LISTING_ID=? AND USER_ID=?";
     $paramsupdate=[$title,$description,$price,$categoryval,$condition,$status,$meetup,$payment,$editid,$loginId];
-    $resultupdate=sqlsrv_query($conn,$sqlupdate,$paramsupdate);
+    $resultupdate=db_query($conn,$sqlupdate,$paramsupdate);
 
     if($resultupdate){
         if(isset($_FILES['edit_listing_img']) && $_FILES['edit_listing_img']['error']==0){
@@ -182,13 +176,13 @@ if(isset($_POST['edit_listing'])){
                 $newname='listing_'.$editid.'_'.time().'.'.$imgext;
                 $uploadpath='listings/'.$newname;
                 if(move_uploaded_file($imgtmp,$uploadpath)){
-                    sqlsrv_query($conn,"DELETE FROM dbo.[LISTING_IMG] WHERE LISTING_ID='$editid'");
-                    $sqlimgupdate="INSERT INTO dbo.[LISTING_IMG] (LISTING_ID,FILE_PATH,IS_PRIMARY) VALUES ('$editid','$uploadpath','1')";
-                    sqlsrv_query($conn,$sqlimgupdate);
+                        db_query($conn,"DELETE FROM LISTING_IMG WHERE LISTING_ID=?", [$editid]);
+                        $sqlimgupdate="INSERT INTO LISTING_IMG (LISTING_ID,FILE_PATH,IS_PRIMARY) VALUES (?,?,1)";
+                        db_query($conn,$sqlimgupdate, [$editid, $uploadpath]);
                 }
             }
         }
-        sqlsrv_close($conn);
+        db_close($conn);
         $_SESSION['flash_success']='Listing updated successfully!';
         header("Location: storefront.php");
         exit;
@@ -200,10 +194,10 @@ if(isset($_POST['edit_listing'])){
 // ── NEW: Handle "Mark as Available" (reverse sold) ──────────
 if(isset($_POST['mark_available'])){
     $markId = (int)trim($_POST['mark_listing_id']);
-    $sqlMark = "UPDATE dbo.[LISTINGS] SET STATUS='Available' WHERE LISTING_ID=? AND USER_ID=?";
-    $resMark = sqlsrv_query($conn, $sqlMark, [$markId, $loginId]);
+    $sqlMark = "UPDATE LISTINGS SET `STATUS`='Available' WHERE LISTING_ID=? AND USER_ID=?";
+    $resMark = db_query($conn, $sqlMark, [$markId, $loginId]);
     if($resMark){
-        sqlsrv_close($conn);
+        db_close($conn);
         $_SESSION['flash_success'] = 'Listing is now Available again.';
         header("Location: storefront.php");
         exit;
@@ -212,19 +206,19 @@ if(isset($_POST['mark_available'])){
 
 // ── Fetch active listings ───────────────────────────────────
 $sqllistings="SELECT L.*, I.FILE_PATH AS IMG
-              FROM dbo.[LISTINGS] L
-              LEFT JOIN dbo.[LISTING_IMG] I ON L.LISTING_ID=I.LISTING_ID AND I.IS_PRIMARY=1
-              WHERE L.USER_ID='$loginId' AND L.STATUS='Available'
+              FROM LISTINGS L
+              LEFT JOIN LISTING_IMG I ON L.LISTING_ID=I.LISTING_ID AND I.IS_PRIMARY=1
+              WHERE L.USER_ID=? AND L.`STATUS`='Available'
               ORDER BY L.DATE_POSTED DESC";
-$resultlistings=sqlsrv_query($conn,$sqllistings);
+$resultlistings=db_query($conn,$sqllistings, [$loginId]);
 
 // ── Fetch sold listings ─────────────────────────────────────
 $sqlsoldlist="SELECT L.*, I.FILE_PATH AS IMG
-              FROM dbo.[LISTINGS] L
-              LEFT JOIN dbo.[LISTING_IMG] I ON L.LISTING_ID=I.LISTING_ID AND I.IS_PRIMARY=1
-              WHERE L.USER_ID='$loginId' AND L.STATUS='Sold'
+              FROM LISTINGS L
+              LEFT JOIN LISTING_IMG I ON L.LISTING_ID=I.LISTING_ID AND I.IS_PRIMARY=1
+              WHERE L.USER_ID=? AND L.`STATUS`='Sold'
               ORDER BY L.DATE_POSTED DESC";
-$resultsoldlist=sqlsrv_query($conn,$sqlsoldlist);
+$resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
 
 // ── Fetch activity: likes on your listings ──────────────────
 // (join with LISTING_LIKES and LISTING_COMMENTS tables)
@@ -232,16 +226,16 @@ $sqlLikes = "SELECT LL.LIKE_ID, LL.CREATED_AT,
                     L.TITLE, L.LISTING_ID,
                     U.FIRST_NAME, U.LAST_NAME, U.USERNAME,
                     UI.FILE_PATH AS AVATAR
-             FROM dbo.[LISTING_LIKES] LL
-             JOIN dbo.[LISTINGS] L ON LL.LISTING_ID = L.LISTING_ID
-             JOIN dbo.[USERS] U    ON LL.USER_ID = U.USER_ID
-             LEFT JOIN dbo.[USER_IMG] UI ON LL.USER_ID = UI.USER_ID
-             WHERE L.USER_ID = '$loginId'
+             FROM LISTING_LIKES LL
+             JOIN LISTINGS L ON LL.LISTING_ID = L.LISTING_ID
+             JOIN USERS U    ON LL.USER_ID = U.USER_ID
+             LEFT JOIN USER_IMG UI ON LL.USER_ID = UI.USER_ID
+             WHERE L.USER_ID = ?
              ORDER BY LL.CREATED_AT DESC";
-$resLikes = sqlsrv_query($conn, $sqlLikes);
+$resLikes = db_query($conn, $sqlLikes, [$loginId]);
 $activityLikes = [];
 if($resLikes){
-    while($row = sqlsrv_fetch_array($resLikes, SQLSRV_FETCH_ASSOC)){
+    while($row = db_fetch_assoc($resLikes)){
         $row['CREATED_AT'] = $row['CREATED_AT'] instanceof DateTime
             ? $row['CREATED_AT']->format('M d, Y g:i A')
             : date('M d, Y g:i A');
@@ -254,16 +248,16 @@ $sqlComments = "SELECT LC.COMMENT_ID, LC.COMMENT_TEXT, LC.CREATED_AT,
                        L.TITLE, L.LISTING_ID,
                        U.FIRST_NAME, U.LAST_NAME, U.USERNAME,
                        UI.FILE_PATH AS AVATAR
-                FROM dbo.[LISTING_COMMENTS] LC
-                JOIN dbo.[LISTINGS] L ON LC.LISTING_ID = L.LISTING_ID
-                JOIN dbo.[USERS] U    ON LC.USER_ID = U.USER_ID
-                LEFT JOIN dbo.[USER_IMG] UI ON LC.USER_ID = UI.USER_ID
-                WHERE L.USER_ID = '$loginId'
+                FROM LISTING_COMMENTS LC
+                JOIN LISTINGS L ON LC.LISTING_ID = L.LISTING_ID
+                JOIN USERS U    ON LC.USER_ID = U.USER_ID
+                LEFT JOIN USER_IMG UI ON LC.USER_ID = UI.USER_ID
+                WHERE L.USER_ID = ?
                 ORDER BY LC.CREATED_AT DESC";
-$resComments = sqlsrv_query($conn, $sqlComments);
+$resComments = db_query($conn, $sqlComments, [$loginId]);
 $activityComments = [];
 if($resComments){
-    while($row = sqlsrv_fetch_array($resComments, SQLSRV_FETCH_ASSOC)){
+    while($row = db_fetch_assoc($resComments)){
         $row['CREATED_AT'] = $row['CREATED_AT'] instanceof DateTime
             ? $row['CREATED_AT']->format('M d, Y g:i A')
             : date('M d, Y g:i A');
@@ -365,7 +359,7 @@ if($resComments){
         <div class="sf-grid">
         <?php
         $haslistings=false;
-        while($item=sqlsrv_fetch_array($resultlistings, SQLSRV_FETCH_ASSOC)){
+        while($item=db_fetch_assoc($resultlistings)){
             $haslistings=true;
             $imgpath=$item['IMG'] ? $item['IMG'] : 'assets/img/no_image.png';
             $condclass=$item['CONDITION']=='New' ? 'cond-new' : ($item['CONDITION']=='Like New' ? 'cond-great' : 'cond-good');
@@ -420,7 +414,7 @@ if($resComments){
         <div class="sf-grid">
         <?php
         $hassold=false;
-        while($item=sqlsrv_fetch_array($resultsoldlist, SQLSRV_FETCH_ASSOC)){
+        while($item=db_fetch_assoc($resultsoldlist)){
             $hassold=true;
             $imgpath=$item['IMG'] ? $item['IMG'] : 'assets/img/no_image.png';
             $condclass=$item['CONDITION']=='New' ? 'cond-new' : ($item['CONDITION']=='Like New' ? 'cond-great' : 'cond-good');
@@ -1087,4 +1081,4 @@ if($resComments){
     </script>
 </body>
 </html>
-<?php sqlsrv_close($conn); ?>
+<?php db_close($conn); ?>

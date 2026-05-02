@@ -7,16 +7,15 @@
 session_start();
 header('Content-Type: application/json');
 
+require_once __DIR__ . '/db.php';
+
 if(!isset($_SESSION['user_id'])){
     http_response_code(401);
     echo json_encode(['error' => 'Unauthorized']);
     exit;
 }
 
-$serverName=".\SQLEXPRESS";
-$connectionOptions=["Database"=>"pipeline_db","Uid"=>"","PWD"=>""];
-$conn=sqlsrv_connect($serverName,$connectionOptions);
-
+$conn = db_connect();
 if(!$conn){
     http_response_code(500);
     echo json_encode(['error' => 'DB connection failed']);
@@ -36,27 +35,27 @@ if(!$listingId || $commentText === ''){
 // Truncate for safety
 $commentText = mb_substr($commentText, 0, 1000);
 
-$sqlInsert = "INSERT INTO dbo.[LISTING_COMMENTS] (LISTING_ID, USER_ID, COMMENT_TEXT) VALUES (?,?,?)";
-$result    = sqlsrv_query($conn, $sqlInsert, [$listingId, $userId, $commentText]);
+$sqlInsert = "INSERT INTO LISTING_COMMENTS (LISTING_ID, USER_ID, COMMENT_TEXT) VALUES (?,?,?)";
+$result    = db_query($conn, $sqlInsert, [$listingId, $userId, $commentText]);
 
 if(!$result){
     http_response_code(500);
-    $errs = sqlsrv_errors();
-    echo json_encode(['error' => $errs[0]['message'] ?? 'Insert failed']);
+    echo json_encode(['error' => db_last_error() ?: 'Insert failed']);
     exit;
 }
 
 // Fetch the newly inserted comment with user info to return to frontend
-$sqlNew = "SELECT TOP 1 C.COMMENT_ID, C.COMMENT_TEXT, C.CREATED_AT,
+$sqlNew = "SELECT C.COMMENT_ID, C.COMMENT_TEXT, C.CREATED_AT,
                   U.FIRST_NAME, U.LAST_NAME, U.USERNAME,
                   UI.FILE_PATH AS AVATAR
-           FROM dbo.[LISTING_COMMENTS] C
-           JOIN dbo.[USERS] U ON C.USER_ID = U.USER_ID
-           LEFT JOIN dbo.[USER_IMG] UI ON C.USER_ID = UI.USER_ID
+           FROM LISTING_COMMENTS C
+           JOIN USERS U ON C.USER_ID = U.USER_ID
+           LEFT JOIN USER_IMG UI ON C.USER_ID = UI.USER_ID
            WHERE C.LISTING_ID=? AND C.USER_ID=?
-           ORDER BY C.COMMENT_ID DESC";
-$resNew = sqlsrv_query($conn, $sqlNew, [$listingId, $userId]);
-$row    = sqlsrv_fetch_array($resNew, SQLSRV_FETCH_ASSOC);
+           ORDER BY C.COMMENT_ID DESC
+           LIMIT 1";
+$resNew = db_query($conn, $sqlNew, [$listingId, $userId]);
+$row    = db_fetch_assoc($resNew);
 
 $createdAt = $row['CREATED_AT'] instanceof DateTime
     ? $row['CREATED_AT']->format('M d, Y g:i A')
@@ -73,4 +72,4 @@ echo json_encode([
     'created_at'   => $createdAt
 ]);
 
-sqlsrv_close($conn);
+db_close($conn);

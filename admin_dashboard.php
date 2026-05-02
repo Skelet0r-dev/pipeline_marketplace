@@ -6,48 +6,48 @@ if (!isset($_SESSION['admin_username'])) {
     exit;
 }
 
-$serverName = ".\SQLEXPRESS";
-$connectionOptions = [
-    "Database" => "pipeline_db",
-    "Uid" => "",
-    "PWD" => ""
-];
-
-$conn = sqlsrv_connect($serverName, $connectionOptions);
+require_once __DIR__ . '/db.php';
+$conn = db_connect();
 if ($conn === false) {
-    die(print_r(sqlsrv_errors(), true));
+    die(db_last_error());
 }
 
 function tableExists($conn, $tableName) {
-    $stmt = sqlsrv_query(
+    $stmt = db_query(
         $conn,
         "SELECT 1 AS EXISTS_FLAG
          FROM INFORMATION_SCHEMA.TABLES
-         WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = ?",
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
+         LIMIT 1",
         [$tableName]
     );
 
-    return $stmt && sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+    return $stmt && db_fetch_assoc($stmt);
 }
 
 function columnExists($conn, $tableName, $columnName) {
-    $stmt = sqlsrv_query(
+    $stmt = db_query(
         $conn,
-        "SELECT COL_LENGTH('dbo.[' + ? + ']', ?) AS COL_LENGTH",
+        "SELECT 1 AS COL_EXISTS
+         FROM INFORMATION_SCHEMA.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = ?
+           AND COLUMN_NAME = ?
+         LIMIT 1",
         [$tableName, $columnName]
     );
-    $row = $stmt ? sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC) : null;
+    $row = $stmt ? db_fetch_assoc($stmt) : null;
 
-    return !empty($row['COL_LENGTH']);
+    return !empty($row['COL_EXISTS']);
 }
 
 function scalarValue($conn, $sql, $params = [], $field = 'CNT', $fallback = 0) {
-    $stmt = sqlsrv_query($conn, $sql, $params);
+    $stmt = db_query($conn, $sql, $params);
     if (!$stmt) {
         return $fallback;
     }
 
-    $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+    $row = db_fetch_assoc($stmt);
     if (!$row || !isset($row[$field])) {
         return $fallback;
     }
@@ -377,15 +377,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['report_action'])) {
     $reportId = isset($_POST['report_id']) ? (int) $_POST['report_id'] : 0;
     $action = $_POST['report_action'];
 
-    $reportStmt = sqlsrv_query(
+    $reportStmt = db_query(
         $conn,
         "SELECT R.REPORT_ID, R.LISTING_ID, R.REPORT_STATUS, L.TITLE
-         FROM dbo.[LISTING_REPORTS] R
-         LEFT JOIN dbo.[LISTINGS] L ON R.LISTING_ID = L.LISTING_ID
+         FROM LISTING_REPORTS R
+         LEFT JOIN LISTINGS L ON R.LISTING_ID = L.LISTING_ID
          WHERE R.REPORT_ID = ?",
         [$reportId]
     );
-    $report = $reportStmt ? sqlsrv_fetch_array($reportStmt, SQLSRV_FETCH_ASSOC) : null;
+    $report = $reportStmt ? db_fetch_assoc($reportStmt) : null;
 
     if (!$report) {
         $_SESSION['admin_flash'] = 'Report was not found.';
@@ -393,9 +393,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['report_action'])) {
     }
 
     if ($action === 'deny') {
-        $denyStmt = sqlsrv_query(
+        $denyStmt = db_query(
             $conn,
-            "DELETE FROM dbo.[LISTING_REPORTS] WHERE REPORT_ID = ?",
+            "DELETE FROM LISTING_REPORTS WHERE REPORT_ID = ?",
             [$reportId]
         );
         $_SESSION['admin_flash'] = $denyStmt ? 'Report denied and removed from the database.' : 'Unable to deny the report.';
@@ -404,30 +404,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['report_action'])) {
 
     if ($action === 'delete_listing') {
         $listingId = (int) $report['LISTING_ID'];
-        sqlsrv_begin_transaction($conn);
+        db_begin_transaction($conn);
 
         $deleteOk = true;
         foreach (['LISTING_REPORTS', 'LISTING_COMMENTS', 'LISTING_LIKES', 'LISTING_IMG'] as $tableName) {
             if (tableExists($conn, $tableName)) {
-                $deleteOk = $deleteOk && (bool) sqlsrv_query(
+                $deleteOk = $deleteOk && (bool) db_query(
                     $conn,
-                    "DELETE FROM dbo.[{$tableName}] WHERE LISTING_ID = ?",
+                    "DELETE FROM {$tableName} WHERE LISTING_ID = ?",
                     [$listingId]
                 );
             }
         }
 
-        $deleteOk = $deleteOk && (bool) sqlsrv_query(
+        $deleteOk = $deleteOk && (bool) db_query(
             $conn,
-            "DELETE FROM dbo.[LISTINGS] WHERE LISTING_ID = ?",
+            "DELETE FROM LISTINGS WHERE LISTING_ID = ?",
             [$listingId]
         );
 
         if ($deleteOk) {
-            sqlsrv_commit($conn);
+            db_commit($conn);
             $_SESSION['admin_flash'] = 'Reported listing deleted from the database.';
         } else {
-            sqlsrv_rollback($conn);
+            db_rollback($conn);
             $_SESSION['admin_flash'] = 'Unable to delete the reported listing.';
         }
 
@@ -438,21 +438,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['report_action'])) {
     safeRedirect('admin_dashboard.php?page=reports');
 }
 
-$totalStudents = (int) scalarValue($conn, "SELECT COUNT(*) AS CNT FROM dbo.[USERS]");
-$totalListings = (int) scalarValue($conn, "SELECT COUNT(*) AS CNT FROM dbo.[LISTINGS]");
-$activeListings = (int) scalarValue($conn, "SELECT COUNT(*) AS CNT FROM dbo.[LISTINGS] WHERE STATUS='Available'");
-$soldListings = (int) scalarValue($conn, "SELECT COUNT(*) AS CNT FROM dbo.[LISTINGS] WHERE STATUS='Sold'");
-$reservedListings = (int) scalarValue($conn, "SELECT COUNT(*) AS CNT FROM dbo.[LISTINGS] WHERE STATUS='Reserved'");
-$pendingReviewListings = (int) scalarValue($conn, "SELECT COUNT(*) AS CNT FROM dbo.[LISTINGS] WHERE STATUS IN ('Pending Review','Pending')");
-$removedListings = (int) scalarValue($conn, "SELECT COUNT(*) AS CNT FROM dbo.[LISTINGS] WHERE STATUS='Removed'");
+$totalStudents = (int) scalarValue($conn, "SELECT COUNT(*) AS CNT FROM USERS");
+$totalListings = (int) scalarValue($conn, "SELECT COUNT(*) AS CNT FROM LISTINGS");
+$activeListings = (int) scalarValue($conn, "SELECT COUNT(*) AS CNT FROM LISTINGS WHERE `STATUS`='Available'");
+$soldListings = (int) scalarValue($conn, "SELECT COUNT(*) AS CNT FROM LISTINGS WHERE `STATUS`='Sold'");
+$reservedListings = (int) scalarValue($conn, "SELECT COUNT(*) AS CNT FROM LISTINGS WHERE `STATUS`='Reserved'");
+$pendingReviewListings = (int) scalarValue($conn, "SELECT COUNT(*) AS CNT FROM LISTINGS WHERE `STATUS` IN ('Pending Review','Pending')");
+$removedListings = (int) scalarValue($conn, "SELECT COUNT(*) AS CNT FROM LISTINGS WHERE `STATUS`='Removed'");
 $listedThisWeek = (int) scalarValue(
     $conn,
-    "SELECT COUNT(*) AS CNT FROM dbo.[LISTINGS] WHERE DATE_POSTED >= ? AND DATE_POSTED < ?",
+    "SELECT COUNT(*) AS CNT FROM LISTINGS WHERE DATE_POSTED >= ? AND DATE_POSTED < ?",
     [$weekStart, $weekEnd]
 );
 $soldThisMonth = (int) scalarValue(
     $conn,
-    "SELECT COUNT(*) AS CNT FROM dbo.[LISTINGS] WHERE STATUS='Sold' AND DATE_POSTED >= ?",
+    "SELECT COUNT(*) AS CNT FROM LISTINGS WHERE `STATUS`='Sold' AND DATE_POSTED >= ?",
     [$thirtyDaysAgo]
 );
 
@@ -462,24 +462,25 @@ $recentReports = [];
 if ($reportsTableExists) {
     $pendingReports = (int) scalarValue(
         $conn,
-        "SELECT COUNT(*) AS CNT FROM dbo.[LISTING_REPORTS] WHERE REPORT_STATUS='Pending'"
+        "SELECT COUNT(*) AS CNT FROM LISTING_REPORTS WHERE REPORT_STATUS='Pending'"
     );
     $reportsThisWeek = (int) scalarValue(
         $conn,
-        "SELECT COUNT(*) AS CNT FROM dbo.[LISTING_REPORTS] WHERE CREATED_AT >= ? AND CREATED_AT < ?",
+        "SELECT COUNT(*) AS CNT FROM LISTING_REPORTS WHERE CREATED_AT >= ? AND CREATED_AT < ?",
         [$weekStart, $weekEnd]
     );
 
-    $reportSql = "SELECT TOP 4 R.REPORT_REASON, R.REPORT_STATUS, R.CREATED_AT,
+    $reportSql = "SELECT R.REPORT_REASON, R.REPORT_STATUS, R.CREATED_AT,
                          L.TITLE,
                          U.USERNAME AS REPORTER_USERNAME
-                  FROM dbo.[LISTING_REPORTS] R
-                  JOIN dbo.[LISTINGS] L ON R.LISTING_ID = L.LISTING_ID
-                  JOIN dbo.[USERS] U ON R.REPORTER_USER_ID = U.USER_ID
-                  ORDER BY R.CREATED_AT DESC, R.REPORT_ID DESC";
-    $reportStmt = sqlsrv_query($conn, $reportSql);
+                  FROM LISTING_REPORTS R
+                  JOIN LISTINGS L ON R.LISTING_ID = L.LISTING_ID
+                  JOIN USERS U ON R.REPORTER_USER_ID = U.USER_ID
+                  ORDER BY R.CREATED_AT DESC, R.REPORT_ID DESC
+                  LIMIT 4";
+    $reportStmt = db_query($conn, $reportSql);
     if ($reportStmt) {
-        while ($row = sqlsrv_fetch_array($reportStmt, SQLSRV_FETCH_ASSOC)) {
+        while ($row = db_fetch_assoc($reportStmt)) {
             $recentReports[] = $row;
         }
     }
@@ -496,7 +497,7 @@ foreach (['CREATED_AT', 'DATE_REGISTERED', 'REG_DATE'] as $candidateColumn) {
 $auditStudentsRegistered = $studentDateColumn
     ? (int) scalarValue(
         $conn,
-        "SELECT COUNT(*) AS CNT FROM dbo.[USERS] WHERE {$studentDateColumn} >= ? AND {$studentDateColumn} < ?",
+        "SELECT COUNT(*) AS CNT FROM USERS WHERE {$studentDateColumn} >= ? AND {$studentDateColumn} < ?",
         [$auditStart, $auditEnd]
     )
     : $totalStudents;
@@ -504,17 +505,17 @@ $auditStudentMetricLabel = $studentDateColumn ? 'Students Registered' : 'Student
 
 $auditListings = (int) scalarValue(
     $conn,
-    "SELECT COUNT(*) AS CNT FROM dbo.[LISTINGS] WHERE DATE_POSTED >= ? AND DATE_POSTED < ?",
+    "SELECT COUNT(*) AS CNT FROM LISTINGS WHERE DATE_POSTED >= ? AND DATE_POSTED < ?",
     [$auditStart, $auditEnd]
 );
 $auditSoldListings = (int) scalarValue(
     $conn,
-    "SELECT COUNT(*) AS CNT FROM dbo.[LISTINGS] WHERE STATUS='Sold' AND DATE_POSTED >= ? AND DATE_POSTED < ?",
+    "SELECT COUNT(*) AS CNT FROM LISTINGS WHERE `STATUS`='Sold' AND DATE_POSTED >= ? AND DATE_POSTED < ?",
     [$auditStart, $auditEnd]
 );
 $auditActiveListings = (int) scalarValue(
     $conn,
-    "SELECT COUNT(*) AS CNT FROM dbo.[LISTINGS] WHERE STATUS='Available' AND DATE_POSTED >= ? AND DATE_POSTED < ?",
+    "SELECT COUNT(*) AS CNT FROM LISTINGS WHERE `STATUS`='Available' AND DATE_POSTED >= ? AND DATE_POSTED < ?",
     [$auditStart, $auditEnd]
 );
 
@@ -522,14 +523,14 @@ $auditReports = 0;
 if ($reportsTableExists) {
     $auditReports += (int) scalarValue(
         $conn,
-        "SELECT COUNT(*) AS CNT FROM dbo.[LISTING_REPORTS] WHERE CREATED_AT >= ? AND CREATED_AT < ?",
+        "SELECT COUNT(*) AS CNT FROM LISTING_REPORTS WHERE CREATED_AT >= ? AND CREATED_AT < ?",
         [$auditStart, $auditEnd]
     );
 }
 if ($userReportsTableExists) {
     $auditReports += (int) scalarValue(
         $conn,
-        "SELECT COUNT(*) AS CNT FROM dbo.[USER_REPORTS] WHERE CREATED_AT >= ? AND CREATED_AT < ?",
+        "SELECT COUNT(*) AS CNT FROM USER_REPORTS WHERE CREATED_AT >= ? AND CREATED_AT < ?",
         [$auditStart, $auditEnd]
     );
 }
@@ -545,10 +546,10 @@ $categoryOrder = [
 ];
 $categoryCounts = array_fill_keys($categoryOrder, 0);
 
-$categorySql = "SELECT CATEGORY, COUNT(*) AS CNT FROM dbo.[LISTINGS] GROUP BY CATEGORY";
-$categoryStmt = sqlsrv_query($conn, $categorySql);
+$categorySql = "SELECT CATEGORY, COUNT(*) AS CNT FROM LISTINGS GROUP BY CATEGORY";
+$categoryStmt = db_query($conn, $categorySql);
 if ($categoryStmt) {
-    while ($row = sqlsrv_fetch_array($categoryStmt, SQLSRV_FETCH_ASSOC)) {
+    while ($row = db_fetch_assoc($categoryStmt)) {
         $normalized = normalizeCategoryName($row['CATEGORY']);
         if (!isset($categoryCounts[$normalized])) {
             $categoryCounts[$normalized] = 0;
@@ -560,16 +561,16 @@ if ($categoryStmt) {
 $maxCategoryCount = !empty($categoryCounts) ? max($categoryCounts) : 0;
 
 $auditCategoryCounts = array_fill_keys($categoryOrder, 0);
-$auditCategoryStmt = sqlsrv_query(
+$auditCategoryStmt = db_query(
     $conn,
     "SELECT CATEGORY, COUNT(*) AS CNT
-     FROM dbo.[LISTINGS]
+     FROM LISTINGS
      WHERE DATE_POSTED >= ? AND DATE_POSTED < ?
      GROUP BY CATEGORY",
     [$auditStart, $auditEnd]
 );
 if ($auditCategoryStmt) {
-    while ($row = sqlsrv_fetch_array($auditCategoryStmt, SQLSRV_FETCH_ASSOC)) {
+    while ($row = db_fetch_assoc($auditCategoryStmt)) {
         $normalized = normalizeCategoryName($row['CATEGORY']);
         if (!isset($auditCategoryCounts[$normalized])) {
             $auditCategoryCounts[$normalized] = 0;
@@ -592,13 +593,13 @@ $donutStyle = donutGradient($statusSegments);
 
 $listingDays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 $listingChartCounts = array_fill(0, 7, 0);
-$listingDatesStmt = sqlsrv_query(
+$listingDatesStmt = db_query(
     $conn,
-    "SELECT DATE_POSTED FROM dbo.[LISTINGS] WHERE DATE_POSTED >= ? AND DATE_POSTED < ?",
+    "SELECT DATE_POSTED FROM LISTINGS WHERE DATE_POSTED >= ? AND DATE_POSTED < ?",
     [$weekStart, $weekEnd]
 );
 if ($listingDatesStmt) {
-    while ($row = sqlsrv_fetch_array($listingDatesStmt, SQLSRV_FETCH_ASSOC)) {
+    while ($row = db_fetch_assoc($listingDatesStmt)) {
         $dateValue = $row['DATE_POSTED'];
         if ($dateValue instanceof DateTime) {
             $dayIndex = (int) $dateValue->format('N') - 1;
@@ -613,25 +614,27 @@ if ($listingDatesStmt) {
 $maxListingDayCount = max($listingChartCounts);
 
 $recentListings = [];
-$recentListingsSql = "SELECT TOP 5 L.TITLE, L.CATEGORY, L.PRICE, L.STATUS, L.DATE_POSTED,
+$recentListingsSql = "SELECT L.TITLE, L.CATEGORY, L.PRICE, L.`STATUS`, L.DATE_POSTED,
                              U.USERNAME
-                      FROM dbo.[LISTINGS] L
-                      JOIN dbo.[USERS] U ON L.USER_ID = U.USER_ID
-                      ORDER BY L.DATE_POSTED DESC, L.LISTING_ID DESC";
-$recentListingsStmt = sqlsrv_query($conn, $recentListingsSql);
+                       FROM LISTINGS L
+                       JOIN USERS U ON L.USER_ID = U.USER_ID
+                       ORDER BY L.DATE_POSTED DESC, L.LISTING_ID DESC
+                       LIMIT 5";
+$recentListingsStmt = db_query($conn, $recentListingsSql);
 if ($recentListingsStmt) {
-    while ($row = sqlsrv_fetch_array($recentListingsStmt, SQLSRV_FETCH_ASSOC)) {
+    while ($row = db_fetch_assoc($recentListingsStmt)) {
         $recentListings[] = $row;
     }
 }
 
 $recentUsers = [];
-$recentUsersSql = "SELECT TOP 4 USER_ID, FIRST_NAME, LAST_NAME, STD_NUM, CYS
-                   FROM dbo.[USERS]
-                   ORDER BY USER_ID DESC";
-$recentUsersStmt = sqlsrv_query($conn, $recentUsersSql);
+$recentUsersSql = "SELECT USER_ID, FIRST_NAME, LAST_NAME, STD_NUM, CYS
+                   FROM USERS
+                   ORDER BY USER_ID DESC
+                   LIMIT 4";
+$recentUsersStmt = db_query($conn, $recentUsersSql);
 if ($recentUsersStmt) {
-    while ($row = sqlsrv_fetch_array($recentUsersStmt, SQLSRV_FETCH_ASSOC)) {
+    while ($row = db_fetch_assoc($recentUsersStmt)) {
         $recentUsers[] = $row;
     }
 }
@@ -644,7 +647,7 @@ $reportFilter = inputValue('report_status');
 
 $allUsers = [];
 $allUsersSql = "SELECT USER_ID, FIRST_NAME, LAST_NAME, STD_NUM, CYS
-                FROM dbo.[USERS]
+                FROM USERS
                 WHERE 1=1";
 $allUsersParams = [];
 if ($studentSearch !== '') {
@@ -653,18 +656,18 @@ if ($studentSearch !== '') {
     array_push($allUsersParams, $like, $like, $like, $like, $like);
 }
 $allUsersSql .= " ORDER BY USER_ID DESC";
-$allUsersStmt = sqlsrv_query($conn, $allUsersSql, $allUsersParams);
+$allUsersStmt = db_query($conn, $allUsersSql, $allUsersParams);
 if ($allUsersStmt) {
-    while ($row = sqlsrv_fetch_array($allUsersStmt, SQLSRV_FETCH_ASSOC)) {
+    while ($row = db_fetch_assoc($allUsersStmt)) {
         $allUsers[] = $row;
     }
 }
 
 $allListings = [];
-$allListingsSql = "SELECT L.LISTING_ID, L.TITLE, L.CATEGORY, L.PRICE, L.STATUS, L.DATE_POSTED,
+$allListingsSql = "SELECT L.LISTING_ID, L.TITLE, L.CATEGORY, L.PRICE, L.`STATUS`, L.DATE_POSTED,
                           U.USERNAME
-                   FROM dbo.[LISTINGS] L
-                   JOIN dbo.[USERS] U ON L.USER_ID = U.USER_ID
+                   FROM LISTINGS L
+                   JOIN USERS U ON L.USER_ID = U.USER_ID
                    WHERE 1=1";
 $allListingsParams = [];
 if ($listingCategory !== '') {
@@ -681,7 +684,7 @@ if ($listingCategory !== '') {
     }
 }
 if ($listingStatus !== '') {
-    $allListingsSql .= " AND L.STATUS = ?";
+    $allListingsSql .= " AND L.`STATUS` = ?";
     $allListingsParams[] = $listingStatus;
 }
 if ($listingSearch !== '') {
@@ -690,9 +693,9 @@ if ($listingSearch !== '') {
     array_push($allListingsParams, $like, $like, $like);
 }
 $allListingsSql .= " ORDER BY L.DATE_POSTED DESC, L.LISTING_ID DESC";
-$allListingsStmt = sqlsrv_query($conn, $allListingsSql, $allListingsParams);
+$allListingsStmt = db_query($conn, $allListingsSql, $allListingsParams);
 if ($allListingsStmt) {
-    while ($row = sqlsrv_fetch_array($allListingsStmt, SQLSRV_FETCH_ASSOC)) {
+    while ($row = db_fetch_assoc($allListingsStmt)) {
         $allListings[] = $row;
     }
 }
@@ -700,20 +703,20 @@ if ($allListingsStmt) {
 $allReports = [];
 if ($reportsTableExists) {
     $reportImageSelect = $listingImagesTableExists ? "I.FILE_PATH AS LISTING_IMAGE," : "NULL AS LISTING_IMAGE,";
-    $reportImageJoin = $listingImagesTableExists ? "LEFT JOIN dbo.[LISTING_IMG] I ON L.LISTING_ID = I.LISTING_ID AND I.IS_PRIMARY = 1" : "";
+    $reportImageJoin = $listingImagesTableExists ? "LEFT JOIN LISTING_IMG I ON L.LISTING_ID = I.LISTING_ID AND I.IS_PRIMARY = 1" : "";
     $allReportsSql = "SELECT R.REPORT_ID, R.LISTING_ID, R.REPORT_REASON, R.REPORT_DETAILS,
-                             R.REPORT_STATUS, R.CREATED_AT,
-                             L.TITLE, L.DESCRIPTION, L.CATEGORY, L.PRICE, L.CONDITION,
-                             L.MEETUP_SPOT, L.PAYMENT_METHOD, L.DATE_POSTED,
-                             L.STATUS AS LISTING_STATUS,
-                             {$reportImageSelect}
-                             REPORTER.USERNAME AS REPORTER_USERNAME,
-                             OWNER.USERNAME AS OWNER_USERNAME
-                      FROM dbo.[LISTING_REPORTS] R
-                      LEFT JOIN dbo.[LISTINGS] L ON R.LISTING_ID = L.LISTING_ID
+                              R.REPORT_STATUS, R.CREATED_AT,
+                              L.TITLE, L.DESCRIPTION, L.CATEGORY, L.PRICE, L.`CONDITION`,
+                              L.MEETUP_SPOT, L.PAYMENT_METHOD, L.DATE_POSTED,
+                              L.`STATUS` AS LISTING_STATUS,
+                              {$reportImageSelect}
+                              REPORTER.USERNAME AS REPORTER_USERNAME,
+                              OWNER.USERNAME AS OWNER_USERNAME
+                      FROM LISTING_REPORTS R
+                      LEFT JOIN LISTINGS L ON R.LISTING_ID = L.LISTING_ID
                       {$reportImageJoin}
-                      LEFT JOIN dbo.[USERS] REPORTER ON R.REPORTER_USER_ID = REPORTER.USER_ID
-                      LEFT JOIN dbo.[USERS] OWNER ON R.LISTING_OWNER_USER_ID = OWNER.USER_ID
+                      LEFT JOIN USERS REPORTER ON R.REPORTER_USER_ID = REPORTER.USER_ID
+                      LEFT JOIN USERS OWNER ON R.LISTING_OWNER_USER_ID = OWNER.USER_ID
                       WHERE 1=1";
     $allReportsParams = [];
     if ($reportFilter !== '') {
@@ -721,9 +724,9 @@ if ($reportsTableExists) {
         $allReportsParams[] = $reportFilter;
     }
     $allReportsSql .= " ORDER BY R.CREATED_AT DESC, R.REPORT_ID DESC";
-    $allReportsStmt = sqlsrv_query($conn, $allReportsSql, $allReportsParams);
+    $allReportsStmt = db_query($conn, $allReportsSql, $allReportsParams);
     if ($allReportsStmt) {
-        while ($row = sqlsrv_fetch_array($allReportsStmt, SQLSRV_FETCH_ASSOC)) {
+        while ($row = db_fetch_assoc($allReportsStmt)) {
             $allReports[] = $row;
         }
     }
@@ -786,13 +789,13 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
     if ($reportsTableExists) {
         $csvSql = "SELECT R.REPORT_REASON, R.REPORT_STATUS, L.TITLE,
                           U.USERNAME AS REPORTER_USERNAME, R.CREATED_AT
-                   FROM dbo.[LISTING_REPORTS] R
-                   JOIN dbo.[LISTINGS] L ON R.LISTING_ID = L.LISTING_ID
-                   JOIN dbo.[USERS] U ON R.REPORTER_USER_ID = U.USER_ID
+                   FROM LISTING_REPORTS R
+                   JOIN LISTINGS L ON R.LISTING_ID = L.LISTING_ID
+                   JOIN USERS U ON R.REPORTER_USER_ID = U.USER_ID
                    ORDER BY R.CREATED_AT DESC, R.REPORT_ID DESC";
-        $csvStmt = sqlsrv_query($conn, $csvSql);
+        $csvStmt = db_query($conn, $csvSql);
         if ($csvStmt) {
-            while ($row = sqlsrv_fetch_array($csvStmt, SQLSRV_FETCH_ASSOC)) {
+            while ($row = db_fetch_assoc($csvStmt)) {
                 fputcsv($output, [
                     $row['REPORT_REASON'],
                     $row['REPORT_STATUS'],

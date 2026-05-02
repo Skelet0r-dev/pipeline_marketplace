@@ -1,14 +1,9 @@
 <?php
 session_start();
 
-$serverName = ".\SQLEXPRESS";
-$connectionOptions = [
-    "Database" => "pipeline_db",
-    "Uid"      => "",
-    "PWD"      => ""
-];
-$conn = sqlsrv_connect($serverName, $connectionOptions);
-if ($conn == false) die(print_r(sqlsrv_errors(), true));
+require_once __DIR__ . '/db.php';
+$conn = db_connect();
+if ($conn == false) die(db_last_error());
 
 // Redirect if not logged in
 if (!isset($_SESSION['user_id'])) {
@@ -29,22 +24,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
     $em   = $_POST['email'];
     
     // Update basic user info
-    $sqlUpd = "UPDATE dbo.[USERS] SET FIRST_NAME = ?, LAST_NAME = ?, CYS = ?, SEX = ?, USERNAME = ?, EMAIL = ? WHERE USER_ID = ?";
+    $sqlUpd = "UPDATE USERS SET FIRST_NAME = ?, LAST_NAME = ?, CYS = ?, SEX = ?, USERNAME = ?, EMAIL = ? WHERE USER_ID = ?";
     $params = [$fn, $ln, $cys, $sex, $un, $em, $loginId];
-    sqlsrv_query($conn, $sqlUpd, $params);
+    db_query($conn, $sqlUpd, $params);
 
     // Update Password if filled
     if (!empty($_POST['new_pw'])) {
         $currentPwInput = $_POST['current_pw'];
         $newPwInput     = $_POST['new_pw'];
         
-        $sqlCheck = "SELECT PASSWORD FROM dbo.[USERS] WHERE USER_ID = ?";
-        $resCheck = sqlsrv_query($conn, $sqlCheck, [$loginId]);
-        $rowCheck = sqlsrv_fetch_array($resCheck, SQLSRV_FETCH_ASSOC);
+        $sqlCheck = "SELECT `PASSWORD` FROM USERS WHERE USER_ID = ?";
+        $resCheck = db_query($conn, $sqlCheck, [$loginId]);
+        $rowCheck = db_fetch_assoc($resCheck);
         
         if ($rowCheck['PASSWORD'] === $currentPwInput) {
-            $sqlPw = "UPDATE dbo.[USERS] SET PASSWORD = ? WHERE USER_ID = ?";
-            sqlsrv_query($conn, $sqlPw, [$newPwInput, $loginId]);
+            $sqlPw = "UPDATE USERS SET `PASSWORD` = ? WHERE USER_ID = ?";
+            db_query($conn, $sqlPw, [$newPwInput, $loginId]);
         }
     }
 
@@ -59,15 +54,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
 
         if (move_uploaded_file($fileTmpPath, $destPath)) {
             // Check if record exists in USER_IMG
-            $sqlExist = "SELECT * FROM dbo.[USER_IMG] WHERE USER_ID = ?";
-            $resExist = sqlsrv_query($conn, $sqlExist, [$loginId]);
+            $sqlExist = "SELECT FILE_PATH FROM USER_IMG WHERE USER_ID = ?";
+            $resExist = db_query($conn, $sqlExist, [$loginId]);
+            $imageRow = $resExist ? db_fetch_assoc($resExist) : null;
+            $imageRecordExists = !empty($imageRow);
             
-            if (sqlsrv_has_rows($resExist)) {
-                $sqlImgUpd = "UPDATE dbo.[USER_IMG] SET IMG_NAME = ?, FILE_PATH = ? WHERE USER_ID = ?";
-                sqlsrv_query($conn, $sqlImgUpd, [$fileName, $destPath, $loginId]);
+            if ($imageRecordExists) {
+                $sqlImgUpd = "UPDATE USER_IMG SET IMG_NAME = ?, FILE_PATH = ? WHERE USER_ID = ?";
+                db_query($conn, $sqlImgUpd, [$fileName, $destPath, $loginId]);
             } else {
-                $sqlImgIns = "INSERT INTO dbo.[USER_IMG] (IMG_NAME, FILE_PATH, USER_ID) VALUES (?, ?, ?)";
-                sqlsrv_query($conn, $sqlImgIns, [$fileName, $destPath, $loginId]);
+                $sqlImgIns = "INSERT INTO USER_IMG (IMG_NAME, FILE_PATH, USER_ID) VALUES (?, ?, ?)";
+                db_query($conn, $sqlImgIns, [$fileName, $destPath, $loginId]);
             }
         }
     }
@@ -75,13 +72,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
 }
 
 // ─── 2. FETCH REFRESHED DATA ───
-$sqlUser = "SELECT * FROM dbo.[USERS] WHERE USER_ID = '$loginId'";
-$resUser = sqlsrv_query($conn, $sqlUser);
-$rowUser = sqlsrv_fetch_array($resUser, SQLSRV_FETCH_ASSOC);
+$sqlUser = "SELECT * FROM USERS WHERE USER_ID = ?";
+$resUser = db_query($conn, $sqlUser, [$loginId]);
+$rowUser = db_fetch_assoc($resUser);
 
-$sqlImg  = "SELECT * FROM dbo.[USER_IMG] WHERE USER_ID = '$loginId'";
-$resImg  = sqlsrv_query($conn, $sqlImg);
-$rowImg  = sqlsrv_fetch_array($resImg, SQLSRV_FETCH_ASSOC);
+$sqlImg  = "SELECT * FROM USER_IMG WHERE USER_ID = ?";
+$resImg  = db_query($conn, $sqlImg, [$loginId]);
+$rowImg  = db_fetch_assoc($resImg);
 
 $firstname  = $rowUser['FIRST_NAME']  ?? '';
 $lastname   = $rowUser['LAST_NAME']   ?? '';
@@ -96,7 +93,7 @@ $avatarSrc  = ($file_path && file_exists($file_path))
               ? htmlspecialchars($file_path)
               : 'https://api.dicebear.com/7.x/adventurer/svg?seed=' . urlencode($firstname);
 
-sqlsrv_close($conn);
+db_close($conn);
 ?>
 <!DOCTYPE html>
 <html lang="en">

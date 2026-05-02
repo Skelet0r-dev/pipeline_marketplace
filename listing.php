@@ -6,9 +6,8 @@
 session_start();
 if(!isset($_SESSION['user_id'])){ header("Location: dashboard.php"); exit; }
 
-$serverName=".\SQLEXPRESS";
-$connectionOptions=["Database"=>"pipeline_db","Uid"=>"","PWD"=>""];
-$conn=sqlsrv_connect($serverName,$connectionOptions);
+require_once __DIR__ . '/db.php';
+$conn = db_connect();
 
 $loginId   = (int)$_SESSION['user_id'];
 $listingId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -40,62 +39,62 @@ function displayCategoryLabel($category){
 if(!$listingId){ header("Location: dashboard.php"); exit; }
 
 // ── Fetch current user for navbar ──────────────────────────
-$resMe = sqlsrv_query($conn,
-    "SELECT FIRST_NAME FROM dbo.[USERS] WHERE USER_ID=?", [$loginId]);
-$me = sqlsrv_fetch_array($resMe, SQLSRV_FETCH_ASSOC);
+$resMe = db_query($conn,
+    "SELECT FIRST_NAME FROM USERS WHERE USER_ID=?", [$loginId]);
+$me = db_fetch_assoc($resMe);
 
-$resNavImg = sqlsrv_query($conn,
-    "SELECT FILE_PATH FROM dbo.[USER_IMG] WHERE USER_ID=?", [$loginId]);
-$navImg = sqlsrv_fetch_array($resNavImg, SQLSRV_FETCH_ASSOC);
+$resNavImg = db_query($conn,
+    "SELECT FILE_PATH FROM USER_IMG WHERE USER_ID=?", [$loginId]);
+$navImg = db_fetch_assoc($resNavImg);
 $navFilePath = $navImg['FILE_PATH'] ?? 'assets/img/default_avatar.png';
 
 // ── Fetch listing + seller ──────────────────────────────────
 $sqlListing = "SELECT L.*,
                       U.FIRST_NAME, U.LAST_NAME, U.USERNAME, U.CYS, U.EMAIL,
                       UI.FILE_PATH AS SELLER_AVATAR
-               FROM dbo.[LISTINGS] L
-               JOIN dbo.[USERS] U    ON L.USER_ID = U.USER_ID
-               LEFT JOIN dbo.[USER_IMG] UI ON L.USER_ID = UI.USER_ID
+               FROM LISTINGS L
+               JOIN USERS U    ON L.USER_ID = U.USER_ID
+               LEFT JOIN USER_IMG UI ON L.USER_ID = UI.USER_ID
                WHERE L.LISTING_ID=?";
-$resListing = sqlsrv_query($conn, $sqlListing, [$listingId]);
-$listing    = sqlsrv_fetch_array($resListing, SQLSRV_FETCH_ASSOC);
+$resListing = db_query($conn, $sqlListing, [$listingId]);
+$listing    = db_fetch_assoc($resListing);
 
 if(!$listing){ header("Location: dashboard.php"); exit; }
 
 // ── Fetch all listing images ────────────────────────────────
-$resImgs = sqlsrv_query($conn,
-    "SELECT FILE_PATH, IS_PRIMARY FROM dbo.[LISTING_IMG] WHERE LISTING_ID=? ORDER BY IS_PRIMARY DESC",
+$resImgs = db_query($conn,
+    "SELECT FILE_PATH, IS_PRIMARY FROM LISTING_IMG WHERE LISTING_ID=? ORDER BY IS_PRIMARY DESC",
     [$listingId]);
 $images = [];
-while($imgRow = sqlsrv_fetch_array($resImgs, SQLSRV_FETCH_ASSOC)){
+while($imgRow = db_fetch_assoc($resImgs)){
     $images[] = $imgRow;
 }
 if(empty($images)) $images[] = ['FILE_PATH'=>'assets/img/no_image.png','IS_PRIMARY'=>1];
 
 // ── Like status & count ────────────────────────────────────
-$resLikes = sqlsrv_query($conn,
-    "SELECT COUNT(*) AS CNT FROM dbo.[LISTING_LIKES] WHERE LISTING_ID=?", [$listingId]);
-$likeRow  = sqlsrv_fetch_array($resLikes, SQLSRV_FETCH_ASSOC);
+$resLikes = db_query($conn,
+    "SELECT COUNT(*) AS CNT FROM LISTING_LIKES WHERE LISTING_ID=?", [$listingId]);
+$likeRow  = db_fetch_assoc($resLikes);
 $likeCount = (int)$likeRow['CNT'];
 
-$resMyLike = sqlsrv_query($conn,
-    "SELECT LIKE_ID FROM dbo.[LISTING_LIKES] WHERE LISTING_ID=? AND USER_ID=?",
+$resMyLike = db_query($conn,
+    "SELECT LIKE_ID FROM LISTING_LIKES WHERE LISTING_ID=? AND USER_ID=?",
     [$listingId, $loginId]);
-$iLiked = (bool)sqlsrv_fetch_array($resMyLike, SQLSRV_FETCH_ASSOC);
+$iLiked = (bool)db_fetch_assoc($resMyLike);
 
 // ── Fetch comments ─────────────────────────────────────────
-$resComments = sqlsrv_query($conn,
+$resComments = db_query($conn,
     "SELECT C.COMMENT_ID, C.COMMENT_TEXT, C.CREATED_AT,
             U.USER_ID, U.FIRST_NAME, U.LAST_NAME, U.USERNAME,
             UI.FILE_PATH AS AVATAR
-     FROM dbo.[LISTING_COMMENTS] C
-     JOIN dbo.[USERS] U ON C.USER_ID = U.USER_ID
-     LEFT JOIN dbo.[USER_IMG] UI ON C.USER_ID = UI.USER_ID
+     FROM LISTING_COMMENTS C
+     JOIN USERS U ON C.USER_ID = U.USER_ID
+     LEFT JOIN USER_IMG UI ON C.USER_ID = UI.USER_ID
      WHERE C.LISTING_ID=?
      ORDER BY C.CREATED_AT ASC",
     [$listingId]);
 $comments = [];
-while($cRow = sqlsrv_fetch_array($resComments, SQLSRV_FETCH_ASSOC)){
+while($cRow = db_fetch_assoc($resComments)){
     $cRow['CREATED_AT'] = $cRow['CREATED_AT'] instanceof DateTime
         ? $cRow['CREATED_AT']->format('M d, Y g:i A')
         : date('M d, Y g:i A');
@@ -548,4 +547,4 @@ function submitComment(){
 </script>
 </body>
 </html>
-<?php sqlsrv_close($conn); ?>
+<?php db_close($conn); ?>

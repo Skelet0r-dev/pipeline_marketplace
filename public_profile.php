@@ -2,10 +2,9 @@
 session_start();
 if(!isset($_SESSION['user_id'])){ header("Location: dashboard.php"); exit; }
 
-$serverName=".\SQLEXPRESS";
-$connectionOptions=["Database"=>"pipeline_db","Uid"=>"","PWD"=>""];
-$conn=sqlsrv_connect($serverName,$connectionOptions);
-if($conn==false) die(print_r(sqlsrv_errors(),true));
+require_once __DIR__ . '/db.php';
+$conn = db_connect();
+if($conn === false) die(db_last_error());
 
 $loginId = (int)$_SESSION['user_id'];
 $profileId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -23,37 +22,37 @@ function normalizeCategoryLabel($category){
     return $map[$category] ?? $category;
 }
 
-$meStmt = sqlsrv_query($conn, "SELECT FIRST_NAME FROM dbo.[USERS] WHERE USER_ID=?", [$loginId]);
-$me = sqlsrv_fetch_array($meStmt, SQLSRV_FETCH_ASSOC);
-$meImgStmt = sqlsrv_query($conn, "SELECT FILE_PATH FROM dbo.[USER_IMG] WHERE USER_ID=?", [$loginId]);
-$meImg = sqlsrv_fetch_array($meImgStmt, SQLSRV_FETCH_ASSOC);
+$meStmt = db_query($conn, "SELECT FIRST_NAME FROM USERS WHERE USER_ID=?", [$loginId]);
+$me = db_fetch_assoc($meStmt);
+$meImgStmt = db_query($conn, "SELECT FILE_PATH FROM USER_IMG WHERE USER_ID=?", [$loginId]);
+$meImg = db_fetch_assoc($meImgStmt);
 $meAvatar = $meImg['FILE_PATH'] ?? 'assets/img/default_avatar.png';
 
-$profileStmt = sqlsrv_query(
+$profileStmt = db_query(
     $conn,
     "SELECT U.USER_ID, U.FIRST_NAME, U.LAST_NAME, U.USERNAME, U.CYS, U.EMAIL, UI.FILE_PATH AS AVATAR
-     FROM dbo.[USERS] U
-     LEFT JOIN dbo.[USER_IMG] UI ON U.USER_ID = UI.USER_ID
+     FROM USERS U
+     LEFT JOIN USER_IMG UI ON U.USER_ID = UI.USER_ID
      WHERE U.USER_ID=?",
     [$profileId]
 );
-$profile = $profileStmt ? sqlsrv_fetch_array($profileStmt, SQLSRV_FETCH_ASSOC) : null;
+$profile = $profileStmt ? db_fetch_assoc($profileStmt) : null;
 if(!$profile){ header("Location: dashboard.php"); exit; }
 
-$listingCountStmt = sqlsrv_query($conn, "SELECT COUNT(*) AS CNT FROM dbo.[LISTINGS] WHERE USER_ID=? AND STATUS='Available'", [$profileId]);
-$listingCountRow = sqlsrv_fetch_array($listingCountStmt, SQLSRV_FETCH_ASSOC);
+$listingCountStmt = db_query($conn, "SELECT COUNT(*) AS CNT FROM LISTINGS WHERE USER_ID=? AND `STATUS`='Available'", [$profileId]);
+$listingCountRow = db_fetch_assoc($listingCountStmt);
 $listingCount = (int)$listingCountRow['CNT'];
 
-$soldCountStmt = sqlsrv_query($conn, "SELECT COUNT(*) AS CNT FROM dbo.[LISTINGS] WHERE USER_ID=? AND STATUS='Sold'", [$profileId]);
-$soldCountRow = sqlsrv_fetch_array($soldCountStmt, SQLSRV_FETCH_ASSOC);
+$soldCountStmt = db_query($conn, "SELECT COUNT(*) AS CNT FROM LISTINGS WHERE USER_ID=? AND `STATUS`='Sold'", [$profileId]);
+$soldCountRow = db_fetch_assoc($soldCountStmt);
 $soldCount = (int)$soldCountRow['CNT'];
 
-$listingsStmt = sqlsrv_query(
+$listingsStmt = db_query(
     $conn,
     "SELECT L.*, I.FILE_PATH AS IMG
-     FROM dbo.[LISTINGS] L
-     LEFT JOIN dbo.[LISTING_IMG] I ON L.LISTING_ID=I.LISTING_ID AND I.IS_PRIMARY=1
-     WHERE L.USER_ID=? AND L.STATUS='Available'
+     FROM LISTINGS L
+     LEFT JOIN LISTING_IMG I ON L.LISTING_ID=I.LISTING_ID AND I.IS_PRIMARY=1
+     WHERE L.USER_ID=? AND L.`STATUS`='Available'
      ORDER BY L.DATE_POSTED DESC",
     [$profileId]
 );
@@ -168,7 +167,7 @@ $messageLink = 'mailto:' . rawurlencode($profile['EMAIL']) . '?subject=' . rawur
         <div class="sf-grid">
             <?php
             $hasListings = false;
-            while($item = sqlsrv_fetch_array($listingsStmt, SQLSRV_FETCH_ASSOC)){
+            while($item = db_fetch_assoc($listingsStmt)){
                 $hasListings = true;
                 $imgpath = $item['IMG'] ? $item['IMG'] : 'assets/img/no_image.png';
                 $condclass = $item['CONDITION']=='New' ? 'cond-new' : ($item['CONDITION']=='Like New' ? 'cond-great' : 'cond-good');
@@ -263,4 +262,4 @@ $messageLink = 'mailto:' . rawurlencode($profile['EMAIL']) . '?subject=' . rawur
     </script>
 </body>
 </html>
-<?php sqlsrv_close($conn); ?>
+<?php db_close($conn); ?>

@@ -2,16 +2,15 @@
 session_start();
 header('Content-Type: application/json');
 
+require_once __DIR__ . '/db.php';
+
 if(!isset($_SESSION['user_id'])){
     http_response_code(401);
     echo json_encode(['error' => 'Please log in first.']);
     exit;
 }
 
-$serverName=".\SQLEXPRESS";
-$connectionOptions=["Database"=>"pipeline_db","Uid"=>"","PWD"=>""];
-$conn=sqlsrv_connect($serverName,$connectionOptions);
-
+$conn = db_connect();
 if($conn === false){
     http_response_code(500);
     echo json_encode(['error' => 'Database connection failed.']);
@@ -24,25 +23,31 @@ $reason = isset($_POST['report_reason']) ? trim($_POST['report_reason']) : '';
 $details = isset($_POST['report_details']) ? trim($_POST['report_details']) : '';
 
 function ensureUserReportsTable($conn){
-    $existsStmt = sqlsrv_query($conn, "SELECT OBJECT_ID('dbo.USER_REPORTS') AS TABLE_ID");
-    $existsRow = $existsStmt ? sqlsrv_fetch_array($existsStmt, SQLSRV_FETCH_ASSOC) : null;
+    $existsStmt = db_query(
+        $conn,
+        "SELECT 1 AS TABLE_ID
+         FROM INFORMATION_SCHEMA.TABLES
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'USER_REPORTS'
+         LIMIT 1"
+    );
+    $existsRow = $existsStmt ? db_fetch_assoc($existsStmt) : null;
 
     if(!empty($existsRow['TABLE_ID'])){
         return true;
     }
 
-    $createSql = "CREATE TABLE dbo.[USER_REPORTS] (
-        REPORT_ID INT IDENTITY(1,1) PRIMARY KEY,
+    $createSql = "CREATE TABLE USER_REPORTS (
+        REPORT_ID INT AUTO_INCREMENT PRIMARY KEY,
         REPORTED_USER_ID INT NOT NULL,
         REPORTER_USER_ID INT NOT NULL,
-        REPORT_REASON NVARCHAR(100) NOT NULL,
-        REPORT_DETAILS NVARCHAR(1000) NOT NULL,
-        PROOF_FILE_PATH NVARCHAR(255) NULL,
-        REPORT_STATUS NVARCHAR(30) NOT NULL DEFAULT 'Pending',
-        CREATED_AT DATETIME NOT NULL DEFAULT GETDATE()
+        REPORT_REASON VARCHAR(100) NOT NULL,
+        REPORT_DETAILS VARCHAR(1000) NOT NULL,
+        PROOF_FILE_PATH VARCHAR(255) NULL,
+        REPORT_STATUS VARCHAR(30) NOT NULL DEFAULT 'Pending',
+        CREATED_AT DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )";
 
-    return (bool)sqlsrv_query($conn, $createSql);
+    return (bool)db_query($conn, $createSql);
 }
 
 if($reportedUserId <= 0){
@@ -63,8 +68,8 @@ if($reason === '' || $details === ''){
     exit;
 }
 
-$userStmt = sqlsrv_query($conn, "SELECT USER_ID FROM dbo.[USERS] WHERE USER_ID=?", [$reportedUserId]);
-if(!$userStmt || !sqlsrv_fetch_array($userStmt, SQLSRV_FETCH_ASSOC)){
+$userStmt = db_query($conn, "SELECT USER_ID FROM USERS WHERE USER_ID=?", [$reportedUserId]);
+if(!$userStmt || !db_fetch_assoc($userStmt)){
     http_response_code(404);
     echo json_encode(['error' => 'User profile not found.']);
     exit;
@@ -111,31 +116,31 @@ if(isset($_FILES['proof_photo']) && $_FILES['proof_photo']['error'] !== UPLOAD_E
     }
 }
 
-$existingStmt = sqlsrv_query(
+$existingStmt = db_query(
     $conn,
-    "SELECT TOP 1 REPORT_ID FROM dbo.[USER_REPORTS]
+    "SELECT REPORT_ID FROM USER_REPORTS
      WHERE REPORTED_USER_ID=? AND REPORTER_USER_ID=? AND REPORT_STATUS='Pending'
-     ORDER BY CREATED_AT DESC",
+     ORDER BY CREATED_AT DESC
+     LIMIT 1",
     [$reportedUserId, $loginId]
 );
 
-if($existingStmt && sqlsrv_fetch_array($existingStmt, SQLSRV_FETCH_ASSOC)){
+if($existingStmt && db_fetch_assoc($existingStmt)){
     echo json_encode(['error' => 'You already sent a pending report for this profile.']);
     exit;
 }
 
-$insertStmt = sqlsrv_query(
+$insertStmt = db_query(
     $conn,
-    "INSERT INTO dbo.[USER_REPORTS]
+    "INSERT INTO USER_REPORTS
         (REPORTED_USER_ID, REPORTER_USER_ID, REPORT_REASON, REPORT_DETAILS, PROOF_FILE_PATH, REPORT_STATUS)
      VALUES (?, ?, ?, ?, ?, 'Pending')",
     [$reportedUserId, $loginId, $reason, $details, $proofPath]
 );
 
 if($insertStmt === false){
-    $errors = sqlsrv_errors();
     http_response_code(500);
-    echo json_encode(['error' => $errors[0]['message'] ?? 'Could not save the profile report.']);
+    echo json_encode(['error' => db_last_error() ?: 'Could not save the profile report.']);
     exit;
 }
 
@@ -144,5 +149,5 @@ echo json_encode([
     'message' => 'Profile report submitted for admin review.'
 ]);
 
-sqlsrv_close($conn);
+db_close($conn);
 ?>

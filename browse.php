@@ -2,9 +2,8 @@
 session_start();
 if(!isset($_SESSION['user_id'])){ header("Location: dashboard.php"); exit; }
 
-$serverName=".\SQLEXPRESS";
-$connectionOptions=["Database"=>"pipeline_db", "Uid"=>"", "PWD"=>""];
-$conn=sqlsrv_connect($serverName,$connectionOptions);
+require_once __DIR__ . '/db.php';
+$conn = db_connect();
 
 $category = isset($_GET['cat']) ? trim($_GET['cat']) : 'all';
 $search   = isset($_GET['q'])   ? trim($_GET['q']) : '';
@@ -50,22 +49,22 @@ if(isset($categoryAliases[$category])){
 }
 
 // Fetch current user info for Navbar
-$sqlUser = "SELECT FIRST_NAME FROM dbo.[USERS] WHERE USER_ID='$loginId'";
-$resUser = sqlsrv_query($conn, $sqlUser);
-$userRow = sqlsrv_fetch_array($resUser, SQLSRV_FETCH_ASSOC);
+$sqlUser = "SELECT FIRST_NAME FROM USERS WHERE USER_ID=?";
+$resUser = db_query($conn, $sqlUser, [$loginId]);
+$userRow = db_fetch_assoc($resUser);
 
 // Fetch Profile Image for Navbar
-$sqlImgNavbar = "SELECT FILE_PATH FROM dbo.[USER_IMG] WHERE USER_ID='$loginId'";
-$resImgNav = sqlsrv_query($conn, $sqlImgNavbar);
-$navImgRow = sqlsrv_fetch_array($resImgNav, SQLSRV_FETCH_ASSOC);
+$sqlImgNavbar = "SELECT FILE_PATH FROM USER_IMG WHERE USER_ID=?";
+$resImgNav = db_query($conn, $sqlImgNavbar, [$loginId]);
+$navImgRow = db_fetch_assoc($resImgNav);
 $nav_file_path = $navImgRow['FILE_PATH'] ?? 'assets/img/default_avatar.png';
 
 // BUILD THE MAIN QUERY (treat legacy listings without status as available)
 $sql = "SELECT L.*, I.FILE_PATH, U.USER_ID AS SELLER_ID, U.FIRST_NAME, U.LAST_NAME 
-        FROM dbo.[LISTINGS] L
-        LEFT JOIN dbo.[LISTING_IMG] I ON L.LISTING_ID = I.LISTING_ID AND I.IS_PRIMARY = 1
-        JOIN dbo.[USERS] U ON L.USER_ID = U.USER_ID
-        WHERE (L.STATUS = 'Available' OR L.STATUS IS NULL)";
+        FROM LISTINGS L
+        LEFT JOIN LISTING_IMG I ON L.LISTING_ID = I.LISTING_ID AND I.IS_PRIMARY = 1
+        JOIN USERS U ON L.USER_ID = U.USER_ID
+        WHERE (L.`STATUS` = 'Available' OR L.`STATUS` IS NULL)";
 
 $params = [];
 
@@ -99,12 +98,12 @@ if($search !== ''){
 }
 
 $stmt = !empty($params)
-        ? sqlsrv_query($conn, $sql, $params)
-        : sqlsrv_query($conn, $sql);
+        ? db_query($conn, $sql, $params)
+        : db_query($conn, $sql);
 
 // Collect all rows into array for count
 $items = [];
-while($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)){
+while($row = db_fetch_assoc($stmt)){
     $items[] = $row;
 }
 

@@ -7,16 +7,15 @@
 session_start();
 header('Content-Type: application/json');
 
+require_once __DIR__ . '/db.php';
+
 if(!isset($_SESSION['user_id'])){
     http_response_code(401);
     echo json_encode(['error' => 'Unauthorized']);
     exit;
 }
 
-$serverName=".\SQLEXPRESS";
-$connectionOptions=["Database"=>"pipeline_db","Uid"=>"","PWD"=>""];
-$conn=sqlsrv_connect($serverName,$connectionOptions);
-
+$conn = db_connect();
 if(!$conn){
     http_response_code(500);
     echo json_encode(['error' => 'DB connection failed']);
@@ -33,36 +32,36 @@ if(!$listingId){
 }
 
 // Check if like already exists
-$sqlCheck = "SELECT LIKE_ID FROM dbo.[LISTING_LIKES] WHERE LISTING_ID=? AND USER_ID=?";
-$resCheck  = sqlsrv_query($conn, $sqlCheck, [$listingId, $userId]);
-$existing  = sqlsrv_fetch_array($resCheck, SQLSRV_FETCH_ASSOC);
+$sqlCheck = "SELECT LIKE_ID FROM LISTING_LIKES WHERE LISTING_ID=? AND USER_ID=?";
+$resCheck  = db_query($conn, $sqlCheck, [$listingId, $userId]);
+$existing  = db_fetch_assoc($resCheck);
 
 if($existing){
     // Unlike
-    sqlsrv_query($conn,
-        "DELETE FROM dbo.[LISTING_LIKES] WHERE LISTING_ID=? AND USER_ID=?",
+    db_query($conn,
+        "DELETE FROM LISTING_LIKES WHERE LISTING_ID=? AND USER_ID=?",
         [$listingId, $userId]
     );
     $liked = false;
 } else {
     // Like
-    sqlsrv_query($conn,
-        "INSERT INTO dbo.[LISTING_LIKES] (LISTING_ID, USER_ID) VALUES (?,?)",
+    db_query($conn,
+        "INSERT INTO LISTING_LIKES (LISTING_ID, USER_ID) VALUES (?,?)",
         [$listingId, $userId]
     );
     $liked = true;
 }
 
 // Return updated count
-$resCount = sqlsrv_query($conn,
-    "SELECT COUNT(*) AS CNT FROM dbo.[LISTING_LIKES] WHERE LISTING_ID=?",
+$resCount = db_query($conn,
+    "SELECT COUNT(*) AS CNT FROM LISTING_LIKES WHERE LISTING_ID=?",
     [$listingId]
 );
-$rowCount = sqlsrv_fetch_array($resCount, SQLSRV_FETCH_ASSOC);
+$rowCount = db_fetch_assoc($resCount);
 
 echo json_encode([
     'liked' => $liked,
     'count' => (int)$rowCount['CNT']
 ]);
 
-sqlsrv_close($conn);
+db_close($conn);

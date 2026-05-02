@@ -2,9 +2,8 @@
 session_start();
 if(!isset($_SESSION['user_id'])){ http_response_code(403); exit; }
 
-$serverName=".\\SQLEXPRESS";
-$connectionOptions=["Database"=>"pipeline_db","Uid"=>"","PWD"=>""];
-$conn=sqlsrv_connect($serverName,$connectionOptions);
+require_once __DIR__ . '/db.php';
+$conn = db_connect();
 
 $loginId = (int)$_SESSION['user_id'];
 $listingId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -29,48 +28,49 @@ function normalizeCategoryLabel($category){
 }
 
 $sqlL = "SELECT L.*, U.FIRST_NAME, U.LAST_NAME, U.USERNAME, U.CYS, U.EMAIL, UI.FILE_PATH AS SELLER_AVATAR
-         FROM dbo.[LISTINGS] L
-         JOIN dbo.[USERS] U ON L.USER_ID = U.USER_ID
-         LEFT JOIN dbo.[USER_IMG] UI ON L.USER_ID = UI.USER_ID
+         FROM LISTINGS L
+         JOIN USERS U ON L.USER_ID = U.USER_ID
+         LEFT JOIN USER_IMG UI ON L.USER_ID = UI.USER_ID
          WHERE L.LISTING_ID=?";
-$resL = sqlsrv_query($conn, $sqlL, [$listingId]);
-$listing = sqlsrv_fetch_array($resL, SQLSRV_FETCH_ASSOC);
+$resL = db_query($conn, $sqlL, [$listingId]);
+$listing = db_fetch_assoc($resL);
 
 if(!$listing){ echo '<div class="text-center p-4 text-muted">Listing not found.</div>'; exit; }
 
-$resImg = sqlsrv_query(
+$resImg = db_query(
     $conn,
-    "SELECT TOP 1 FILE_PATH FROM dbo.[LISTING_IMG] WHERE LISTING_ID=? ORDER BY IS_PRIMARY DESC",
+    "SELECT FILE_PATH FROM LISTING_IMG WHERE LISTING_ID=? ORDER BY IS_PRIMARY DESC LIMIT 1",
     [$listingId]
 );
-$imgRow = sqlsrv_fetch_array($resImg, SQLSRV_FETCH_ASSOC);
+$imgRow = db_fetch_assoc($resImg);
 $imgSrc = $imgRow['FILE_PATH'] ?? 'assets/img/no_image.png';
 
-$resLikes = sqlsrv_query($conn, "SELECT COUNT(*) AS CNT FROM dbo.[LISTING_LIKES] WHERE LISTING_ID=?", [$listingId]);
-$likeRow = sqlsrv_fetch_array($resLikes, SQLSRV_FETCH_ASSOC);
+$resLikes = db_query($conn, "SELECT COUNT(*) AS CNT FROM LISTING_LIKES WHERE LISTING_ID=?", [$listingId]);
+$likeRow = db_fetch_assoc($resLikes);
 $likeCount = (int)$likeRow['CNT'];
 
-$resMyLike = sqlsrv_query(
+$resMyLike = db_query(
     $conn,
-    "SELECT LIKE_ID FROM dbo.[LISTING_LIKES] WHERE LISTING_ID=? AND USER_ID=?",
+    "SELECT LIKE_ID FROM LISTING_LIKES WHERE LISTING_ID=? AND USER_ID=?",
     [$listingId, $loginId]
 );
-$iLiked = (bool)sqlsrv_fetch_array($resMyLike, SQLSRV_FETCH_ASSOC);
+$iLiked = (bool)db_fetch_assoc($resMyLike);
 
-$resC = sqlsrv_query(
+$resC = db_query(
     $conn,
-    "SELECT TOP 5 C.COMMENT_TEXT, C.CREATED_AT,
+    "SELECT C.COMMENT_TEXT, C.CREATED_AT,
             U.USER_ID, U.FIRST_NAME, U.LAST_NAME, U.USERNAME,
             UI.FILE_PATH AS AVATAR
-     FROM dbo.[LISTING_COMMENTS] C
-     JOIN dbo.[USERS] U ON C.USER_ID = U.USER_ID
-     LEFT JOIN dbo.[USER_IMG] UI ON C.USER_ID = UI.USER_ID
+     FROM LISTING_COMMENTS C
+     JOIN USERS U ON C.USER_ID = U.USER_ID
+     LEFT JOIN USER_IMG UI ON C.USER_ID = UI.USER_ID
      WHERE C.LISTING_ID=?
-     ORDER BY C.CREATED_AT DESC",
+     ORDER BY C.CREATED_AT DESC
+     LIMIT 5",
     [$listingId]
 );
 $comments = [];
-while($cRow = sqlsrv_fetch_array($resC, SQLSRV_FETCH_ASSOC)){
+while($cRow = db_fetch_assoc($resC)){
     $cRow['CREATED_AT'] = $cRow['CREATED_AT'] instanceof DateTime
         ? $cRow['CREATED_AT']->format('M d, Y g:i A')
         : date('M d, Y g:i A');
@@ -78,8 +78,8 @@ while($cRow = sqlsrv_fetch_array($resC, SQLSRV_FETCH_ASSOC)){
 }
 $comments = array_reverse($comments);
 
-$resCnt = sqlsrv_query($conn, "SELECT COUNT(*) AS CNT FROM dbo.[LISTING_COMMENTS] WHERE LISTING_ID=?", [$listingId]);
-$cntRow = sqlsrv_fetch_array($resCnt, SQLSRV_FETCH_ASSOC);
+$resCnt = db_query($conn, "SELECT COUNT(*) AS CNT FROM LISTING_COMMENTS WHERE LISTING_ID=?", [$listingId]);
+$cntRow = db_fetch_assoc($resCnt);
 $totalComments = (int)$cntRow['CNT'];
 
 $condClass = 'cond-' . strtolower(str_replace([' ','-'],'',$listing['CONDITION']));
@@ -92,7 +92,7 @@ $datePosted = $listing['DATE_POSTED'] instanceof DateTime
     ? $listing['DATE_POSTED']->format('M d, Y')
     : date('M d, Y', strtotime($listing['DATE_POSTED']));
 
-sqlsrv_close($conn);
+db_close($conn);
 ?>
 <link rel="stylesheet" href="assets/css/listing_modal.css">
 
