@@ -151,6 +151,12 @@
     flex-shrink: 0;
 }
 
+.listing-seller-avatar-link {
+    display: flex;
+    flex-shrink: 0;
+    text-decoration: none;
+}
+
 .listing-seller-info {
     display: flex;
     flex-direction: column;
@@ -165,12 +171,19 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-decoration: none;
 }
 
 .listing-seller-handle {
     font-size: 12px;
     color: #606c38;
     font-weight: 600;
+    text-decoration: none;
+}
+
+.listing-seller-name:hover,
+.listing-seller-handle:hover {
+    text-decoration: underline;
 }
 
 .listing-seller-cys {
@@ -558,6 +571,12 @@
     flex-shrink: 0;
 }
 
+.comment-avatar-link {
+    display: flex;
+    flex-shrink: 0;
+    text-decoration: none;
+}
+
 .comment-bubble {
     flex: 1;
     background: #f7f9f3;
@@ -578,12 +597,19 @@
     font-size: 13px;
     font-weight: 700;
     color: #283618;
+    text-decoration: none;
 }
 
 .comment-handle {
     font-size: 12px;
     color: #606c38;
     font-weight: 600;
+    text-decoration: none;
+}
+
+.comment-user:hover,
+.comment-handle:hover {
+    text-decoration: underline;
 }
 
 .comment-time {

@@ -86,7 +86,7 @@ $iLiked = (bool)sqlsrv_fetch_array($resMyLike, SQLSRV_FETCH_ASSOC);
 // ── Fetch comments ─────────────────────────────────────────
 $resComments = sqlsrv_query($conn,
     "SELECT C.COMMENT_ID, C.COMMENT_TEXT, C.CREATED_AT,
-            U.FIRST_NAME, U.LAST_NAME, U.USERNAME,
+            U.USER_ID, U.FIRST_NAME, U.LAST_NAME, U.USERNAME,
             UI.FILE_PATH AS AVATAR
      FROM dbo.[LISTING_COMMENTS] C
      JOIN dbo.[USERS] U ON C.USER_ID = U.USER_ID
@@ -113,6 +113,7 @@ $isOwner = ($loginId == (int)$listing['USER_ID']);
 $browseCategory = normalizeCategoryBrowseParam($listing['CATEGORY']);
 $categoryLabel = displayCategoryLabel($listing['CATEGORY']);
 $messageLink = 'mailto:' . rawurlencode($listing['EMAIL']) . '?subject=' . rawurlencode('Pipeline Inquiry: ' . $listing['TITLE']);
+$sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (int)$listing['USER_ID'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -147,8 +148,6 @@ $messageLink = 'mailto:' . rawurlencode($listing['EMAIL']) . '?subject=' . rawur
                 <a href="dashboard.php"  class="dropdown-item-custom"><span class="item-icon">🏬</span> Browse Products</a>
                 <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">🏪</span> My Storefront</a>
                 <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
-                <a href="purchases.php"  class="dropdown-item-custom"><span class="item-icon">🛍️</span> Purchases</a>
-                <a href="settings.php"   class="dropdown-item-custom"><span class="item-icon">⚙️</span> Settings</a>
                 <div class="dropdown-divider-custom"></div>
                 <a href="logout.php"     class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
             </div>
@@ -202,11 +201,13 @@ $messageLink = 'mailto:' . rawurlencode($listing['EMAIL']) . '?subject=' . rawur
 
             <!-- Seller card -->
             <div class="listing-seller-card">
-                <img src="<?php echo htmlspecialchars($listing['SELLER_AVATAR'] ?? 'assets/img/default_avatar.png'); ?>"
-                     class="listing-seller-avatar" alt="Seller">
+                <a href="<?php echo htmlspecialchars($sellerProfileLink); ?>" class="listing-seller-avatar-link" aria-label="View seller profile">
+                    <img src="<?php echo htmlspecialchars($listing['SELLER_AVATAR'] ?? 'assets/img/default_avatar.png'); ?>"
+                         class="listing-seller-avatar" alt="Seller">
+                </a>
                 <div class="listing-seller-info">
-                    <span class="listing-seller-name"><?php echo $sellerName; ?></span>
-                    <span class="listing-seller-handle">@<?php echo htmlspecialchars($listing['USERNAME']); ?></span>
+                    <a href="<?php echo htmlspecialchars($sellerProfileLink); ?>" class="listing-seller-name"><?php echo $sellerName; ?></a>
+                    <a href="<?php echo htmlspecialchars($sellerProfileLink); ?>" class="listing-seller-handle">@<?php echo htmlspecialchars($listing['USERNAME']); ?></a>
                     <span class="listing-seller-cys"><?php echo htmlspecialchars($listing['CYS']); ?></span>
                 </div>
                 <?php if(!$isOwner): ?>
@@ -311,12 +312,14 @@ $messageLink = 'mailto:' . rawurlencode($listing['EMAIL']) . '?subject=' . rawur
             <?php else: ?>
             <?php foreach($comments as $c): ?>
             <div class="comment-item">
-                <img src="<?php echo htmlspecialchars($c['AVATAR'] ?? 'assets/img/default_avatar.png'); ?>"
-                     class="comment-avatar" alt="Avatar">
+                <a href="public_profile.php?id=<?php echo (int)$c['USER_ID']; ?>" class="comment-avatar-link">
+                    <img src="<?php echo htmlspecialchars($c['AVATAR'] ?? 'assets/img/default_avatar.png'); ?>"
+                         class="comment-avatar" alt="Avatar">
+                </a>
                 <div class="comment-bubble">
                     <div class="comment-meta">
-                        <span class="comment-user"><?php echo htmlspecialchars($c['FIRST_NAME'].' '.$c['LAST_NAME']); ?></span>
-                        <span class="comment-handle">@<?php echo htmlspecialchars($c['USERNAME']); ?></span>
+                        <a href="public_profile.php?id=<?php echo (int)$c['USER_ID']; ?>" class="comment-user"><?php echo htmlspecialchars($c['FIRST_NAME'].' '.$c['LAST_NAME']); ?></a>
+                        <a href="public_profile.php?id=<?php echo (int)$c['USER_ID']; ?>" class="comment-handle">@<?php echo htmlspecialchars($c['USERNAME']); ?></a>
                         <span class="comment-time"><?php echo htmlspecialchars($c['CREATED_AT']); ?></span>
                     </div>
                     <p class="comment-text"><?php echo nl2br(htmlspecialchars($c['COMMENT_TEXT'])); ?></p>

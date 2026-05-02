@@ -209,29 +209,6 @@
             font-weight: 600;
         }
 
-        .notif-btn {
-            position: relative;
-            background: #f0f2e8;
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .notif-dot {
-            position: absolute;
-            top: 6px; right: 6px;
-            width: 8px; height: 8px;
-            background: var(--danger);
-            border-radius: 50%;
-            border: 2px solid white;
-        }
-
         /* ── CONTENT ── */
         .content {
             padding: 28px 32px;
@@ -698,6 +675,213 @@
             font-size: 12px;
             color: var(--muted);
             font-weight: 500;
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .filter-input,
+        .filter-select {
+            min-height: 39px;
+            border: 1.5px solid #d0d8b0;
+            border-radius: 10px;
+            background: var(--white);
+            color: var(--forest);
+            font-family: "DM Sans", sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 0 12px;
+        }
+
+        .filter-input {
+            min-width: 260px;
+            flex: 1;
+        }
+
+        .filter-select {
+            min-width: 180px;
+        }
+
+        .flash-message {
+            background: #e8f5e0;
+            color: var(--forest);
+            border: 1px solid #cfe0bf;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .category-link {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .category-link:hover .cat-name {
+            color: var(--olive);
+        }
+
+        .legend a.legend-item {
+            color: var(--forest);
+            text-decoration: none;
+        }
+
+        .reports-table {
+            table-layout: fixed;
+        }
+
+        .reports-table th:nth-child(1) { width: 34%; }
+        .reports-table th:nth-child(2) { width: 25%; }
+        .reports-table th:nth-child(3) { width: 18%; }
+        .reports-table th:nth-child(4) { width: 10%; }
+        .reports-table th:nth-child(5) { width: 13%; }
+
+        .reports-table tbody tr {
+            cursor: default;
+        }
+
+        .reports-table tbody td {
+            vertical-align: top;
+            padding-top: 14px;
+            padding-bottom: 14px;
+        }
+
+        .report-listing {
+            display: grid;
+            grid-template-columns: 64px minmax(0, 1fr);
+            gap: 12px;
+            align-items: center;
+        }
+
+        .report-thumb {
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #f0f2e8;
+            border: 1px solid #e1e8d2;
+            display: block;
+        }
+
+        .report-listing-info {
+            min-width: 0;
+        }
+
+        .report-listing-info .item-name,
+        .reports-table .item-name {
+            line-height: 1.3;
+            overflow-wrap: anywhere;
+        }
+
+        .report-person {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 5px 0;
+            border-bottom: 1px solid #f0f2e8;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .report-person:last-child {
+            border-bottom: none;
+        }
+
+        .report-person strong {
+            color: var(--forest);
+            font-weight: 800;
+            overflow-wrap: anywhere;
+            text-align: right;
+        }
+
+        .report-details {
+            margin-top: 6px;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .listing-details {
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .report-details summary {
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--olive);
+        }
+
+        .listing-details summary {
+            cursor: pointer;
+            font-weight: 800;
+            color: var(--olive);
+        }
+
+        .report-details p {
+            margin: 6px 0;
+            color: var(--forest);
+            line-height: 1.4;
+        }
+
+        .listing-detail-grid {
+            display: grid;
+            grid-template-columns: 78px 1fr;
+            gap: 6px 10px;
+            margin: 8px 0;
+        }
+
+        .listing-detail-grid span {
+            color: var(--muted);
+            font-weight: 700;
+        }
+
+        .listing-detail-grid strong {
+            color: var(--forest);
+            font-weight: 700;
+        }
+
+        .listing-full-description {
+            max-height: 220px;
+            overflow: auto;
+            padding: 10px;
+            border-radius: 8px;
+            background: #f8faf0;
+            color: var(--forest);
+            line-height: 1.45;
+            white-space: normal;
+        }
+
+        .table-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .mini-btn {
+            border: 1.5px solid #d0d8b0;
+            background: var(--white);
+            color: var(--forest);
+            border-radius: 8px;
+            padding: 7px 10px;
+            font-family: "DM Sans", sans-serif;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .mini-btn.danger {
+            border-color: #f0b8b8;
+            background: #fde8e8;
+            color: var(--danger);
         }
 .sidebar-logo-img {
     max-width: 200px;

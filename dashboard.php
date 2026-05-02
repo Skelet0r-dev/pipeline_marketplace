@@ -158,12 +158,6 @@ sqlsrv_close($conn);
                     <a href="edit_profile.php" class="dropdown-item-custom">
                         <span class="item-icon">👤</span> My Profile
                     </a>
-                    <a href="purchases.php" class="dropdown-item-custom">
-                        <span class="item-icon">🛍️</span> Purchases
-                    </a>
-                    <a href="settings.php" class="dropdown-item-custom">
-                        <span class="item-icon">⚙️</span> Settings
-                    </a>
 
                     <div class="dropdown-divider-custom"></div>
 

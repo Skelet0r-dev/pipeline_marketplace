@@ -297,6 +297,12 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-decoration: none;
+}
+
+.ig-seller:hover {
+    color: #283618;
+    text-decoration: underline;
 }
 
 .ig-title {

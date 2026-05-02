@@ -130,8 +130,6 @@ sqlsrv_close($conn);
         <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon">🏬</span> Browse Products</a>
         <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">🏪</span> My Storefront</a>
         <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
-        <a href="purchases.php" class="dropdown-item-custom"><span class="item-icon">🛍️</span> Purchases</a>
-        <a href="settings.php" class="dropdown-item-custom"><span class="item-icon">⚙️</span> Settings</a>
         <div class="dropdown-divider-custom"></div>
         <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
       </div>

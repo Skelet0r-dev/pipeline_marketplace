@@ -61,7 +61,7 @@ $navImgRow = sqlsrv_fetch_array($resImgNav, SQLSRV_FETCH_ASSOC);
 $nav_file_path = $navImgRow['FILE_PATH'] ?? 'assets/img/default_avatar.png';
 
 // BUILD THE MAIN QUERY
-$sql = "SELECT L.*, I.FILE_PATH, U.FIRST_NAME, U.LAST_NAME 
+$sql = "SELECT L.*, I.FILE_PATH, U.USER_ID AS SELLER_ID, U.FIRST_NAME, U.LAST_NAME 
         FROM dbo.[LISTINGS] L
         LEFT JOIN dbo.[LISTING_IMG] I ON L.LISTING_ID = I.LISTING_ID AND I.IS_PRIMARY = 1
         JOIN dbo.[USERS] U ON L.USER_ID = U.USER_ID
@@ -168,8 +168,6 @@ $accentColor = $catColors[$category] ?? '#606c38';
                     <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon">🏬</span> Browse Products</a>
                     <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">🏪</span> My Storefront</a>
                     <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
-                    <a href="purchases.php" class="dropdown-item-custom"><span class="item-icon">🛍️</span> Purchases</a>
-                    <a href="settings.php" class="dropdown-item-custom"><span class="item-icon">⚙️</span> Settings</a>
                     <div class="dropdown-divider-custom"></div>
                     <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
                 </div>
@@ -260,7 +258,7 @@ $accentColor = $catColors[$category] ?? '#606c38';
                 <div class="ig-body">
                     <div class="ig-seller-row">
                         <span class="ig-seller-dot"></span>
-                        <span class="ig-seller"><?php echo $sellerName; ?></span>
+                        <a class="ig-seller" href="public_profile.php?id=<?php echo (int)$item['SELLER_ID']; ?>" onclick="event.stopPropagation();"><?php echo $sellerName; ?></a>
                     </div>
                     <p class="ig-title"><?php echo htmlspecialchars($item['TITLE']); ?></p>
                     <div class="ig-footer">

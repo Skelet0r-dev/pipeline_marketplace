@@ -418,69 +418,6 @@
     color: #999;
 }
 
-/* ── Reviews ── */
-.sf-reviews {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    max-width: 680px;
-}
-
-.sf-review-card {
-    background: #fff;
-    border-radius: 14px;
-    padding: 18px;
-    box-shadow: 0 2px 12px rgba(40,54,24,0.08);
-}
-
-.sf-review-top {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-.sf-reviewer-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #606c38, #283618);
-    color: #fefae0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: "DM Sans", sans-serif;
-    font-size: 12px;
-    font-weight: 800;
-    flex-shrink: 0;
-}
-
-.sf-reviewer-name {
-    font-family: "DM Sans", sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    color: #283618;
-    margin: 0;
-}
-
-.sf-reviewer-stars { font-size: 12px; margin: 0; }
-
-.sf-review-date {
-    margin-left: auto;
-    font-family: "DM Sans", sans-serif;
-    font-size: 11px;
-    color: #aaa;
-    flex-shrink: 0;
-}
-
-.sf-review-text {
-    font-family: "DM Sans", sans-serif;
-    font-size: 13.5px;
-    color: #444;
-    line-height: 1.6;
-    margin: 0;
-}
-
 /* ── Add Listing Modal ── */
 .modal-content {
     border-radius: 16px;
@@ -860,22 +797,6 @@
     background: #cce5fa;
     transform: scale(1.03);
 }
-
-/* ── Tab badge (notification count) ── */
-.sf-tab-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: #c0392b;
-    color: #fff;
-    font-size: 10px;
-    font-weight: 700;
-    border-radius: 20px;
-    padding: 1px 7px;
-    margin-left: 5px;
-    line-height: 1.5;
-}
-
 /* ── Activity tab layout ── */
 .sf-activity-wrap {
     display: grid;
@@ -1011,3 +932,33 @@
     color: #fefae0;
     transform: scale(1.04);
 }
+
+/* Public profile */
+.public-profile-section{border-bottom:1px solid #e8eadf;}
+.public-profile-actions{align-items:stretch;}
+.public-message-btn{text-align:center;text-decoration:none;}
+.public-report-toggle{padding:9px 20px;border:1.5px solid #e8b4b0;border-radius:8px;background:#fff;color:#c0392b;font-family:"DM Sans",sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background .2s,border-color .2s;white-space:nowrap;}
+.public-report-toggle:hover{background:#fff3f2;border-color:#c0392b;}
+.public-report-open{overflow:hidden;}
+.public-report-modal{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;}
+.public-report-modal[hidden]{display:none;}
+.public-report-backdrop{position:absolute;inset:0;background:rgba(18,27,14,.52);}
+.public-report-dialog{position:relative;z-index:1;width:min(620px,100%);max-height:calc(100vh - 40px);overflow:auto;background:#fff8f7;border:1px solid #f1d3cf;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;box-shadow:0 24px 70px rgba(40,54,24,.28);}
+.public-report-head{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.public-report-head h3{margin:0;font-size:18px;font-weight:800;color:#6b241b;}
+.public-report-head button{border:none;background:transparent;color:#9b4d45;font-size:24px;line-height:1;cursor:pointer;}
+.public-report-dialog label{font-size:12px;font-weight:700;color:#6b241b;}
+.public-report-dialog select,.public-report-dialog textarea,.public-report-dialog input[type="file"]{width:100%;border:1px solid #e8c1bc;border-radius:12px;padding:11px 13px;font-family:"DM Sans",sans-serif;font-size:14px;color:#3d312e;background:#fff;}
+.public-report-dialog textarea{resize:vertical;min-height:120px;}
+.public-report-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:6px;}
+.public-report-cancel,.public-report-submit{border-radius:30px;padding:9px 18px;font-size:13px;font-weight:700;}
+.public-report-cancel{border:1px solid #d8cbc8;background:#fff;color:#6c5c59;}
+.public-report-submit{border:none;background:#c0392b;color:#fff;}
+.public-report-feedback{border-radius:12px;padding:11px 13px;font-size:13px;font-weight:600;}
+.public-report-feedback.is-success{background:#edf7ee;color:#1e6b2e;}
+.public-report-feedback.is-error{background:#fff1ef;color:#9f2f23;}
+.public-section-title{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;}
+.public-section-title h3{margin:0;font-size:20px;font-weight:800;color:#283618;}
+.public-section-title a{color:#606c38;font-size:13px;font-weight:700;text-decoration:none;}
+.public-section-title a:hover{text-decoration:underline;}
+.public-listing-card{text-decoration:none;color:inherit;}

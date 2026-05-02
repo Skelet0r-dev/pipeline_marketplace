@@ -60,7 +60,7 @@ $iLiked = (bool)sqlsrv_fetch_array($resMyLike, SQLSRV_FETCH_ASSOC);
 $resC = sqlsrv_query(
     $conn,
     "SELECT TOP 5 C.COMMENT_TEXT, C.CREATED_AT,
-            U.FIRST_NAME, U.LAST_NAME, U.USERNAME,
+            U.USER_ID, U.FIRST_NAME, U.LAST_NAME, U.USERNAME,
             UI.FILE_PATH AS AVATAR
      FROM dbo.[LISTING_COMMENTS] C
      JOIN dbo.[USERS] U ON C.USER_ID = U.USER_ID
@@ -87,6 +87,7 @@ $sellerName = htmlspecialchars($listing['FIRST_NAME'].' '.$listing['LAST_NAME'])
 $categoryLabel = normalizeCategoryLabel($listing['CATEGORY']);
 $isOwner = ($loginId === (int)$listing['USER_ID']);
 $messageLink = 'mailto:' . rawurlencode($listing['EMAIL']) . '?subject=' . rawurlencode('Pipeline Inquiry: ' . $listing['TITLE']);
+$sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (int)$listing['USER_ID'];
 $datePosted = $listing['DATE_POSTED'] instanceof DateTime
     ? $listing['DATE_POSTED']->format('M d, Y')
     : date('M d, Y', strtotime($listing['DATE_POSTED']));
@@ -105,11 +106,13 @@ sqlsrv_close($conn);
 
     <div class="lm-info-col">
         <div class="lm-seller-row">
-            <img src="<?php echo htmlspecialchars($listing['SELLER_AVATAR'] ?? 'assets/img/default_avatar.png'); ?>" class="lm-seller-avatar" alt="Seller">
-            <div>
+            <a href="<?php echo htmlspecialchars($sellerProfileLink); ?>" class="lm-seller-profile-link" aria-label="View seller profile">
+                <img src="<?php echo htmlspecialchars($listing['SELLER_AVATAR'] ?? 'assets/img/default_avatar.png'); ?>" class="lm-seller-avatar" alt="Seller">
+            </a>
+            <a href="<?php echo htmlspecialchars($sellerProfileLink); ?>" class="lm-seller-text-link">
                 <div class="lm-seller-name"><?php echo $sellerName; ?></div>
                 <div class="lm-seller-handle">@<?php echo htmlspecialchars($listing['USERNAME']); ?></div>
-            </div>
+            </a>
             <div class="lm-seller-actions">
                 <?php if(!$isOwner): ?>
                 <a href="<?php echo htmlspecialchars($messageLink); ?>" class="lm-message-btn">Message</a>
@@ -136,12 +139,21 @@ sqlsrv_close($conn);
 
         <div class="lm-meta">
             <?php if($listing['MEETUP_SPOT']): ?>
-            <span class="lm-meta-item">Meet-up: <?php echo htmlspecialchars($listing['MEETUP_SPOT']); ?></span>
+            <div class="lm-meta-card">
+                <span class="lm-meta-label">📍 Meet-up</span>
+                <span class="lm-meta-value"><?php echo htmlspecialchars($listing['MEETUP_SPOT']); ?></span>
+            </div>
             <?php endif; ?>
             <?php if($listing['PAYMENT_METHOD']): ?>
-            <span class="lm-meta-item">Payment: <?php echo htmlspecialchars($listing['PAYMENT_METHOD']); ?></span>
+            <div class="lm-meta-card">
+                <span class="lm-meta-label">💳 Payment</span>
+                <span class="lm-meta-value"><?php echo htmlspecialchars($listing['PAYMENT_METHOD']); ?></span>
+            </div>
             <?php endif; ?>
-            <span class="lm-meta-item">Posted: <?php echo $datePosted; ?></span>
+            <div class="lm-meta-card">
+                <span class="lm-meta-label">🧾 Posted</span>
+                <span class="lm-meta-value"><?php echo $datePosted; ?></span>
+            </div>
         </div>
 
         <div class="lm-social">
@@ -195,9 +207,11 @@ sqlsrv_close($conn);
             <div class="lm-comments-list">
                 <?php foreach($comments as $c): ?>
                 <div class="lm-comment">
-                    <img src="<?php echo htmlspecialchars($c['AVATAR'] ?? 'assets/img/default_avatar.png'); ?>" class="lm-comment-avatar" alt="Avatar">
+                    <a href="public_profile.php?id=<?php echo (int)$c['USER_ID']; ?>" class="lm-comment-profile-link">
+                        <img src="<?php echo htmlspecialchars($c['AVATAR'] ?? 'assets/img/default_avatar.png'); ?>" class="lm-comment-avatar" alt="Avatar">
+                    </a>
                     <div class="lm-comment-body">
-                        <span class="lm-comment-user"><?php echo htmlspecialchars($c['FIRST_NAME'].' '.$c['LAST_NAME']); ?></span>
+                        <a href="public_profile.php?id=<?php echo (int)$c['USER_ID']; ?>" class="lm-comment-user"><?php echo htmlspecialchars($c['FIRST_NAME'].' '.$c['LAST_NAME']); ?></a>
                         <span class="lm-comment-text"><?php echo htmlspecialchars($c['COMMENT_TEXT']); ?></span>
                     </div>
                 </div>

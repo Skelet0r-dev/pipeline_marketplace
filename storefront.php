@@ -304,8 +304,6 @@ if($resComments){
                     <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon">🏬</span> Browse Products</a>
                     <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">🏪</span> My Storefront</a>
                     <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
-                    <a href="purchases.php" class="dropdown-item-custom"><span class="item-icon">🛍️</span> Purchases</a>
-                    <a href="settings.php" class="dropdown-item-custom"><span class="item-icon">⚙️</span> Settings</a>
                     <div class="dropdown-divider-custom"></div>
                     <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
                 </div>
@@ -337,11 +335,6 @@ if($resComments){
                         <span class="sf-stat-num"><?php echo $sold_count; ?></span>
                         <span class="sf-stat-label">Sold</span>
                     </div>
-                    <div class="sf-stat-div"></div>
-                    <div class="sf-stat">
-                        <span class="sf-stat-num">— ⭐</span>
-                        <span class="sf-stat-label">Rating</span>
-                    </div>
                 </div>
             </div>
             <div class="sf-actions">
@@ -355,13 +348,7 @@ if($resComments){
         <div class="sf-tabs">
             <button class="sf-tab active" data-tab="listings">🏷️ Listings</button>
             <button class="sf-tab" data-tab="sold">✅ Sold</button>
-            <button class="sf-tab" data-tab="activity">
-                ❤️ Activity
-                <?php if(!empty($activityLikes) || !empty($activityComments)): ?>
-                <span class="sf-tab-badge"><?php echo count($activityLikes)+count($activityComments); ?></span>
-                <?php endif; ?>
-            </button>
-            <button class="sf-tab" data-tab="reviews">⭐ Reviews</button>
+            <button class="sf-tab" data-tab="activity">Activity</button>
         </div>
     </div>
 
@@ -546,16 +533,6 @@ if($resComments){
                 <?php endif; ?>
             </div>
 
-        </div>
-    </div>
-
-    <!-- ── REVIEWS TAB ── -->
-    <div class="sf-content d-none" id="tab-reviews">
-        <div class="sf-reviews">
-            <div class="sf-empty">
-                <div class="sf-empty-icon">⭐</div>
-                <p class="sf-empty-text">Reviews will appear here once enabled.</p>
-            </div>
         </div>
     </div>
 
