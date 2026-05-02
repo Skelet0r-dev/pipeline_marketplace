@@ -4,6 +4,7 @@ declare(strict_types=1);
 $GLOBALS['DB_LAST_ERROR'] = '';
 
 function db_config(): array {
+    // Defaults are for local development; override with environment variables in production.
     return [
         'host' => getenv('DB_HOST') ?: 'localhost',
         'database' => getenv('DB_NAME') ?: 'pipeline_db',
@@ -19,8 +20,8 @@ function db_connect() {
     try {
         return new PDO($dsn, $config['user'], $config['password'], [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            // Use silent errors so existing call sites can surface db_last_error without exceptions.
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT,
+            // Use warning mode to surface issues while keeping existing error handling paths.
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING,
             PDO::ATTR_EMULATE_PREPARES => false
         ]);
     } catch (PDOException $e) {
