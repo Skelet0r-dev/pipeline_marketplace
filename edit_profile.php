@@ -71,12 +71,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
 }
 
 // ─── 2. FETCH REFRESHED DATA ───
-$sqlUser = "SELECT * FROM USERS WHERE USER_ID = '$loginId'";
-$resUser = db_query($conn, $sqlUser);
+$sqlUser = "SELECT * FROM USERS WHERE USER_ID = ?";
+$resUser = db_query($conn, $sqlUser, [$loginId]);
 $rowUser = db_fetch_assoc($resUser);
 
-$sqlImg  = "SELECT * FROM USER_IMG WHERE USER_ID = '$loginId'";
-$resImg  = db_query($conn, $sqlImg);
+$sqlImg  = "SELECT * FROM USER_IMG WHERE USER_ID = ?";
+$resImg  = db_query($conn, $sqlImg, [$loginId]);
 $rowImg  = db_fetch_assoc($resImg);
 
 $firstname  = $rowUser['FIRST_NAME']  ?? '';

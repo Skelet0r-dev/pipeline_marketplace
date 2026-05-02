@@ -32,13 +32,13 @@ $firstname='';
 // Load user from session if navigating directly (not via login form)
 if(!isset($_POST['stdnum']) && isset($_SESSION['user_id'])){
     $loginId=$_SESSION['user_id'];
-    $sqlsess="SELECT * FROM USERS WHERE USER_ID='$loginId'";
-    $resultsess=db_query($conn,$sqlsess);
+    $sqlsess="SELECT * FROM USERS WHERE USER_ID=?";
+    $resultsess=db_query($conn,$sqlsess, [$loginId]);
     $rowsess=db_fetch_assoc($resultsess);
     if($rowsess){
         $firstname=$rowsess['FIRST_NAME'];
-        $sqlprofile="SELECT * FROM USER_IMG WHERE USER_ID='$loginId'";
-        $resultprofile=db_query($conn,$sqlprofile);
+        $sqlprofile="SELECT * FROM USER_IMG WHERE USER_ID=?";
+        $resultprofile=db_query($conn,$sqlprofile, [$loginId]);
         $rowprofile=db_fetch_assoc($resultprofile);
         $file_path=$rowprofile['FILE_PATH'];
     }
@@ -48,8 +48,8 @@ if(!$locked && isset($_POST['stdnum'])){
     $stdnum=trim($_POST['stdnum']);
     $password=$_POST['password'];
 
-    $sql="SELECT * FROM USERS WHERE STD_NUM='$stdnum'";
-    $result=db_query($conn,$sql);
+    $sql="SELECT * FROM USERS WHERE STD_NUM=?";
+    $result=db_query($conn,$sql, [$stdnum]);
     $rowname=db_fetch_assoc($result);
 
     if($rowname==null){
@@ -63,8 +63,8 @@ if(!$locked && isset($_POST['stdnum'])){
             $error='Student number not found. '.$left.' attempt'.($left!=1?'s':'').' remaining.';
         }
     } else {
-        $sqlpassword="SELECT * FROM USERS WHERE STD_NUM='$stdnum' AND `PASSWORD`='$password'";
-        $resultpassword=db_query($conn,$sqlpassword);
+        $sqlpassword="SELECT * FROM USERS WHERE STD_NUM=? AND `PASSWORD`=?";
+        $resultpassword=db_query($conn,$sqlpassword, [$stdnum, $password]);
         $rowpassword=db_fetch_assoc($resultpassword);
 
         if($rowpassword==null){
@@ -85,8 +85,8 @@ if(!$locked && isset($_POST['stdnum'])){
             $loginId=$rowpassword['USER_ID'];
             $firstname=$rowpassword['FIRST_NAME'];
 
-            $sqlprofile="SELECT * FROM USER_IMG WHERE USER_ID='$loginId'";
-            $resultprofile=db_query($conn,$sqlprofile);
+            $sqlprofile="SELECT * FROM USER_IMG WHERE USER_ID=?";
+            $resultprofile=db_query($conn,$sqlprofile, [$loginId]);
             if($resultprofile===false)
                 die(db_last_error());
             $rowprofile=db_fetch_assoc($resultprofile);

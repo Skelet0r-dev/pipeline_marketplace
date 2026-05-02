@@ -49,13 +49,13 @@ if(isset($categoryAliases[$category])){
 }
 
 // Fetch current user info for Navbar
-$sqlUser = "SELECT FIRST_NAME FROM USERS WHERE USER_ID='$loginId'";
-$resUser = db_query($conn, $sqlUser);
+$sqlUser = "SELECT FIRST_NAME FROM USERS WHERE USER_ID=?";
+$resUser = db_query($conn, $sqlUser, [$loginId]);
 $userRow = db_fetch_assoc($resUser);
 
 // Fetch Profile Image for Navbar
-$sqlImgNavbar = "SELECT FILE_PATH FROM USER_IMG WHERE USER_ID='$loginId'";
-$resImgNav = db_query($conn, $sqlImgNavbar);
+$sqlImgNavbar = "SELECT FILE_PATH FROM USER_IMG WHERE USER_ID=?";
+$resImgNav = db_query($conn, $sqlImgNavbar, [$loginId]);
 $navImgRow = db_fetch_assoc($resImgNav);
 $nav_file_path = $navImgRow['FILE_PATH'] ?? 'assets/img/default_avatar.png';
 

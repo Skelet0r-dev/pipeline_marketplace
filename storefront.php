@@ -38,8 +38,8 @@ function normalizeCategoryLabel($category){
 }
 
 // Get user info
-$sql="SELECT * FROM USERS WHERE USER_ID='$loginId'";
-$result=db_query($conn,$sql);
+$sql="SELECT * FROM USERS WHERE USER_ID=?";
+$result=db_query($conn,$sql, [$loginId]);
 $user=db_fetch_assoc($result);
 
 $firstname=$user['FIRST_NAME'];
@@ -49,20 +49,20 @@ $cys=$user['CYS'];
 $username=$user['USERNAME'];
 
 // Get profile image
-$sqlimg="SELECT FILE_PATH FROM USER_IMG WHERE USER_ID='$loginId'";
-$resultimg=db_query($conn,$sqlimg);
+$sqlimg="SELECT FILE_PATH FROM USER_IMG WHERE USER_ID=?";
+$resultimg=db_query($conn,$sqlimg, [$loginId]);
 $rowimg=db_fetch_assoc($resultimg);
 $file_path=$rowimg['FILE_PATH'] ?? 'assets/img/default_avatar.png';
 
 // Get listing count
-$sqlcount="SELECT COUNT(*) AS CNT FROM LISTINGS WHERE USER_ID='$loginId' AND `STATUS`='Available'";
-$resultcount=db_query($conn,$sqlcount);
+$sqlcount="SELECT COUNT(*) AS CNT FROM LISTINGS WHERE USER_ID=? AND `STATUS`='Available'";
+$resultcount=db_query($conn,$sqlcount, [$loginId]);
 $rowcount=db_fetch_assoc($resultcount);
 $listing_count=$rowcount['CNT'];
 
 // Get sold count
-$sqlsold="SELECT COUNT(*) AS CNT FROM LISTINGS WHERE USER_ID='$loginId' AND `STATUS`='Sold'";
-$resultsold=db_query($conn,$sqlsold);
+$sqlsold="SELECT COUNT(*) AS CNT FROM LISTINGS WHERE USER_ID=? AND `STATUS`='Sold'";
+$resultsold=db_query($conn,$sqlsold, [$loginId]);
 $rowsold=db_fetch_assoc($resultsold);
 $sold_count=$rowsold['CNT'];
 
@@ -94,8 +94,8 @@ if(isset($_POST['add_listing']) && $_POST['add_listing']=='1'){
     $resultadd=db_query($conn,$sqladd,$paramsadd);
 
     if($resultadd){
-        $sqllastid="SELECT LISTING_ID FROM LISTINGS WHERE USER_ID='$loginId' ORDER BY LISTING_ID DESC LIMIT 1";
-        $resultlastid=db_query($conn,$sqllastid);
+        $sqllastid="SELECT LISTING_ID FROM LISTINGS WHERE USER_ID=? ORDER BY LISTING_ID DESC LIMIT 1";
+        $resultlastid=db_query($conn,$sqllastid, [$loginId]);
         $rowlastid=db_fetch_assoc($resultlastid);
         $newlistingid=$rowlastid['LISTING_ID'];
 
@@ -108,8 +108,8 @@ if(isset($_POST['add_listing']) && $_POST['add_listing']=='1'){
                 $newname='listing_'.$newlistingid.'_'.time().'.'.$imgext;
                 $uploadpath='listings/'.$newname;
                 if(move_uploaded_file($imgtmp,$uploadpath)){
-                    $sqlimginsert="INSERT INTO LISTING_IMG (LISTING_ID,FILE_PATH,IS_PRIMARY) VALUES ('$newlistingid','$uploadpath','1')";
-                    db_query($conn,$sqlimginsert);
+                    $sqlimginsert="INSERT INTO LISTING_IMG (LISTING_ID,FILE_PATH,IS_PRIMARY) VALUES (?,?,1)";
+                    db_query($conn,$sqlimginsert, [$newlistingid, $uploadpath]);
                 }
             }
         }
@@ -126,9 +126,9 @@ if(isset($_POST['add_listing']) && $_POST['add_listing']=='1'){
 // ── Handle Delete Listing POST ──────────────────────────────
 if(isset($_POST['delete_listing'])){
     $deleteid=trim($_POST['edit_listing_id']);
-    db_query($conn,"DELETE FROM LISTING_IMG WHERE LISTING_ID='$deleteid'");
-    $sqldeletelisting="DELETE FROM LISTINGS WHERE LISTING_ID='$deleteid' AND USER_ID='$loginId'";
-    $resultdelete=db_query($conn,$sqldeletelisting);
+    db_query($conn,"DELETE FROM LISTING_IMG WHERE LISTING_ID=?", [$deleteid]);
+    $sqldeletelisting="DELETE FROM LISTINGS WHERE LISTING_ID=? AND USER_ID=?";
+    $resultdelete=db_query($conn,$sqldeletelisting, [$deleteid, $loginId]);
     if($resultdelete){
         db_close($conn);
         $_SESSION['flash_success']='Listing deleted successfully.';
@@ -176,9 +176,9 @@ if(isset($_POST['edit_listing'])){
                 $newname='listing_'.$editid.'_'.time().'.'.$imgext;
                 $uploadpath='listings/'.$newname;
                 if(move_uploaded_file($imgtmp,$uploadpath)){
-                    db_query($conn,"DELETE FROM LISTING_IMG WHERE LISTING_ID='$editid'");
-                    $sqlimgupdate="INSERT INTO LISTING_IMG (LISTING_ID,FILE_PATH,IS_PRIMARY) VALUES ('$editid','$uploadpath','1')";
-                    db_query($conn,$sqlimgupdate);
+                        db_query($conn,"DELETE FROM LISTING_IMG WHERE LISTING_ID=?", [$editid]);
+                        $sqlimgupdate="INSERT INTO LISTING_IMG (LISTING_ID,FILE_PATH,IS_PRIMARY) VALUES (?,?,1)";
+                        db_query($conn,$sqlimgupdate, [$editid, $uploadpath]);
                 }
             }
         }
@@ -208,17 +208,17 @@ if(isset($_POST['mark_available'])){
 $sqllistings="SELECT L.*, I.FILE_PATH AS IMG
               FROM LISTINGS L
               LEFT JOIN LISTING_IMG I ON L.LISTING_ID=I.LISTING_ID AND I.IS_PRIMARY=1
-              WHERE L.USER_ID='$loginId' AND L.`STATUS`='Available'
+              WHERE L.USER_ID=? AND L.`STATUS`='Available'
               ORDER BY L.DATE_POSTED DESC";
-$resultlistings=db_query($conn,$sqllistings);
+$resultlistings=db_query($conn,$sqllistings, [$loginId]);
 
 // ── Fetch sold listings ─────────────────────────────────────
 $sqlsoldlist="SELECT L.*, I.FILE_PATH AS IMG
               FROM LISTINGS L
               LEFT JOIN LISTING_IMG I ON L.LISTING_ID=I.LISTING_ID AND I.IS_PRIMARY=1
-              WHERE L.USER_ID='$loginId' AND L.`STATUS`='Sold'
+              WHERE L.USER_ID=? AND L.`STATUS`='Sold'
               ORDER BY L.DATE_POSTED DESC";
-$resultsoldlist=db_query($conn,$sqlsoldlist);
+$resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
 
 // ── Fetch activity: likes on your listings ──────────────────
 // (join with LISTING_LIKES and LISTING_COMMENTS tables)
@@ -230,9 +230,9 @@ $sqlLikes = "SELECT LL.LIKE_ID, LL.CREATED_AT,
              JOIN LISTINGS L ON LL.LISTING_ID = L.LISTING_ID
              JOIN USERS U    ON LL.USER_ID = U.USER_ID
              LEFT JOIN USER_IMG UI ON LL.USER_ID = UI.USER_ID
-             WHERE L.USER_ID = '$loginId'
+             WHERE L.USER_ID = ?
              ORDER BY LL.CREATED_AT DESC";
-$resLikes = db_query($conn, $sqlLikes);
+$resLikes = db_query($conn, $sqlLikes, [$loginId]);
 $activityLikes = [];
 if($resLikes){
     while($row = db_fetch_assoc($resLikes)){
@@ -252,9 +252,9 @@ $sqlComments = "SELECT LC.COMMENT_ID, LC.COMMENT_TEXT, LC.CREATED_AT,
                 JOIN LISTINGS L ON LC.LISTING_ID = L.LISTING_ID
                 JOIN USERS U    ON LC.USER_ID = U.USER_ID
                 LEFT JOIN USER_IMG UI ON LC.USER_ID = UI.USER_ID
-                WHERE L.USER_ID = '$loginId'
+                WHERE L.USER_ID = ?
                 ORDER BY LC.CREATED_AT DESC";
-$resComments = db_query($conn, $sqlComments);
+$resComments = db_query($conn, $sqlComments, [$loginId]);
 $activityComments = [];
 if($resComments){
     while($row = db_fetch_assoc($resComments)){

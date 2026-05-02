@@ -19,6 +19,7 @@ function db_connect() {
     try {
         return new PDO($dsn, $config['user'], $config['password'], [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            // Use silent errors so existing call sites can surface db_last_error without exceptions.
             PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT,
             PDO::ATTR_EMULATE_PREPARES => false
         ]);

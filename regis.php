@@ -66,8 +66,8 @@ if(!empty($errors)){
 }
 
 // ── Check if student number already exists ──
-$sql="SELECT * FROM USERS WHERE STD_NUM='$stdnum'";
-$result=db_query($conn,$sql);
+$sql="SELECT * FROM USERS WHERE STD_NUM=?";
+$result=db_query($conn,$sql, [$stdnum]);
 if($result===false) die(db_last_error());
 
 if(db_fetch($result)===true){
@@ -99,13 +99,13 @@ if(db_fetch($result)===true){
 
 // ── Insert new user ──
 $sql="INSERT INTO USERS (FIRST_NAME, LAST_NAME, STD_NUM, CYS, SEX, USERNAME, EMAIL, `PASSWORD`)
-      VALUES ('$firstname','$lastname','$stdnum','$cys','$sex','$username','$email','$password')";
-$result=db_query($conn,$sql);
+      VALUES (?,?,?,?,?,?,?,?)";
+$result=db_query($conn,$sql, [$firstname,$lastname,$stdnum,$cys,$sex,$username,$email,$password]);
 if($result===false) die(db_last_error());
 
 // ── Get new user ID ──
-$sql="SELECT USER_ID FROM USERS WHERE STD_NUM='$stdnum'";
-$result=db_query($conn,$sql);
+$sql="SELECT USER_ID FROM USERS WHERE STD_NUM=?";
+$result=db_query($conn,$sql, [$stdnum]);
 if($result===false) die(db_last_error());
 $row=db_fetch_assoc($result);
 $id=$row['USER_ID'];
@@ -123,8 +123,8 @@ if(!empty($_FILES['image']['name'])){
 
     if(in_array($checkimage, $allowtypes)){
         if(move_uploaded_file($_FILES['image']['tmp_name'], $imagepath)){
-            $sql="INSERT INTO USER_IMG (IMG_NAME, FILE_PATH, USER_ID) VALUES ('$imagename','$imagepath','$id')";
-            $result=db_query($conn,$sql);
+            $sql="INSERT INTO USER_IMG (IMG_NAME, FILE_PATH, USER_ID) VALUES (?,?,?)";
+            $result=db_query($conn,$sql, [$imagename,$imagepath,$id]);
             if($result===false) die(db_last_error());
         }
     }
