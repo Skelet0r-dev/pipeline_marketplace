@@ -1,0 +1,59 @@
+services:
+
+  # ── MySQL ────────────────────────────────────────────────────────────────────
+  db:
+    image: mysql:8.0
+    container_name: app_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE:      pipeline_db
+      MYSQL_USER:          app_user
+      MYSQL_PASSWORD:      app_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Apache ───────────────────────────────────────────────────────────────────
+  web:
+    image: php:8.2-apache
+    container_name: app_apache
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST:     db
+      DB_NAME:     pipeline_db
+      DB_USER:     app_user
+      DB_PASSWORD: app_password
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "9090:80"
+
+  # ── phpMyAdmin ───────────────────────────────────────────────────────────────
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: app_phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PMA_HOST:     db
+      PMA_PORT:     3306
+      PMA_USER:     root
+      PMA_PASSWORD: rootpassword
+    ports:
+      - "9091:80"
+
+volumes:
+  mysql_data:
