@@ -1,11 +1,20 @@
 /* ── Base ── */
 * { box-sizing: border-box; }
 
+html {
+    min-height: 100%;
+}
+
 body {
-    background-color: #FFF;
-    font-family: "DM Sans", sans-serif;
     margin: 0;
     min-height: 100vh;
+    font-family: "DM Sans", sans-serif;
+    background-image: url('/pipeline_marketplace/assets/img/background_registration.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+
 }
 
 /* ── Header ── */
@@ -36,37 +45,39 @@ body {
     justify-content: center;
     align-items: center;
     min-height: calc(100vh - 70px);
-    padding: 40px 20px;
+    padding: 20px 16px;
+    background: transparent;
 }
 
 /* ── Main card ── */
 .regis-card {
-    background: #F9F8F6;
+    background: rgba(249, 248, 246, 0.94);
     border-radius: 24px;
-    border:2px solid #054d20;
+    border: 2px solid #054d20;
     box-shadow: 0 8px 32px rgba(8, 120, 50, 0.13);
     display: flex;
     overflow: hidden;
-    width: 860px;
-    max-width: 100%;
+    width: 1420px;
+    max-width: 97vw;
+    min-height: 740px;
 }
 
 /* ── Left panel ── */
 .regis-left {
-    background:   #F2F0EF;
-    width: 280px;
+    background: rgba(242, 240, 239, 0.88);
+    width: 440px;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 32px 24px;
-    gap: 16px;
+    padding: 60px 40px;
+    gap: 20px;
 }
 
 .photo-preview-box {
-    width: 180px;
-    height: 180px;
+    width: 300px;
+    height: 300px;
     border-radius: 16px;
     border: 3px solid #054d20;
     overflow: hidden;
@@ -122,7 +133,7 @@ body {
 /* ── Right panel ── */
 .regis-right {
     flex: 1;
-    padding: 36px 36px;
+    padding: 60px 64px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -141,7 +152,7 @@ body {
 }
 
 .regis-title {
-    font-size: 32px;
+    font-size: 44px;
     font-weight: 800;
     color: #054d20;
     margin: 0;
@@ -161,11 +172,11 @@ body {
 /* ── Inputs ── */
 .regis-input {
     width: 100%;
-    padding: 10px 14px;
+    padding: 12px 16px;
     border: 1.5px solid #b8dfc8;
     border-radius: 10px;
     font-family: "DM Sans", sans-serif;
-    font-size: 14px;
+    font-size: 15px;
     color: #054d20;
     background: #fff;
     outline: none;
