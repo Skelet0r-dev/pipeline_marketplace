@@ -2,7 +2,7 @@
 * { box-sizing: border-box; }
 
 body {
-    background-color: #fefae0;
+    background-color: #FFF;
     font-family: "DM Sans", sans-serif;
     margin: 0;
     min-height: 100vh;
@@ -10,7 +10,7 @@ body {
 
 /* ── Header ── */
 .regis-header {
-    background: linear-gradient(135deg, #283618 0%, #606c38 60%, #a7b87a 100%);
+    background:  #054d20;
     padding: 16px 40px;
     display: flex;
     justify-content: space-between;
@@ -25,7 +25,7 @@ body {
 
 .header-tagline {
     font-size: 12px;
-    color: #dde5b6;
+    color: #c8f0d8;
     letter-spacing: 1.5px;
     font-style: italic;
 }
@@ -41,9 +41,10 @@ body {
 
 /* ── Main card ── */
 .regis-card {
-    background: #fff;
+    background: #F9F8F6;
     border-radius: 24px;
-    box-shadow: 0 8px 32px rgba(40, 54, 24, 0.15);
+    border:2px solid #054d20;
+    box-shadow: 0 8px 32px rgba(8, 120, 50, 0.13);
     display: flex;
     overflow: hidden;
     width: 860px;
@@ -52,7 +53,7 @@ body {
 
 /* ── Left panel ── */
 .regis-left {
-    background: linear-gradient(160deg, #dde5b6 0%, #fefae0 100%);
+    background:   #F2F0EF;
     width: 280px;
     flex-shrink: 0;
     display: flex;
@@ -67,7 +68,7 @@ body {
     width: 180px;
     height: 180px;
     border-radius: 16px;
-    border: 3px solid #606c38;
+    border: 3px solid #054d20;
     overflow: hidden;
     background: #fff;
     display: flex;
@@ -83,8 +84,8 @@ body {
 }
 
 .upload-btn {
-    background-color: #606c38;
-    color: #fefae0;
+    background-color: #054d20;
+    color: #F2F0EF;
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 1px;
@@ -98,12 +99,12 @@ body {
 }
 
 .upload-btn:hover {
-    background-color: #283618;
+     opacity: 0.88;
 }
 
 .file-name {
     font-size: 11px;
-    color: #606c38;
+    color: #054d20;
     margin: 0;
     text-align: center;
     word-break: break-all;
@@ -111,8 +112,8 @@ body {
 
 /* ── Divider ── */
 .regis-divider {
-    width: 1px;
-    background: linear-gradient(to bottom, transparent, #606c38, transparent);
+    width: 2px;
+    background: #087832;
     align-self: stretch;
     margin: 0;
     flex-shrink: 0;
@@ -134,7 +135,7 @@ body {
 .form-label-small {
     font-size: 11px;
     font-weight: 700;
-    color: #606c38;
+    color: #087832;
     letter-spacing: 2px;
     margin-bottom: 4px;
 }
@@ -142,7 +143,7 @@ body {
 .regis-title {
     font-size: 32px;
     font-weight: 800;
-    color: #283618;
+    color: #054d20;
     margin: 0;
 }
 
@@ -150,7 +151,7 @@ body {
 .field-label {
     font-size: 11px;
     font-weight: 700;
-    color: #606c38;
+    color: #087832;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     display: block;
@@ -161,23 +162,23 @@ body {
 .regis-input {
     width: 100%;
     padding: 10px 14px;
-    border: 1.5px solid #dde5b6;
+    border: 1.5px solid #b8dfc8;
     border-radius: 10px;
     font-family: "DM Sans", sans-serif;
     font-size: 14px;
-    color: #283618;
-    background: #fefae0;
+    color: #054d20;
+    background: #fff;
     outline: none;
     transition: border-color 0.2s;
 }
 
 .regis-input:focus {
-    border-color: #606c38;
+    border-color: #087832;
     background: #fff;
 }
 
 .regis-input::placeholder {
-    color: #aab57a;
+    color: #7dbf9a;
 }
 
 /* ── Buttons ── */
@@ -199,8 +200,8 @@ body {
 }
 
 .btn-register {
-    background: linear-gradient(135deg, #606c38, #283618);
-    color: #fefae0;
+    background:  #087832;
+    color: #F2F0EF;
     border: none;
     padding: 11px 20px;
     border-radius: 10px;
@@ -232,7 +233,7 @@ body {
 }
 .field-error.show { display: block; }
 .regis-input.is-bad, .regis-select.is-bad { border-color: #dc3545; }
-.regis-input.is-ok,  .regis-select.is-ok  { border-color: #28a745; }
+.regis-input.is-ok,  .regis-select.is-ok  { border-color: #087832; }
 
 /* ── Password strength ── */
 .pw-bar {
@@ -276,18 +277,18 @@ body {
 .regis-select {
     width: 100%;
     padding: 10px 14px;
-    border: 1.5px solid #dde5b6;
+    border: 1.5px solid #b8dfc8;
     border-radius: 10px;
     font-family: "DM Sans", sans-serif;
     font-size: 14px;
-    color: #283618;
-    background: #fefae0 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23606c38' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 12px center;
+    color: #054d20;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23087832' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 12px center;
     appearance: none;
     outline: none;
     cursor: pointer;
     transition: border-color 0.2s;
 }
-.regis-select:focus { border-color: #606c38; background-color: #fff; }
+.regis-select:focus { border-color: #087832; background-color: #fff; }
 
 /* ── Error page ── */
 .error-card {
@@ -295,7 +296,7 @@ body {
     margin: 80px auto;
     background: #fff;
     border-radius: 16px;
-    box-shadow: 0 4px 32px rgba(0, 0, 0, 0.10);
+    box-shadow: 0 4px 32px rgba(8, 120, 50, 0.10);
     padding: 40px 36px 32px;
 }
 .error-card h2 {
@@ -320,8 +321,8 @@ body {
 }
 .btn-back {
     display: inline-block;
-    background: #606c38;
-    color: #fff;
+    background: #087832;
+    color: #F2F0EF;
     padding: 10px 28px;
     border-radius: 8px;
     text-decoration: none;
@@ -329,4 +330,11 @@ body {
     font-size: 14px;
     transition: background 0.2s;
 }
-.btn-back:hover { background: #283618; color: #fff; }
+.btn-back:hover { background: #054d20; color: #F2F0EF; }
+
+/* ── Success card brand logo ── */
+.brand-logo {
+    max-height: 36px;
+    width: auto;
+    display: block;
+}

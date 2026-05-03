@@ -116,7 +116,6 @@ db_close($conn);
             <div class="lm-seller-actions">
                 <?php if(!$isOwner): ?>
                 <a href="<?php echo htmlspecialchars($messageLink); ?>" class="lm-message-btn">Message</a>
-                <button type="button" class="lm-report-btn" id="lmToggleReportBtn">Report Item</button>
                 <?php endif; ?>
                 <a href="listing.php?id=<?php echo $listing['LISTING_ID']; ?>" class="lm-full-btn">View Full →</a>
             </div>
@@ -164,35 +163,6 @@ db_close($conn);
             </button>
         </div>
 
-        <?php if(!$isOwner): ?>
-        <div class="lm-report-panel" id="lmReportPanel" hidden>
-            <form id="lmReportForm">
-                <div class="lm-report-head">
-                    <h3 class="lm-report-title">Report this item</h3>
-                    <button type="button" class="lm-report-close" id="lmCloseReportBtn" aria-label="Close report form">×</button>
-                </div>
-                <input type="hidden" name="listing_id" value="<?php echo $listingId; ?>">
-                <label class="lm-report-label" for="lmReportReason">Reason</label>
-                <select id="lmReportReason" name="report_reason" class="lm-report-select" required>
-                    <option value="" disabled selected>Select a reason</option>
-                    <option value="Prohibited Item">Prohibited Item</option>
-                    <option value="Misleading Description">Misleading Description</option>
-                    <option value="Spam or Duplicate">Spam or Duplicate</option>
-                    <option value="Harassment or Abuse">Harassment or Abuse</option>
-                    <option value="Suspicious Pricing">Suspicious Pricing</option>
-                    <option value="Other">Other</option>
-                </select>
-                <label class="lm-report-label" for="lmReportDetails">Details</label>
-                <textarea id="lmReportDetails" name="report_details" class="lm-report-textarea" maxlength="1000" placeholder="Tell the admin what is wrong with this listing." required></textarea>
-                <div class="lm-report-actions">
-                    <button type="button" class="lm-report-cancel" id="lmCancelReportBtn">Cancel</button>
-                    <button type="submit" class="lm-report-submit" id="lmSubmitReportBtn">Submit Report</button>
-                </div>
-                <div class="lm-report-feedback" id="lmReportFeedback" hidden></div>
-            </form>
-        </div>
-        <?php endif; ?>
-
         <div class="lm-comments-preview">
             <div class="lm-comments-label">
                 Comments
@@ -219,6 +189,7 @@ db_close($conn);
             </div>
             <?php endif; ?>
         </div>
+
     </div>
 </div>
 
@@ -237,74 +208,6 @@ db_close($conn);
                     this.classList.toggle('liked', data.liked);
                     this.querySelector('.lm-heart').textContent = data.liked ? '❤️' : '🤍';
                     this.querySelector('.lm-like-count').textContent = data.count;
-                });
-        });
-    }
-
-    const panel = document.getElementById('lmReportPanel');
-    const toggleBtn = document.getElementById('lmToggleReportBtn');
-    const cancelBtn = document.getElementById('lmCancelReportBtn');
-    const closeBtn = document.getElementById('lmCloseReportBtn');
-    const form = document.getElementById('lmReportForm');
-    const feedback = document.getElementById('lmReportFeedback');
-    const submitBtn = document.getElementById('lmSubmitReportBtn');
-
-    function showFeedback(message, isError){
-        if(!feedback){
-            return;
-        }
-
-        feedback.hidden = false;
-        feedback.textContent = message;
-        feedback.className = 'lm-report-feedback ' + (isError ? 'is-error' : 'is-success');
-    }
-
-    if(toggleBtn && panel){
-        toggleBtn.addEventListener('click', function(){
-            panel.hidden = false;
-        });
-    }
-
-    if(cancelBtn && panel){
-        cancelBtn.addEventListener('click', function(){
-            panel.hidden = true;
-        });
-    }
-
-    if(closeBtn && panel){
-        closeBtn.addEventListener('click', function(){
-            panel.hidden = true;
-        });
-    }
-
-    if(form){
-        form.addEventListener('submit', function(e){
-            e.preventDefault();
-
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-            feedback.hidden = true;
-
-            const body = new FormData(form);
-            body.append('ajax', '1');
-
-            fetch('report_item.php', { method:'POST', body })
-                .then(r => r.json())
-                .then(data => {
-                    if(data.error){
-                        showFeedback(data.error, true);
-                        return;
-                    }
-
-                    showFeedback(data.message || 'Report submitted successfully.', false);
-                    form.reset();
-                })
-                .catch(() => {
-                    showFeedback('Could not submit your report right now. Please try again.', true);
-                })
-                .finally(() => {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Submit Report';
                 });
         });
     }

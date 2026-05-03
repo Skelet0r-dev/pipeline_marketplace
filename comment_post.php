@@ -35,7 +35,7 @@ if(!$listingId || $commentText === ''){
 // Truncate for safety
 $commentText = mb_substr($commentText, 0, 1000);
 
-$sqlInsert = "INSERT INTO LISTING_COMMENTS (LISTING_ID, USER_ID, COMMENT_TEXT) VALUES (?,?,?)";
+$sqlInsert = "INSERT INTO LISTING_COMMENTS (LISTING_ID, USER_ID, COMMENT_TEXT, CREATED_AT) VALUES (?,?,?,NOW())";
 $result    = db_query($conn, $sqlInsert, [$listingId, $userId, $commentText]);
 
 if(!$result){

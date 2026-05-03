@@ -1,22 +1,25 @@
 body {
-    background-color: #fefae0;
+    background-color: #087832;                /* GREEN page bg */
     font-family: "DM Sans", sans-serif;
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
     margin: 0;
+    padding: 40px 20px;
 }
 
 .id-card {
-    width: 680px;
+    width: 620px;
+    max-width: 100%;
     border-radius: 24px;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(40, 54, 24, 0.25);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.30);
 }
 
+/* ── Header ── */
 .id-card-header {
-    background: linear-gradient(135deg, #283618 0%, #606c38 60%, #a7b87a 100%);
+    background: #087832;                      /* solid GREEN */
     padding: 18px 28px 14px 28px;
     display: flex;
     justify-content: space-between;
@@ -24,9 +27,9 @@ body {
 }
 
 .id-card-header .brand {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 900;
-    color: #fefae0;
+    color: #F2F0EF;
     letter-spacing: 3px;
 }
 
@@ -35,35 +38,49 @@ body {
 }
 
 .id-card-header .date-issue {
-    font-size: 11px;
-    color: #dde5b6;
-    letter-spacing: 1px;
+    font-size: 10px;
+    color: #c8f0d8;
+    letter-spacing: 1.2px;
+    font-style: italic;
 }
 
 .id-card-header .card-title {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 800;
-    color: #fefae0;
-    letter-spacing: 1px;
+    color: #F2F0EF;
+    letter-spacing: 1.5px;
 }
 
+/* brand-logo img variant from regis.php */
+.brand-logo {
+    max-height: 32px;
+    width: auto;
+    display: block;
+    filter: brightness(0) invert(1);
+}
+
+/* ── Body ── */
 .id-card-body {
-    background: linear-gradient(160deg, #dde5b6 0%, #fefae0 55%, #fefae0 100%);
+    background: #F2F0EF;                      /* OFF-WHITE body */
     padding: 24px 28px 20px 28px;
     display: flex;
-    gap: 24px;
+    gap: 20px;
     align-items: flex-start;
     position: relative;
 }
 
+/* ── Photo — scaled DOWN to fit the card ── */
 .id-photo-box {
-    border: 3px solid #606c38;
+    border: 3px solid #087832;
     border-radius: 12px;
-    width: 300px;
-    height: 300px;
+    width: 120px;                             /* was 300px */
+    height: 140px;
     overflow: hidden;
     flex-shrink: 0;
     background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .id-photo-box img {
@@ -72,71 +89,82 @@ body {
     object-fit: cover;
 }
 
+/* ── Fields ── */
 .id-fields {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .id-field {
-    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
 }
 
 .id-field-label {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
-    color: #606c38;
-    letter-spacing: 1.5px;
+    color: #087832;
+    letter-spacing: 1.8px;
     text-transform: uppercase;
 }
 
 .id-field-value {
-    font-size: 17px;
+    font-size: 14px;
     font-weight: 700;
-    color: #283618;
+    color: #054d20;
+    border-bottom: 1px solid #b8dfc8;
+    padding-bottom: 4px;
 }
 
 .id-field-value.large {
-    font-size: 22px;
+    font-size: 17px;
+    font-weight: 800;
 }
 
+/* ── Watermark ── */
 .id-watermark {
     position: absolute;
-    right: 20px;
+    right: 18px;
     bottom: 10px;
-    opacity: 0.06;
-    font-size: 120px;
+    font-size: 110px;
     font-weight: 900;
-    color: #283618;
+    color: rgba(8, 120, 50, 0.07);
     pointer-events: none;
     user-select: none;
     line-height: 1;
 }
 
+/* ── Footer ── */
 .id-card-footer {
-    background: linear-gradient(90deg, #606c38, #283618);
-    padding: 10px 28px;
+    background: #087832;                    
+    padding: 12px 28px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .id-card-footer .tagline {
-    font-size: 12px;
-    color: #dde5b6;
-    letter-spacing: 1px;
+    font-size: 10px;
+    color: #c8f0d8;
+    letter-spacing: 1.2px;
     font-style: italic;
 }
 
 .id-card-footer a {
     font-size: 13px;
-    font-weight: 700;
-    color: #fefae0;
+    font-weight: 800;
+    color: #087832;
     text-decoration: none;
-    border: 2px solid #fefae0;
-    padding: 4px 24px;
+    background: #F2F0EF;                     
+    padding: 6px 26px;
     border-radius: 20px;
+    letter-spacing: 0.5px;
+    transition: opacity 0.2s;
 }
 
 .id-card-footer a:hover {
-    background: #fefae0;
-    color: #283618;
+    opacity: 0.85;
 }

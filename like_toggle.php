@@ -46,7 +46,7 @@ if($existing){
 } else {
     // Like
     db_query($conn,
-        "INSERT INTO LISTING_LIKES (LISTING_ID, USER_ID) VALUES (?,?)",
+        "INSERT INTO LISTING_LIKES (LISTING_ID, USER_ID, CREATED_AT) VALUES (?,?,NOW())",
         [$listingId, $userId]
     );
     $liked = true;

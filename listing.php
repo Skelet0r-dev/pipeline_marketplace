@@ -218,36 +218,6 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
                 <?php endif; ?>
             </div>
 
-            <?php if(!$isOwner): ?>
-            <div class="listing-report-panel" id="reportPanel" hidden>
-                <div class="listing-report-head">
-                    <h3 class="listing-report-title">Report this item</h3>
-                    <button type="button" class="listing-report-close" id="closeReportBtn" aria-label="Close report form">×</button>
-                </div>
-                <p class="listing-report-copy">Choose a reason and add details. The report will be saved for the admin review side.</p>
-                <form id="reportForm" class="listing-report-form">
-                    <input type="hidden" name="listing_id" value="<?php echo $listingId; ?>">
-                    <label class="listing-report-label" for="reportReason">Reason</label>
-                    <select id="reportReason" name="report_reason" class="listing-report-select" required>
-                        <option value="" disabled selected>Select a reason</option>
-                        <option value="Prohibited Item">Prohibited Item</option>
-                        <option value="Misleading Description">Misleading Description</option>
-                        <option value="Spam or Duplicate">Spam or Duplicate</option>
-                        <option value="Harassment or Abuse">Harassment or Abuse</option>
-                        <option value="Suspicious Pricing">Suspicious Pricing</option>
-                        <option value="Other">Other</option>
-                    </select>
-                    <label class="listing-report-label" for="reportDetails">Details</label>
-                    <textarea id="reportDetails" name="report_details" class="listing-report-textarea" rows="4" maxlength="1000" placeholder="Tell the admin what is wrong with this listing." required></textarea>
-                    <div class="listing-report-actions">
-                        <button type="button" class="listing-report-cancel" id="cancelReportBtn">Cancel</button>
-                        <button type="submit" class="listing-report-submit" id="submitReportBtn">Submit Report</button>
-                    </div>
-                    <div class="listing-report-feedback" id="reportFeedback" hidden></div>
-                </form>
-            </div>
-            <?php endif; ?>
-
             <!-- Category & Condition -->
             <div class="listing-meta-row">
                 <span class="listing-cat-badge"><?php echo htmlspecialchars($categoryLabel); ?></span>
@@ -343,6 +313,43 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
 
 </div><!-- /container -->
 
+<?php if(!$isOwner): ?>
+<!-- ── REPORT MODAL ── -->
+<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reportModalLabel">Report this item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="listing-report-copy">Choose a reason and add details. The report will be saved for admin review.</p>
+                <form id="reportForm">
+                    <input type="hidden" name="listing_id" value="<?php echo $listingId; ?>">
+                    <label class="listing-report-label" for="reportReason">Reason</label>
+                    <select id="reportReason" name="report_reason" class="listing-report-select form-select mb-3" required>
+                        <option value="" disabled selected>Select a reason</option>
+                        <option value="Prohibited Item">Prohibited Item</option>
+                        <option value="Misleading Description">Misleading Description</option>
+                        <option value="Spam or Duplicate">Spam or Duplicate</option>
+                        <option value="Harassment or Abuse">Harassment or Abuse</option>
+                        <option value="Suspicious Pricing">Suspicious Pricing</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <label class="listing-report-label" for="reportDetails">Details</label>
+                    <textarea id="reportDetails" name="report_details" class="listing-report-textarea form-control mb-3" rows="4" maxlength="1000" placeholder="Tell the admin what is wrong with this listing." required></textarea>
+                    <div class="listing-report-feedback" id="reportFeedback" hidden></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="listing-report-cancel" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="listing-report-submit" id="submitReportBtn">Submit Report</button>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 // ── Profile dropdown ─────────────────────────────────────
@@ -362,8 +369,7 @@ function switchImg(thumb){
 }
 
 // ── Like toggle ──────────────────────────────────────────
-// Designed so the fetch URL can be replaced with an API endpoint
-const LIKE_ENDPOINT = 'like_toggle.php'; // ← swap to API URL when ready
+const LIKE_ENDPOINT = 'like_toggle.php';
 
 const likeBtn   = document.getElementById('likeBtn');
 const likeCount = document.getElementById('likeCount');
@@ -387,88 +393,54 @@ likeBtn.addEventListener('click', function(){
         .catch(err => console.error('Like error:', err));
 });
 
-// ── Comment submit ───────────────────────────────────────
-// Designed so the fetch URL can be replaced with an API endpoint
-const COMMENT_ENDPOINT = 'comment_post.php'; // ← swap to API URL when ready
-const REPORT_ENDPOINT = 'report_item.php';
+// ── Report modal ─────────────────────────────────────────
+const REPORT_ENDPOINT  = 'report_item.php';
+const toggleReportBtn  = document.getElementById('toggleReportBtn');
+const submitReportBtn  = document.getElementById('submitReportBtn');
+const reportForm       = document.getElementById('reportForm');
+const reportFeedback   = document.getElementById('reportFeedback');
 
-const commentInput  = document.getElementById('commentInput');
-const commentSubmit = document.getElementById('commentSubmit');
-const commentsList  = document.getElementById('commentsList');
-const commentsCount = document.getElementById('commentsCount');
-const charCount     = document.getElementById('charCount');
-const listingId     = <?php echo $listingId; ?>;
-const reportPanel   = document.getElementById('reportPanel');
-const reportForm    = document.getElementById('reportForm');
-const reportFeedback = document.getElementById('reportFeedback');
-const toggleReportBtn = document.getElementById('toggleReportBtn');
-const closeReportBtn = document.getElementById('closeReportBtn');
-const cancelReportBtn = document.getElementById('cancelReportBtn');
-const submitReportBtn = document.getElementById('submitReportBtn');
-
-function setReportPanelVisibility(isVisible){
-    if(!reportPanel){
-        return;
-    }
-
-    reportPanel.hidden = !isVisible;
-    if(isVisible){
-        reportPanel.scrollIntoView({ behavior:'smooth', block:'nearest' });
-    }
-}
-
-function showReportFeedback(message, isError){
-    if(!reportFeedback){
-        return;
-    }
-
-    reportFeedback.hidden = false;
-    reportFeedback.textContent = message;
-    reportFeedback.className = 'listing-report-feedback ' + (isError ? 'is-error' : 'is-success');
+let reportModal = null;
+if(document.getElementById('reportModal')){
+    reportModal = new bootstrap.Modal(document.getElementById('reportModal'));
 }
 
 if(toggleReportBtn){
     toggleReportBtn.addEventListener('click', function(){
-        setReportPanelVisibility(true);
+        reportForm.reset();
+        reportFeedback.hidden = true;
+        reportModal.show();
     });
 }
 
-if(closeReportBtn){
-    closeReportBtn.addEventListener('click', function(){
-        setReportPanelVisibility(false);
-    });
-}
-
-if(cancelReportBtn){
-    cancelReportBtn.addEventListener('click', function(){
-        setReportPanelVisibility(false);
-    });
-}
-
-if(reportForm){
-    reportForm.addEventListener('submit', function(e){
-        e.preventDefault();
+if(submitReportBtn){
+    submitReportBtn.addEventListener('click', function(){
+        if(!reportForm.reportValidity()) return;
 
         submitReportBtn.disabled = true;
         submitReportBtn.textContent = 'Submitting...';
         reportFeedback.hidden = true;
 
         const body = new FormData(reportForm);
-        body.append('ajax', '1');
 
         fetch(REPORT_ENDPOINT, { method:'POST', body })
             .then(r => r.json())
             .then(data => {
+                reportFeedback.hidden = false;
                 if(data.error){
-                    showReportFeedback(data.error, true);
-                    return;
+                    reportFeedback.textContent = data.error;
+                    reportFeedback.className = 'listing-report-feedback is-error';
+                } else {
+                    reportFeedback.textContent = data.message || 'Report submitted successfully.';
+                    reportFeedback.className = 'listing-report-feedback is-success';
+                    reportForm.reset();
+                    setTimeout(() => reportModal.hide(), 1800);
                 }
-
-                showReportFeedback(data.message || 'Report submitted successfully.', false);
-                reportForm.reset();
             })
             .catch(() => {
-                showReportFeedback('Could not submit your report right now. Please try again.', true);
+                reportFeedback.hidden = false;
+                reportFeedback.textContent = 'Could not submit your report right now. Please try again.';
+                reportFeedback.className = 'listing-report-feedback is-error';
             })
             .finally(() => {
                 submitReportBtn.disabled = false;
@@ -477,10 +449,19 @@ if(reportForm){
     });
 }
 
+// ── Comment submit ───────────────────────────────────────
+const COMMENT_ENDPOINT = 'comment_post.php';
+
+const commentInput  = document.getElementById('commentInput');
+const commentSubmit = document.getElementById('commentSubmit');
+const commentsList  = document.getElementById('commentsList');
+const commentsCount = document.getElementById('commentsCount');
+const charCount     = document.getElementById('charCount');
+const listingId     = <?php echo $listingId; ?>;
+
 // Character counter
 commentInput.addEventListener('input', function(){
     charCount.textContent = this.value.length;
-    // Auto-resize
     this.style.height = 'auto';
     this.style.height = Math.min(this.scrollHeight, 120) + 'px';
 });
@@ -507,11 +488,9 @@ function submitComment(){
         .then(data => {
             if(data.error){ alert('Error: ' + data.error); return; }
 
-            // Remove "no comments" placeholder
             const empty = document.getElementById('commentsEmpty');
             if(empty) empty.remove();
 
-            // Build new comment element
             const item = document.createElement('div');
             item.className = 'comment-item comment-item-new';
             item.innerHTML = `
@@ -526,14 +505,11 @@ function submitComment(){
                 </div>`;
             commentsList.appendChild(item);
 
-            // Scroll to new comment
             item.scrollIntoView({ behavior:'smooth', block:'nearest' });
 
-            // Update count
             const newCount = parseInt(commentsCount.textContent||'0') + 1;
             commentsCount.textContent = newCount;
 
-            // Reset input
             commentInput.value = '';
             commentInput.style.height = 'auto';
             charCount.textContent = '0';

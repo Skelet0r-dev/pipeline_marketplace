@@ -98,8 +98,9 @@ if(db_fetch($result)===true){
 }
 
 // ── Insert new user ──
-$sql="INSERT INTO USERS (FIRST_NAME, LAST_NAME, STD_NUM, CYS, SEX, USERNAME, EMAIL, `PASSWORD`)
-      VALUES (?,?,?,?,?,?,?,?)";
+// ── Insert new user ──
+$sql="INSERT INTO USERS (FIRST_NAME, LAST_NAME, STD_NUM, CYS, SEX, USERNAME, EMAIL, `PASSWORD`, DATE_REGISTERED)
+      VALUES (?,?,?,?,?,?,?,?,NOW())";
 $result=db_query($conn,$sql, [$firstname,$lastname,$stdnum,$cys,$sex,$username,$email,$password]);
 if($result===false) die(db_last_error());
 
@@ -147,7 +148,7 @@ if(!empty($_FILES['image']['name'])){
     <div class="id-card">
 
         <div class="id-card-header">
-            <div class="brand">PIPELINE</div>
+            <img src="assets/img/pipeline_logo_light.png" class="brand-logo" alt="Pipeline">
             <div class="card-title-block">
                 <div class="date-issue">&#10022; Date of issue <?php echo date("m. d. Y"); ?> &#10022;</div>
                 <div class="card-title">ACCOUNT CREATED</div>
