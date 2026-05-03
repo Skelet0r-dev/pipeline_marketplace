@@ -1,5 +1,5 @@
 body {
-    background-color: #087832;                /* GREEN page bg */
+    background-color: #F2F0EF;                /* OFF-WHITE page bg */
     font-family: "DM Sans", sans-serif;
     display: flex;
     align-items: center;
@@ -53,7 +53,7 @@ body {
 
 /* brand-logo img variant from regis.php */
 .brand-logo {
-    max-height: 32px;
+    max-height: 60px;
     width: auto;
     display: block;
     filter: brightness(0) invert(1);
@@ -65,7 +65,7 @@ body {
     padding: 24px 28px 20px 28px;
     display: flex;
     gap: 20px;
-    align-items: flex-start;
+    align-items: center;
     position: relative;
 }
 
@@ -73,8 +73,8 @@ body {
 .id-photo-box {
     border: 3px solid #087832;
     border-radius: 12px;
-    width: 120px;                             /* was 300px */
-    height: 140px;
+    width: 300px;
+    height: 300px;
     overflow: hidden;
     flex-shrink: 0;
     background: #fff;

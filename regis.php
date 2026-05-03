@@ -150,7 +150,7 @@ if(!empty($_FILES['image']['name'])){
         <div class="id-card-header">
             <img src="assets/img/pipeline_logo_light.png" class="brand-logo" alt="Pipeline">
             <div class="card-title-block">
-                <div class="date-issue">&#10022; Date of issue <?php echo date("m. d. Y"); ?> &#10022;</div>
+                <div class="date-issue"> Date of issue <?php echo date("m. d. Y"); ?></div>
                 <div class="card-title">ACCOUNT CREATED</div>
             </div>
         </div>
@@ -197,7 +197,7 @@ if(!empty($_FILES['image']['name'])){
         </div>
 
         <div class="id-card-footer">
-            <span class="tagline">&#10022; Your campus marketplace &#10022;</span>
+            <span class="tagline"></span>
             <a href="login.html">OK</a>
         </div>
 

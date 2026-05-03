@@ -6,8 +6,8 @@ function db_config(): array {
     return [
         'host' => getenv('DB_HOST') ?: 'localhost',
         'database' => getenv('DB_NAME') ?: 'pipeline_db',
-        'user' => getenv('DB_USER') ?: 'app_user',
-        'password' => getenv('DB_PASS') ?: 'app_password'
+        'user' => getenv('DB_USER') ?: 'root',
+        'password' => getenv('DB_PASS') ?: ''
     ];
 }
 
