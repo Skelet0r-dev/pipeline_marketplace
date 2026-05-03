@@ -16,7 +16,7 @@ body {
     margin: 0;
     font-family: "DM Sans", sans-serif;
     color: var(--green-900);
-    background: #fff;
+    background: #F2F0EF;
 }
 
 a {
@@ -40,8 +40,8 @@ img {
     align-items: center;
     justify-content: space-between;
     padding: 18px 48px;
-    border-bottom: 2px solid #29462c;
-    background: #fff;
+    border-bottom: 2px solid #097734;
+    background: #F2F0EF;
     gap: 24px;
 }
 
@@ -53,22 +53,22 @@ img {
 .nav-icons {
     display: flex;
     align-items: center;
-    gap: 30px;
+    gap: 52px;
 }
 
 .nav-icon {
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.4px;
     color: var(--green-900);
 }
 
 .icon-circle {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: var(--green-600);
     display: flex;

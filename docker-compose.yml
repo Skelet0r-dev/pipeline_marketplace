@@ -23,7 +23,7 @@ services:
 
   # ── Apache ───────────────────────────────────────────────────────────────────
   web:
-    image: php:8.2-apache
+    build: .
     container_name: app_apache
     restart: unless-stopped
     depends_on:

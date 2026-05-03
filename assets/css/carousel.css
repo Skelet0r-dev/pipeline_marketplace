@@ -1,0 +1,272 @@
+/* ============================================================
+   PIPELINE — Hero Carousel (add to or @import in index.css)
+   ============================================================ */
+
+/* ---------- Hero overrides for dark background ---------- */
+.hero {
+    background: #0d0d1a;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* Ambient glow orbs */
+  .hero::before {
+    content: '';
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(99,87,255,0.18) 0%, transparent 70%);
+    top: -110px;
+    right: -70px;
+    pointer-events: none;
+  }
+  
+  .hero::after {
+    content: '';
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(29,158,117,0.12) 0%, transparent 70%);
+    bottom: -90px;
+    left: 35%;
+    pointer-events: none;
+  }
+  
+  /* ---------- Live pill badge ---------- */
+  .hero-live-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(99,87,255,0.15);
+    border: 0.5px solid rgba(99,87,255,0.4);
+    border-radius: 20px;
+    padding: 4px 12px;
+    margin-bottom: 16px;
+  }
+  
+  .hero-live-pill .pill-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #7f77dd;
+    animation: pill-pulse 2s infinite;
+  }
+  
+  .hero-live-pill span {
+    font-size: 11px;
+    color: #afa9ec;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+  
+  @keyframes pill-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(0.8); }
+  }
+  
+  /* ---------- Hero heading ---------- */
+  .hero-content h1 {
+    color: #ffffff;
+  }
+  
+  .hero-content h1 em {
+    font-style: normal;
+    color: #7f77dd;
+  }
+  
+  /* ---------- Carousel wrapper ---------- */
+  .hero-image {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .carousel-track-wrap {
+    position: relative;
+    height: 280px;
+    perspective: 1000px;
+  }
+  
+  /* ---------- Individual listing cards ---------- */
+  .carousel-card {
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  
+    /* hidden state */
+    opacity: 0;
+    transform: translateX(60px) scale(0.95);
+    transition:
+      opacity     0.5s cubic-bezier(.22, 1, .36, 1),
+      transform   0.5s cubic-bezier(.22, 1, .36, 1);
+    pointer-events: none;
+  }
+  
+  .carousel-card.active {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    pointer-events: auto;
+  }
+  
+  .carousel-card.exit {
+    opacity: 0;
+    transform: translateX(-60px) scale(0.95);
+  }
+  
+  /* per-card background tints */
+  .carousel-card.card-0 { background: linear-gradient(135deg, #1a1040 0%, #2d1f6e 100%); }
+  .carousel-card.card-1 { background: linear-gradient(135deg, #051f1a 0%, #0a3d30 100%); }
+  .carousel-card.card-2 { background: linear-gradient(135deg, #1a0f28 0%, #3b1a5a 100%); }
+  .carousel-card.card-3 { background: linear-gradient(135deg, #1a1000 0%, #3d2a00 100%); }
+  .carousel-card.card-4 { background: linear-gradient(135deg, #1a0a0a 0%, #3d1212 100%); }
+  
+  /* ---------- Card internals ---------- */
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  
+  .card-category {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+  
+  .card-category.cat-purple { background: rgba(127,119,221,0.2); color: #afa9ec; }
+  .card-category.cat-teal   { background: rgba(29,158,117,0.2);  color: #5dcaa5; }
+  .card-category.cat-pink   { background: rgba(212,83,126,0.2);  color: #ed93b1; }
+  .card-category.cat-amber  { background: rgba(186,117,23,0.2);  color: #ef9f27; }
+  .card-category.cat-red    { background: rgba(226,75,74,0.2);   color: #f09595; }
+  
+  .card-fav {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s;
+  }
+  
+  .card-fav:hover { background: rgba(255,255,255,0.2); }
+  
+  .card-fav svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .card-art {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 56px;
+    margin: 10px 0;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+  }
+  
+  .card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 3px;
+  }
+  
+  .card-subtitle {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 12px;
+  }
+  
+  .card-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .card-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  
+  .card-price small {
+    font-size: 13px;
+    font-weight: 400;
+    opacity: 0.6;
+  }
+  
+  .card-action-btn {
+    background: rgba(255,255,255,0.12);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .card-action-btn:hover { background: rgba(255,255,255,0.22); }
+  
+  /* ---------- Progress bar ---------- */
+  .carousel-progress {
+    height: 2px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    margin-top: 14px;
+    overflow: hidden;
+  }
+  
+  .carousel-progress-fill {
+    height: 100%;
+    background: #6357ff;
+    border-radius: 2px;
+    width: 0%;
+    /* JS drives this via inline style — no CSS transition needed */
+  }
+  
+  /* ---------- Dot nav ---------- */
+  .carousel-dots {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  
+  .carousel-dots .dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.2);
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    transition: width 0.3s ease, background 0.3s ease;
+  }
+  
+  .carousel-dots .dot.active {
+    width: 20px;
+    background: #6357ff;
+  }
+  
+  .carousel-counter {
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+  }
