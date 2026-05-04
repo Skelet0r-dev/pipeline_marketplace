@@ -312,15 +312,87 @@ html, body {
 }
 .login-attempt-warn.show { display: block; }
 
-/* ── Responsive ── */
-@media (max-width: 768px) {
-    .login-navbar  { padding: 10px 20px; }
-    .main-content  { padding: 16px 12px; }
-    .login-card    { flex-direction: column; max-width: 480px; margin: auto; }
-    .panel-left    { flex: none; padding: 36px 24px; border-right: none; border-bottom: 1px solid var(--grey-light); }
-    .panel-right   { min-height: 220px; }
-    .site-footer   { flex-direction: column; align-items: flex-start; gap: 10px; padding: 10px 20px; }
-    .footer-links  { text-align: left; }
-    .login-greeting { font-size: 34px; }
-    .footer-brand  { flex-direction: column; align-items: flex-start; gap: 6px; }
+/* ── Step transition animations ── */
+.step-hidden { display: none !important; }
+
+.step-exit {
+    animation: stepOut 0.25s ease forwards;
 }
+.step-enter {
+    animation: stepIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes stepOut {
+    from { opacity: 1; transform: translateX(0); }
+    to   { opacity: 0; transform: translateX(-20px); }
+}
+@keyframes stepIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Login method buttons ── */
+.btn-method {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 18px;
+    border-radius: 12px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    border: 1.5px solid var(--border);
+    background: #fff;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.btn-method:hover {
+    background: #f8f9fa;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    transform: translateY(-1px);
+}
+
+.btn-method:active { transform: scale(0.99); }
+
+.btn-microsoft { border-color: #d1d5db; }
+.btn-stdnum   { border-color: var(--green); color: var(--green); }
+.btn-stdnum:hover { background: #f0fdf4; }
+
+/* ── Method divider ── */
+.method-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 0 4px;
+    color: var(--grey-mid);
+    font-size: 13px;
+}
+.method-divider::before,
+.method-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--grey-light);
+}
+
+/* ── Back button ── */
+.btn-back {
+    background: none;
+    border: none;
+    color: var(--grey-mid);
+    font-family: "DM Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s;
+}
+.btn-back:hover { color: var(--green); }
