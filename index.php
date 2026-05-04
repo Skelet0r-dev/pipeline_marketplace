@@ -378,7 +378,7 @@ function getCategoryStyle($category) {
             const dotsWrap = document.getElementById('hcDots');
 
             const cards = Array.from(track.children);
-            const CARD_H = 240;  // px — matches .hc-card height in CSS
+            const CARD_H = 240;  
             const STEP = CARD_H;
             let current = 0;
             let autoTimer;
