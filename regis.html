@@ -18,13 +18,13 @@
 <body>
 
     <div class="regis-header">
-        <img src="assets/img/pipeline_logo_light.png" class="img-logo-light" alt="Pipeline Logo">
+        <a href="index.php"><img src="assets/img/pipeline_logo_light.png" class="img-logo-light" alt="Pipeline Logo"></a>
 
     </div>
 
     <div class="regis-wrapper">
         <form action="regis.php" method="POST" enctype="multipart/form-data" id="regisForm" novalidate
-            class="regis-card">
+            class="regis-card step-one">
 
             <!-- Left: Photo -->
             <div class="regis-left">
@@ -41,11 +41,51 @@
 
             <!-- Right: Fields -->
             <div class="regis-right">
-                <div class="regis-form-header">
-                    <h1 class="regis-title">Create an Account</h1>
+
+                <!-- STEP 1: Choose signup method -->
+                <div id="step-choose">
+                    <h1 class="regis-title" style="margin-bottom:8px;">Create an Account</h1>
+                    <p style="color:#6b7280; font-size:15px; margin-bottom:32px;">How would you like to sign up?</p>
+
+                    <!-- Microsoft SSO -->
+                    <button type="button" class="btn-method btn-microsoft" id="btnMicrosoft">
+                        <svg width="20" height="20" viewBox="0 0 21 21" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <rect x="1" y="1" width="9" height="9" fill="#F25022" />
+                            <rect x="11" y="1" width="9" height="9" fill="#7FBA00" />
+                            <rect x="1" y="11" width="9" height="9" fill="#00A4EF" />
+                            <rect x="11" y="11" width="9" height="9" fill="#FFB900" />
+                        </svg>
+                        Sign up with Microsoft
+                    </button>
+
+                    <div class="method-divider"><span>or</span></div>
+
+                    <!-- Student Number -->
+                    <button type="button" class="btn-method btn-stdnum" id="btnStdNum">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        Sign up with Student Number
+                    </button>
+
+                    <div style="margin-top:28px; text-align:center; font-size:13px; color:#6b7280;">
+                        <span>Already have an account?</span>
+                        <a href="login.html" style="color:#087832; font-weight:700; text-decoration:none;">Log in here</a>
+                    </div>
                 </div>
 
-                <div class="cooldown-box" id="cooldownBox">
+                <!-- STEP 2: Standard Registration Form -->
+                <div id="step-form" class="step-hidden">
+                    <button type="button" class="btn-back" id="btnBack" style="margin-bottom:16px;">← Back</button>
+
+                    <div class="regis-form-header">
+                        <h1 class="regis-title">Create an Account</h1>
+                    </div>
+
+                    <div class="cooldown-box" id="cooldownBox">
                     🔒 Too many failed attempts. Wait <span id="countdownText">60s</span> before trying again.
                 </div>
                 <div class="attempt-warn" id="attemptWarn"></div>
@@ -117,6 +157,7 @@
                     <button type="submit" class="btn-register w-50" id="submitBtn">Register</button>
                 </div>
 
+                </div> <!-- End step-form -->
             </div>
 
         </form>
@@ -124,6 +165,42 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/regis.js"></script>
+    <script>
+        // Two-step signup flow
+        const stepChoose = document.getElementById('step-choose');
+        const stepForm = document.getElementById('step-form');
+
+        const regisForm = document.getElementById('regisForm');
+
+        document.getElementById('btnStdNum').addEventListener('click', function () {
+            stepChoose.classList.add('step-exit');
+            setTimeout(() => {
+                stepChoose.style.display = 'none';
+                stepChoose.classList.remove('step-exit');
+                regisForm.classList.remove('step-one');
+                stepForm.classList.remove('step-hidden');
+                stepForm.classList.add('step-enter');
+                setTimeout(() => stepForm.classList.remove('step-enter'), 400);
+            }, 250);
+        });
+
+        document.getElementById('btnBack').addEventListener('click', function () {
+            stepForm.classList.add('step-exit');
+            setTimeout(() => {
+                stepForm.classList.add('step-hidden');
+                stepForm.classList.remove('step-exit');
+                regisForm.classList.add('step-one');
+                stepChoose.style.display = '';
+                stepChoose.classList.add('step-enter');
+                setTimeout(() => stepChoose.classList.remove('step-enter'), 400);
+            }, 250);
+        });
+
+        // Microsoft: redirect to the login script
+        document.getElementById('btnMicrosoft').addEventListener('click', function () {
+            window.location.href = 'auth/microsoft_login.php';
+        });
+    </script>
 </body>
 
 </html>

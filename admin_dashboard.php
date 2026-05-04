@@ -824,7 +824,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
 
 <aside class="sidebar">
     <div class="sidebar-logo">
-        <img src="assets/img/pipeline_logo_light.png" class="sidebar-logo-img" alt="Pipeline Logo">
+        <a href="index.php"><img src="assets/img/pipeline_logo_light.png" class="sidebar-logo-img" alt="Pipeline Logo"></a>
     </div>
 
     <div class="sidebar-admin">

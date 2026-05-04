@@ -151,7 +151,7 @@ $accentColor = $catColors[$category] ?? '#606c38';
 
     <!-- ── NAVBAR ── -->
     <div class="dash-navbar">
-        <img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Logo">
+        <a href="index.php"><img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Logo"></a>
         <div class="dash-nav-right">
             <div class="dash-greeting">
                 <span class="dash-hello">Hello,</span>

@@ -158,7 +158,7 @@ db_close($conn);
 
     <!-- ── DASHBOARD ── -->
     <div class="dash-navbar">
-        <img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Pipeline Logo">
+        <a href="index.php"><img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Pipeline Logo"></a>
         <div class="dash-nav-right">
             <div class="dash-greeting">
                 <span class="dash-hello">Hello,</span>
@@ -292,7 +292,7 @@ db_close($conn);
 
     <!-- ── LOGIN FORM WITH ERROR ── -->
     <div class="login-header">
-        <img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo-light" alt="Pipeline Logo">
+        <a href="index.php"><img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo-light" alt="Pipeline Logo"></a>
         <div class="header-links">
             <a href="#" class="header-link" data-bs-toggle="modal" data-bs-target="#aboutModal">ABOUT US</a>
             <span class="header-sep">|</span>

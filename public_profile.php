@@ -76,7 +76,7 @@ $messageLink = 'mailto:' . rawurlencode($profile['EMAIL']) . '?subject=' . rawur
 </head>
 <body class="body">
     <div class="dash-navbar">
-        <img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Pipeline Logo">
+        <a href="index.php"><img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Pipeline Logo"></a>
         <div class="dash-nav-right">
             <div class="dash-greeting">
                 <span class="dash-hello">Hello,</span>
