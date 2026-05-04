@@ -53,7 +53,7 @@ body {
 
 /* ── Main card ── */
 .regis-card {
-    background: rgba(249, 248, 246, 0.94);
+    background:#F2F0EF;
     border-radius: 24px;
     border: 2px solid #054d20;
     box-shadow: 0 8px 32px rgba(8, 120, 50, 0.13);
@@ -66,7 +66,7 @@ body {
 
 /* ── Left panel ── */
 .regis-left {
-    background: rgba(242, 240, 239, 0.88);
+    background: #F2F0EF;
     width: 440px;
     flex-shrink: 0;
     display: flex;

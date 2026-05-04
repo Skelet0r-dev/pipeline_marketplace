@@ -91,11 +91,7 @@
 
 /* ── Page ────────────────────────────── */
 body {
-    background-image: url('/pipeline_marketplace/assets/img/bg_try.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    background: #b2c9b5;
     font-family: "DM Sans", sans-serif;
     display: flex;
     align-items: center;
