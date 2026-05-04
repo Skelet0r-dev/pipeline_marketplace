@@ -87,13 +87,32 @@ $stmt = db_query($conn, "SELECT * FROM USERS WHERE LOWER(EMAIL) = ?", [$msEmail]
 $user = db_fetch_assoc($stmt);
 
 if (!$user) {
-    // No account found — send them to registration with info pre-filled
-    $_SESSION['ms_email']      = $msEmail;
-    $_SESSION['ms_first_name'] = $msUser['givenName'] ?? '';
-    $_SESSION['ms_last_name']  = $msUser['surname']   ?? '';
-    db_close($conn);
-    header('Location: ../regis.html?from=microsoft');
-    exit;
+    // No account found — Auto-register the user
+    $firstName = $msUser['givenName'] ?? '';
+    $lastName  = $msUser['surname'] ?? '';
+    $email     = $msEmail;
+    // Generate a default username from the email
+    $username  = explode('@', $email)[0];
+    $password  = ''; // No password needed for MS login
+    $stdNum    = $msUser['employeeId'] ?? 0; // Default placeholder for INT column   
+    $cys       = $msUser['department'] ?? 'N/A'; 
+    $sex       = 'Prefer Not To Say';
+
+    $sql = "INSERT INTO USERS (FIRST_NAME, LAST_NAME, STD_NUM, CYS, SEX, USERNAME, EMAIL, `PASSWORD`, DATE_REGISTERED)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+    
+    $insertResult = db_query($conn, $sql, [$firstName, $lastName, $stdNum, $cys, $sex, $username, $email, $password]);
+    if ($insertResult === false) {
+        die('Failed to create account: ' . db_last_error());
+    }
+
+    // Fetch the newly created user
+    $stmt = db_query($conn, "SELECT * FROM USERS WHERE LOWER(EMAIL) = ?", [$msEmail]);
+    $user = db_fetch_assoc($stmt);
+
+    $isFirstLogin = true;
+} else {
+    $isFirstLogin = false;
 }
 
 // ── 6. Log the user in ───────────────────────────────────────────────────────
@@ -135,5 +154,10 @@ if ($photoHttpCode === 200 && !empty($photoData)) {
 }
 
 db_close($conn);
-header('Location: ../dashboard.php');
+
+if ($isFirstLogin) {
+    header('Location: ms_success.php');
+} else {
+    header('Location: ../dashboard.php');
+}
 exit;

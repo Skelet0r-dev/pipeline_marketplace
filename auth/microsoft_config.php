@@ -19,5 +19,5 @@ define('MS_REDIRECT_URI', 'http://localhost:9090/auth/microsoft_callback.php');
 // OAuth endpoints
 define('MS_AUTH_URL',  'https://login.microsoftonline.com/' . MS_TENANT_ID . '/oauth2/v2.0/authorize');
 define('MS_TOKEN_URL', 'https://login.microsoftonline.com/' . MS_TENANT_ID . '/oauth2/v2.0/token');
-define('MS_GRAPH_URL', 'https://graph.microsoft.com/v1.0/me');
+define('MS_GRAPH_URL', 'https://graph.microsoft.com/v1.0/me?$select=id,displayName,givenName,surname,mail,userPrincipalName,employeeId,department');
 define('MS_PHOTO_URL', 'https://graph.microsoft.com/v1.0/me/photo/$value');
