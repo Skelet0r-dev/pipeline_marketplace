@@ -1,5 +1,7 @@
 /* ── Base ── */
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+}
 
 html {
     min-height: 100%;
@@ -19,7 +21,7 @@ body {
 
 /* ── Header ── */
 .regis-header {
-    background:  #054d20;
+    background: #054d20;
     padding: 16px 40px;
     display: flex;
     justify-content: space-between;
@@ -110,7 +112,7 @@ body {
 }
 
 .upload-btn:hover {
-     opacity: 0.88;
+    opacity: 0.88;
 }
 
 .file-name {
@@ -211,7 +213,7 @@ body {
 }
 
 .btn-register {
-    background:  #087832;
+    background: #087832;
     color: #F2F0EF;
     border: none;
     padding: 11px 20px;
@@ -229,10 +231,29 @@ body {
 }
 
 /* ── Keep old classes so other pages don't break ── */
-.hr-style { height: 2px; background-color: black; border: none; opacity: 1; }
-.img-logo { max-width: 10%; height: auto; }
-.img-regis { max-width: 100%; height: 100%; border-radius: 15px; }
-.img-login { max-width: 100%; height: 100%; border-radius: 15px; }
+.hr-style {
+    height: 2px;
+    background-color: black;
+    border: none;
+    opacity: 1;
+}
+
+.img-logo {
+    max-width: 10%;
+    height: auto;
+}
+
+.img-regis {
+    max-width: 100%;
+    height: 100%;
+    border-radius: 15px;
+}
+
+.img-login {
+    max-width: 100%;
+    height: 100%;
+    border-radius: 15px;
+}
 
 /* ── Inline validation ── */
 .field-error {
@@ -242,9 +263,20 @@ body {
     font-weight: 600;
     margin-top: 4px;
 }
-.field-error.show { display: block; }
-.regis-input.is-bad, .regis-select.is-bad { border-color: #dc3545; }
-.regis-input.is-ok,  .regis-select.is-ok  { border-color: #087832; }
+
+.field-error.show {
+    display: block;
+}
+
+.regis-input.is-bad,
+.regis-select.is-bad {
+    border-color: #dc3545;
+}
+
+.regis-input.is-ok,
+.regis-select.is-ok {
+    border-color: #087832;
+}
 
 /* ── Password strength ── */
 .pw-bar {
@@ -255,6 +287,7 @@ body {
     background: #ccc;
     transition: width 0.3s, background 0.3s;
 }
+
 .pw-label {
     font-size: 11px;
     font-weight: 600;
@@ -273,7 +306,10 @@ body {
     font-size: 13px;
     font-weight: 500;
 }
-.cooldown-box.show { display: block; }
+
+.cooldown-box.show {
+    display: block;
+}
 
 .attempt-warn {
     display: none;
@@ -282,7 +318,10 @@ body {
     font-weight: 600;
     margin-bottom: 10px;
 }
-.attempt-warn.show { display: block; }
+
+.attempt-warn.show {
+    display: block;
+}
 
 /* ── Sex dropdown ── */
 .regis-select {
@@ -299,7 +338,11 @@ body {
     cursor: pointer;
     transition: border-color 0.2s;
 }
-.regis-select:focus { border-color: #087832; background-color: #fff; }
+
+.regis-select:focus {
+    border-color: #087832;
+    background-color: #fff;
+}
 
 /* ── Error page ── */
 .error-card {
@@ -310,17 +353,20 @@ body {
     box-shadow: 0 4px 32px rgba(8, 120, 50, 0.10);
     padding: 40px 36px 32px;
 }
+
 .error-card h2 {
     font-size: 22px;
     font-weight: 700;
     color: #dc3545;
     margin-bottom: 16px;
 }
+
 .error-list {
     list-style: none;
     padding: 0;
     margin: 0 0 24px 0;
 }
+
 .error-list li {
     background: #fff5f5;
     border-left: 4px solid #dc3545;
@@ -330,6 +376,7 @@ body {
     font-size: 14px;
     color: #7b2020;
 }
+
 .btn-back {
     display: inline-block;
     background: #087832;
@@ -341,7 +388,11 @@ body {
     font-size: 14px;
     transition: background 0.2s;
 }
-.btn-back:hover { background: #054d20; color: #F2F0EF; }
+
+.btn-back:hover {
+    background: #054d20;
+    color: #F2F0EF;
+}
 
 /* ── Success card brand logo ── */
 .brand-logo {
