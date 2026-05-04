@@ -97,7 +97,7 @@ function getCategoryStyle($category) {
                         clothing, gadgets, and more from your campus community.</p>
                     <div class="hero-ctas">
                         <a href="login.html" class="cta-primary">Get Started — It's Free</a>
-                        <a href="browse.php" class="cta-ghost">Browse Listings ↗</a>
+                        <a href="#" class="cta-ghost js-auth-trigger">Browse Listings ↗</a>
                     </div>
                     <!-- Category pills -->
                     <div class="hero-pills">
@@ -295,7 +295,7 @@ function getCategoryStyle($category) {
                 <p>Join thousands of Lasallians already buying and selling on campus.</p>
                 <div class="callout-actions">
                     <a href="regis.html" class="cta-primary">Sign Up for Free</a>
-                    <a href="browse.php" class="cta-ghost cta-ghost--light">Browse Listings</a>
+                    <a href="#" class="cta-ghost cta-ghost--light js-auth-trigger">Browse Listings</a>
                 </div>
             </div>
         </section>
