@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,107 +8,116 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="assets/css/regis.css">
 
 </head>
+
 <body>
 
     <div class="regis-header">
-        <img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo-light" alt="Pipeline Logo">
-      
+        <img src="assets/img/pipeline_wireframe-rbemovebg.png" class="img-logo-light" alt="Pipeline Logo">
+
     </div>
 
     <div class="regis-wrapper">
-        <form action="regis.php" method="POST" enctype="multipart/form-data" id="regisForm" novalidate class="regis-card">
+        <form action="regis.php" method="POST" enctype="multipart/form-data" id="regisForm" novalidate
+            class="regis-card">
 
-                <!-- Left: Photo -->
-                <div class="regis-left">
-                    <div class="photo-preview-box">
-                        <img src="assets/img/avatar.png" id="imagePreview" alt="Preview">
-                    </div>
-                    <label for="image" class="upload-btn">UPLOAD IMAGE</label>
-                    <input type="file" name="image" id="image" accept=".jpg" style="display:none;" onchange="previewImage(this)">
-                    <p class="file-name" id="fileName">No file chosen</p>
+            <!-- Left: Photo -->
+            <div class="regis-left">
+                <div class="photo-preview-box">
+                    <img src="assets/img/avatar.png" id="imagePreview" alt="Preview">
+                </div>
+                <label for="image" class="upload-btn">UPLOAD IMAGE</label>
+                <input type="file" name="image" id="image" accept=".jpg" style="display:none;"
+                    onchange="previewImage(this)">
+                <p class="file-name" id="fileName">No file chosen</p>
+            </div>
+
+            <div class="regis-divider"></div>
+
+            <!-- Right: Fields -->
+            <div class="regis-right">
+                <div class="regis-form-header">
+                    <h1 class="regis-title">Create an Account</h1>
                 </div>
 
-                <div class="regis-divider"></div>
-
-                <!-- Right: Fields -->
-                <div class="regis-right">
-                    <div class="regis-form-header">
-                        <h1 class="regis-title">Create an Account</h1>
-                    </div>
-
-                    <div class="cooldown-box" id="cooldownBox">
-                        🔒 Too many failed attempts. Wait <span id="countdownText">60s</span> before trying again.
-                    </div>
-                    <div class="attempt-warn" id="attemptWarn"></div>
-
-                    <div class="d-flex gap-3 mb-3">
-                        <div class="w-100">
-                            <label class="field-label">First Name</label>
-                            <input type="text" class="regis-input" name="f_name" id="f_name" placeholder="Juan" required>
-                            <div class="field-error" id="err-f_name">First name is required.</div>
-                        </div>
-                        <div class="w-100">
-                            <label class="field-label">Last Name</label>
-                            <input type="text" class="regis-input" name="l_name" id="l_name" placeholder="Dela Cruz" required>
-                            <div class="field-error" id="err-l_name">Last name is required.</div>
-                        </div>
-                    </div>
-
-                    <div class="d-flex gap-3 mb-3">
-                        <div class="w-100">
-                            <label class="field-label">Student Number</label>
-                            <input type="text" class="regis-input" name="stdnum" id="stdnum" placeholder="202012345" maxlength="9" required>
-                            <div class="field-error" id="err-stdnum">Must be exactly 9 digits.</div>
-                        </div>
-                        <div class="w-100">
-                            <label class="field-label">Course Year Section</label>
-                            <input type="text" class="regis-input" name="cys" id="cys" placeholder="CEE11" required>
-                            <div class="field-error" id="err-cys">Course Year Section is required.</div>
-                        </div>
-                    </div>
-
-                    <div class="d-flex gap-3 mb-3">
-                        <div class="w-100">
-                            <label class="field-label">Sex</label>
-                            <select class="regis-select" name="sex" id="sex" required>
-                                <option value="" disabled selected>Select...</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Prefer Not To Say">Prefer Not To Say</option>
-                            </select>
-                            <div class="field-error" id="err-sex">Please select your sex.</div>
-                        </div>
-                        <div class="w-100">
-                            <label class="field-label">Username</label>
-                            <input type="text" class="regis-input" name="username" id="username" required>
-                            <div class="field-error" id="err-username">Username is required.</div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="field-label">School Email Address</label>
-                        <input type="email" class="regis-input" name="email" id="email" placeholder="djc2345@dlsud.edu.ph" required>
-                        <div class="field-error" id="err-email">Enter a valid email address.</div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="field-label">Password</label>
-                        <input type="password" class="regis-input" name="password" id="password" maxlength="16" required>
-                        <div class="pw-bar" id="pwBar"></div>
-                        <div class="pw-label" id="pwLabel"></div>
-                        <div class="field-error" id="err-password">8–16 chars with uppercase, lowercase, number, and symbol.</div>
-                    </div>
-
-                    <div class="d-flex gap-3">
-                        <a href="login.html" class="btn-cancel w-50 text-center text-decoration-none">Cancel</a>
-                        <button type="submit" class="btn-register w-50" id="submitBtn">Register</button>
-                    </div>
-
+                <div class="cooldown-box" id="cooldownBox">
+                    🔒 Too many failed attempts. Wait <span id="countdownText">60s</span> before trying again.
                 </div>
+                <div class="attempt-warn" id="attemptWarn"></div>
+
+                <div class="d-flex gap-3 mb-3">
+                    <div class="w-100">
+                        <label class="field-label">First Name</label>
+                        <input type="text" class="regis-input" name="f_name" id="f_name" placeholder="Juan" required>
+                        <div class="field-error" id="err-f_name">First name is required.</div>
+                    </div>
+                    <div class="w-100">
+                        <label class="field-label">Last Name</label>
+                        <input type="text" class="regis-input" name="l_name" id="l_name" placeholder="Dela Cruz"
+                            required>
+                        <div class="field-error" id="err-l_name">Last name is required.</div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3 mb-3">
+                    <div class="w-100">
+                        <label class="field-label">Student Number</label>
+                        <input type="text" class="regis-input" name="stdnum" id="stdnum" placeholder="202012345"
+                            maxlength="9" required>
+                        <div class="field-error" id="err-stdnum">Must be exactly 9 digits.</div>
+                    </div>
+                    <div class="w-100">
+                        <label class="field-label">Course Year Section</label>
+                        <input type="text" class="regis-input" name="cys" id="cys" placeholder="CEE11" required>
+                        <div class="field-error" id="err-cys">Course Year Section is required.</div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3 mb-3">
+                    <div class="w-100">
+                        <label class="field-label">Sex</label>
+                        <select class="regis-select" name="sex" id="sex" required>
+                            <option value="" disabled selected>Select...</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Prefer Not To Say">Prefer Not To Say</option>
+                        </select>
+                        <div class="field-error" id="err-sex">Please select your sex.</div>
+                    </div>
+                    <div class="w-100">
+                        <label class="field-label">Username</label>
+                        <input type="text" class="regis-input" name="username" id="username" required>
+                        <div class="field-error" id="err-username">Username is required.</div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="field-label">School Email Address</label>
+                    <input type="email" class="regis-input" name="email" id="email" placeholder="djc2345@dlsud.edu.ph"
+                        required>
+                    <div class="field-error" id="err-email">Enter a valid email address.</div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="field-label">Password</label>
+                    <input type="password" class="regis-input" name="password" id="password" maxlength="16" required>
+                    <div class="pw-bar" id="pwBar"></div>
+                    <div class="pw-label" id="pwLabel"></div>
+                    <div class="field-error" id="err-password">8–16 chars with uppercase, lowercase, number, and symbol.
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3">
+                    <a href="login.html" class="btn-cancel w-50 text-center text-decoration-none">Cancel</a>
+                    <button type="submit" class="btn-register w-50" id="submitBtn">Register</button>
+                </div>
+
+            </div>
 
         </form>
     </div>
@@ -115,4 +125,5 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/regis.js"></script>
 </body>
+
 </html>
