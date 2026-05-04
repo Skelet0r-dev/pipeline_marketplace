@@ -1,69 +1,82 @@
+/* ── Sticky nav ── */
+const nav = document.getElementById('topNav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 10);
+});
+
+/* ── Hero Carousel ── */
 (function () {
-    var DURATION = 3500;
-    var cards    = document.querySelectorAll('.carousel-card');
-    var dotsWrap = document.getElementById('carouselDots');
-    var progEl   = document.getElementById('carouselProgress');
-    var ctrEl    = document.getElementById('carouselCounter');
-    var cur      = 0;
-    var startTime = null;
-    var raf       = null;
- 
-    /* Build dot buttons */
-    cards.forEach(function (_, i) {
-      var btn = document.createElement('button');
-      btn.className = 'dot' + (i === 0 ? ' active' : '');
-      btn.setAttribute('aria-label', 'Go to slide ' + (i + 1));
-      btn.addEventListener('click', function () { goTo(i); resetTimer(); });
-      dotsWrap.insertBefore(btn, ctrEl);
+  const track = document.getElementById('hcTrack');
+  const prevBtn = document.getElementById('hcPrev');
+  const nextBtn = document.getElementById('hcNext');
+  const dotsWrap = document.getElementById('hcDots');
+
+  const cards = Array.from(track.children);
+  const CARD_H = 240;  // px — matches .hc-card height in CSS
+  const STEP = CARD_H;
+  let current = 0;
+  let autoTimer;
+
+  /* Build dots */
+  cards.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'hc-dot' + (i === 0 ? ' hc-dot--active' : '');
+    d.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+    d.addEventListener('click', () => goTo(i));
+    dotsWrap.appendChild(d);
+  });
+  const dots = Array.from(dotsWrap.children);
+
+  function goTo(idx) {
+    current = Math.max(0, Math.min(idx, cards.length - 1));
+    track.style.transform = `translateY(-${current * STEP}px)`;
+    dots.forEach((d, i) => d.classList.toggle('hc-dot--active', i === current));
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === cards.length - 1;
+  }
+
+  prevBtn.addEventListener('click', () => { resetAuto(); goTo(current - 1); });
+  nextBtn.addEventListener('click', () => { resetAuto(); goTo(current + 1); });
+
+  function autoPlay() {
+    goTo(current < cards.length - 1 ? current + 1 : 0);
+  }
+
+  function resetAuto() {
+    clearInterval(autoTimer);
+    autoTimer = setInterval(autoPlay, 3000);
+  }
+
+  goTo(0);
+  autoTimer = setInterval(autoPlay, 3000);
+
+  /* Pause on hover */
+  track.closest('.hc-track-outer').addEventListener('mouseenter', () => clearInterval(autoTimer));
+  track.closest('.hc-track-outer').addEventListener('mouseleave', () => resetAuto());
+})();
+
+/* ── Auth Modal ── */
+(function () {
+  const triggers = document.querySelectorAll('.js-auth-trigger');
+  const modal = document.getElementById('authModal');
+  const closeBtn = document.getElementById('authModalClose');
+
+  if (!modal) return;
+
+  triggers.forEach(trigger => {
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      modal.classList.add('active');
     });
- 
-    function getDots() { return dotsWrap.querySelectorAll('.dot'); }
- 
-    function goTo(n) {
-      /* Exit current */
-      cards[cur].classList.remove('active');
-      cards[cur].classList.add('exit');
-      getDots()[cur].classList.remove('active');
- 
-      /* Clean up exit class after transition */
-      (function (idx) {
-        setTimeout(function () { cards[idx].classList.remove('exit'); }, 520);
-      }(cur));
- 
-      cur = (n + cards.length) % cards.length;
- 
-      cards[cur].classList.add('active');
-      getDots()[cur].classList.add('active');
-      ctrEl.textContent = (cur + 1) + ' / ' + cards.length;
+  });
+
+  closeBtn.addEventListener('click', () => {
+    modal.classList.remove('active');
+  });
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.remove('active');
     }
- 
-    function resetTimer() {
-      startTime = null;
-      progEl.style.width = '0%';
-    }
- 
-    function tick(ts) {
-      if (!startTime) startTime = ts;
-      var elapsed = ts - startTime;
-      var pct = Math.min((elapsed / DURATION) * 100, 100);
-      progEl.style.width = pct.toFixed(1) + '%';
- 
-      if (elapsed >= DURATION) {
-        goTo(cur + 1);
-        startTime = ts;
-      }
-      raf = requestAnimationFrame(tick);
-    }
- 
-    raf = requestAnimationFrame(tick);
- 
-    /* Pause on hover */
-    var col = document.querySelector('.hero-image');
-    col.addEventListener('mouseenter', function () {
-      cancelAnimationFrame(raf);
-    });
-    col.addEventListener('mouseleave', function () {
-      startTime = null;
-      raf = requestAnimationFrame(tick);
-    });
-  }());
+  });
+})();
