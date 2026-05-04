@@ -132,7 +132,7 @@ function getCategoryStyle($category) {
                                         $price = '₱' . number_format($item['PRICE'], 2);
                                         list($emoji, $bg) = getCategoryStyle($item['CATEGORY']);
                                         ?>
-                                        <div class="hc-card" onclick="window.location.href='listing.php?id=<?php echo $item['LISTING_ID']; ?>'">
+                                        <div class="hc-card js-auth-trigger">
                                             <div class="hc-card-img" style="background:<?php echo $bg; ?>; position: relative;">
                                                 <?php if ($imgSrc): ?>
                                                     <img src="<?php echo $imgSrc; ?>" alt="<?php echo htmlspecialchars($item['TITLE']); ?>" style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">
@@ -187,7 +187,7 @@ function getCategoryStyle($category) {
                             list($emoji, $bg) = getCategoryStyle($item['CATEGORY']);
                             $tallClass = ($index === 1 || $index === 4) ? ' shot-card--tall' : '';
                             ?>
-                            <article class="shot-card<?php echo $tallClass; ?>" onclick="window.location.href='listing.php?id=<?php echo $item['LISTING_ID']; ?>'">
+                            <article class="shot-card<?php echo $tallClass; ?> js-auth-trigger">
                                 <div class="shot-img" style="background: <?php echo $bg; ?>; position: relative;">
                                     <?php if ($imgSrc): ?>
                                         <img src="<?php echo $imgSrc; ?>" alt="<?php echo htmlspecialchars($item['TITLE']); ?>" style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">
@@ -305,6 +305,20 @@ function getCategoryStyle($category) {
             </div>
         </section>
 
+        <!-- ── AUTH MODAL ── -->
+        <div class="auth-modal-overlay" id="authModal">
+            <div class="auth-modal">
+                <button class="auth-modal-close" id="authModalClose" aria-label="Close">&times;</button>
+                <div class="auth-modal-icon">🔒</div>
+                <h3 class="auth-modal-title">Join Pipeline</h3>
+                <p class="auth-modal-desc">You need to log in or create an account with your DLSU-D email to view full listings and connect with sellers.</p>
+                <div class="auth-modal-actions">
+                    <a href="login.html" class="cta-primary">Log In</a>
+                    <a href="regis.html" class="cta-ghost">Create an Account</a>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- ── FOOTER ── -->
@@ -349,64 +363,7 @@ function getCategoryStyle($category) {
         </div>
     </footer>
 
-    <script>
-        /* ── Sticky nav ── */
-        const nav = document.getElementById('topNav');
-        window.addEventListener('scroll', () => {
-            nav.classList.toggle('scrolled', window.scrollY > 10);
-        });
-
-        /* ── Hero Carousel ── */
-        (function () {
-            const track = document.getElementById('hcTrack');
-            const prevBtn = document.getElementById('hcPrev');
-            const nextBtn = document.getElementById('hcNext');
-            const dotsWrap = document.getElementById('hcDots');
-
-            const cards = Array.from(track.children);
-            const CARD_H = 240;  // px — matches .hc-card height in CSS
-            const STEP = CARD_H;
-            let current = 0;
-            let autoTimer;
-
-            /* Build dots */
-            cards.forEach((_, i) => {
-                const d = document.createElement('button');
-                d.className = 'hc-dot' + (i === 0 ? ' hc-dot--active' : '');
-                d.setAttribute('aria-label', 'Go to slide ' + (i + 1));
-                d.addEventListener('click', () => goTo(i));
-                dotsWrap.appendChild(d);
-            });
-            const dots = Array.from(dotsWrap.children);
-
-            function goTo(idx) {
-                current = Math.max(0, Math.min(idx, cards.length - 1));
-                track.style.transform = `translateY(-${current * STEP}px)`;
-                dots.forEach((d, i) => d.classList.toggle('hc-dot--active', i === current));
-                prevBtn.disabled = current === 0;
-                nextBtn.disabled = current === cards.length - 1;
-            }
-
-            prevBtn.addEventListener('click', () => { resetAuto(); goTo(current - 1); });
-            nextBtn.addEventListener('click', () => { resetAuto(); goTo(current + 1); });
-
-            function autoPlay() {
-                goTo(current < cards.length - 1 ? current + 1 : 0);
-            }
-
-            function resetAuto() {
-                clearInterval(autoTimer);
-                autoTimer = setInterval(autoPlay, 3000);
-            }
-
-            goTo(0);
-            autoTimer = setInterval(autoPlay, 3000);
-
-            /* Pause on hover */
-            track.closest('.hc-track-outer').addEventListener('mouseenter', () => clearInterval(autoTimer));
-            track.closest('.hc-track-outer').addEventListener('mouseleave', () => resetAuto());
-        })();
-    </script>
+    <script src="assets/js/index.js"></script>
 
 </body>
 
