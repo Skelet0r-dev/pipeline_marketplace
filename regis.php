@@ -82,6 +82,7 @@ if(db_fetch($result)===true){
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/regis.css">
+    <link rel="stylesheet" href="assets/css/regis_success.css">
 </head>
 <body>
     <div class="error-card">
@@ -142,10 +143,14 @@ if(!empty($_FILES['image']['name'])){
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/regis_success.css">
+
 </head>
 <body>
 
+<!-- Account Created Card-->
     <div class="id-card">
+        <!-- scan line sweeps after card enters -->
+        <div class="scan"></div>
 
         <div class="id-card-header">
             <img src="assets/img/pipeline_logo_light.png" class="brand-logo" alt="Pipeline">

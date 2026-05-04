@@ -1,5 +1,97 @@
+/* ════════════════════════════════════════
+   regis_success.css – Account Created card
+   Animation approach: card enters from below,
+   scan line sweeps, then elements fade-up in sequence.
+   All child translateY values are tiny (≤10px) so they
+   never leave the card's overflow:hidden boundary.
+   ════════════════════════════════════════ */
+
+/* ── Keyframes ─────────────────────────── */
+
+/* Card rises from below */
+@keyframes cardIn {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.94);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Green scan stripe sweeps downward */
+@keyframes scanline {
+    0% {
+        transform: translateY(0);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: translateY(420px);
+        opacity: 0;
+    }
+}
+
+/* Every child: fades up 10px — stays inside card bounds */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Divider line grows left→right */
+@keyframes widthGrow {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100%;
+    }
+}
+
+/* Watermark breathes */
+@keyframes shimmer {
+
+    0%,
+    100% {
+        opacity: 0.05;
+    }
+
+    50% {
+        opacity: 0.14;
+    }
+}
+
+/* OK button pops */
+@keyframes checkPop {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    65% {
+        transform: scale(1.18);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ── Page ────────────────────────────── */
 body {
-    background-color: #F2F0EF;                /* OFF-WHITE page bg */
+    background-color: #F2F0EF;
     font-family: "DM Sans", sans-serif;
     display: flex;
     align-items: center;
@@ -9,21 +101,50 @@ body {
     padding: 40px 20px;
 }
 
+/* ── Card ────────────────────────────── */
 .id-card {
     width: 620px;
     max-width: 100%;
     border-radius: 24px;
     overflow: hidden;
     box-shadow: 0 12px 48px rgba(0, 0, 0, 0.30);
+    position: relative;
+    /* scan line needs this */
+
+    opacity: 0;
+    animation: cardIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
+    transition: box-shadow 0.3s ease;
 }
 
-/* ── Header ── */
+.id-card:hover {
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.38);
+}
+
+/* ── Scan line (injected via PHP/HTML) ──── */
+.scan {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: rgba(8, 120, 50, 0.55);
+    opacity: 0;
+    z-index: 20;
+    pointer-events: none;
+    /* fires once card is settled */
+    animation: scanline 0.7s ease-out 0.75s forwards;
+}
+
+/* ── Header ─────────────────────────── */
 .id-card-header {
-    background: #087832;                      /* solid GREEN */
+    background: #087832;
     padding: 18px 28px 14px 28px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    opacity: 0;
+    animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.95s forwards;
 }
 
 .id-card-header .brand {
@@ -51,7 +172,6 @@ body {
     letter-spacing: 1.5px;
 }
 
-/* brand-logo img variant from regis.php */
 .brand-logo {
     max-height: 60px;
     width: auto;
@@ -59,9 +179,9 @@ body {
     filter: brightness(0) invert(1);
 }
 
-/* ── Body ── */
+/* ── Body ────────────────────────────── */
 .id-card-body {
-    background: #F2F0EF;                      /* OFF-WHITE body */
+    background: #F2F0EF;
     padding: 24px 28px 20px 28px;
     display: flex;
     gap: 20px;
@@ -69,7 +189,7 @@ body {
     position: relative;
 }
 
-/* ── Photo — scaled DOWN to fit the card ── */
+/* ── Photo ───────────────────────────── */
 .id-photo-box {
     border: 3px solid #087832;
     border-radius: 12px;
@@ -81,6 +201,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+
+    opacity: 0;
+    animation: fadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) 1.25s forwards;
 }
 
 .id-photo-box img {
@@ -89,7 +212,7 @@ body {
     object-fit: cover;
 }
 
-/* ── Fields ── */
+/* ── Fields ──────────────────────────── */
 .id-fields {
     flex: 1;
     display: flex;
@@ -101,6 +224,33 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1px;
+    opacity: 0;
+    animation: fadeUp 0.4s ease forwards;
+}
+
+/* stagger each row */
+.id-field:nth-child(1) {
+    animation-delay: 1.40s;
+}
+
+.id-field:nth-child(2) {
+    animation-delay: 1.55s;
+}
+
+.id-field:nth-child(3) {
+    animation-delay: 1.70s;
+}
+
+.id-field:nth-child(4) {
+    animation-delay: 1.85s;
+}
+
+.id-field:nth-child(5) {
+    animation-delay: 2.00s;
+}
+
+.id-field:nth-child(6) {
+    animation-delay: 2.15s;
 }
 
 .id-field-label {
@@ -124,26 +274,30 @@ body {
     font-weight: 800;
 }
 
-/* ── Watermark ── */
+/* ── Watermark ───────────────────────── */
 .id-watermark {
     position: absolute;
     right: 18px;
     bottom: 10px;
     font-size: 110px;
     font-weight: 900;
-    color: rgba(8, 120, 50, 0.07);
+    color: rgba(8, 120, 50, 0.05);
     pointer-events: none;
     user-select: none;
     line-height: 1;
+    animation: shimmer 3s ease-in-out 2.5s infinite;
 }
 
-/* ── Footer ── */
+/* ── Footer ──────────────────────────── */
 .id-card-footer {
-    background: #087832;                    
+    background: #087832;
     padding: 12px 28px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    opacity: 0;
+    animation: fadeUp 0.45s ease 2.25s forwards;
 }
 
 .id-card-footer .tagline {
@@ -158,13 +312,17 @@ body {
     font-weight: 800;
     color: #087832;
     text-decoration: none;
-    background: #F2F0EF;                     
+    background: #F2F0EF;
     padding: 6px 26px;
     border-radius: 20px;
     letter-spacing: 0.5px;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s, transform 0.15s;
+
+    opacity: 0;
+    animation: checkPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 2.45s forwards;
 }
 
 .id-card-footer a:hover {
     opacity: 0.85;
+    transform: scale(1.06);
 }
