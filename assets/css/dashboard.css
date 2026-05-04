@@ -250,7 +250,9 @@ img { display: block; max-width: 100%; }
 }
 
 .dash-pill {
-    padding: 7px 16px;
+    padding: 0 16px;
+    height: 36px;
+    box-sizing: border-box;
     border-radius: var(--radius-pill);
     font-size: 13px;
     font-weight: 600;
@@ -262,6 +264,7 @@ img { display: block; max-width: 100%; }
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    text-decoration: none;
 }
 .dash-pill:hover {
     background: var(--green-100);
@@ -513,36 +516,47 @@ img { display: block; max-width: 100%; }
 .dash-listing-cond.cond-fair { background: #ffedd5; color: #9a3412; }
 
 /* ── DASHBOARD SEARCH BAR ──────────────────────── */
+.dash-search-form {
+    display: flex;
+    align-items: center;
+}
+
 .dash-search-wrapper {
     display: flex;
     align-items: center;
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: var(--radius-pill);
-    padding: 6px 6px 6px 20px;
+    padding: 0 4px 0 12px;
+    height: 36px; /* must match pill height: 7+7 padding + ~20px line-height + 2px border */
+    box-sizing: border-box;
     box-shadow: var(--shadow-sm);
     transition: box-shadow var(--transition), border-color var(--transition);
 }
 
 .dash-search-wrapper:focus-within {
     border-color: var(--green-600);
-    box-shadow: 0 0 0 4px var(--green-100);
+    box-shadow: 0 0 0 3px var(--green-100);
 }
 
 .dash-search-icon {
-    font-size: 16px;
+    font-size: 13px;
     color: var(--text-soft);
-    margin-right: 12px;
+    margin-right: 8px;
+    flex-shrink: 0;
 }
 
 .dash-search-input {
     flex: 1;
     border: none;
     outline: none;
-    font-size: 15px;
+    font-size: 13px;
     font-family: inherit;
     color: var(--text-dark);
     background: transparent;
+    padding: 0;
+    line-height: 1;
+    width: 100%;
 }
 
 .dash-search-input::placeholder {
@@ -550,17 +564,85 @@ img { display: block; max-width: 100%; }
 }
 
 .dash-search-btn {
+    flex-shrink: 0;
     background: var(--green-600);
     color: var(--white);
     border: none;
-    padding: 8px 24px;
+    padding: 0 12px;
+    height: 26px; /* shorter than the 36px wrapper so it floats inside */
     border-radius: var(--radius-pill);
     font-weight: 700;
-    font-size: 14px;
+    font-size: 12px;
     cursor: pointer;
     transition: background var(--transition);
+    white-space: nowrap;
+    line-height: 26px;
 }
 
 .dash-search-btn:hover {
     background: var(--green-700);
 }
+
+/* ── STICKY NAV FILTERS & SEARCH ──────────────────────── */
+.dash-sticky-nav {
+    position: sticky;
+    top: 68px; /* Match navbar height */
+    z-index: 90;
+    background: rgba(249, 250, 251, 0.95); /* Matches --off-white with opacity */
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 4%;
+    margin-bottom: 32px;
+}
+
+.dash-sticky-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .dash-sticky-inner {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .dash-search-form {
+        max-width: 100% !important;
+    }
+}
+
+/* ── COMPACT STICKY MODE ── */
+.dash-sticky-nav {
+    transition: padding var(--transition), box-shadow var(--transition);
+}
+
+.dash-sticky-nav.is-sticky {
+    padding: 10px 4%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.dash-sticky-nav.is-sticky .dash-sticky-inner {
+    flex-wrap: nowrap;
+}
+
+.dash-sticky-nav.is-sticky .dash-filter-pills {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+}
+
+.dash-sticky-nav.is-sticky .dash-filter-pills::-webkit-scrollbar {
+    display: none;
+}
+
+.dash-sticky-nav.is-sticky .dash-pill {
+    white-space: nowrap;
+}
+
+

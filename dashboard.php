@@ -209,8 +209,25 @@ db_close($conn);
             <h1 class="h1">Everything You Need,</h1>
             <h1 class="h1">Within Campus Reach</h1>
 
+            </div>
+        </div>  
+    </div>
+
+    <!-- ── STICKY FILTERS & SEARCH ── -->
+    <div class="dash-sticky-nav">
+        <div class="dash-sticky-inner">
             <!-- Category pill quick-filters -->
-            <div class="dash-filter-pills">
+            <div class="dash-filter-pills" style="margin: 0;">
+                <!-- Search Bar Inline (First element) -->
+                <form action="dashboard.php" method="GET" class="dash-search-form" style="width: 300px; margin: 0;">
+                    <input type="hidden" name="cat" value="<?php echo htmlspecialchars($currentCategory); ?>">
+                    <div class="dash-search-wrapper">
+                        <span class="dash-search-icon">🔍</span>
+                        <input type="text" name="search" class="dash-search-input" placeholder="Search..." value="<?php echo htmlspecialchars($searchQuery); ?>">
+                        <button type="submit" class="dash-search-btn">Search</button>
+                    </div>
+                </form>
+                
                 <a href="dashboard.php?cat=all" class="dash-pill <?php echo ($currentCategory === 'all') ? 'active' : ''; ?>">
                     <img src="assets/img/cart.svg" alt="Cart" style="width: 16px; height: 16px;"> All Items</a>
                 <a href="dashboard.php?cat=Clothing+%26+Apparel" class="dash-pill <?php echo ($currentCategory === 'Clothing & Apparel') ? 'active' : ''; ?>">
@@ -227,16 +244,7 @@ db_close($conn);
                     <img src="assets/img/electronics.svg" alt="Course-Specific" style="width: 16px; height: 16px;"> Course-Specific</a>
             </div>
             
-            <!-- Search Bar -->
-            <form action="dashboard.php" method="GET" class="dash-search-form mt-4" style="width: 100%; max-width: 600px;">
-                <input type="hidden" name="cat" value="<?php echo htmlspecialchars($currentCategory); ?>">
-                <div class="dash-search-wrapper">
-                    <span class="dash-search-icon">🔍</span>
-                    <input type="text" name="search" class="dash-search-input" placeholder="Search for anything..." value="<?php echo htmlspecialchars($searchQuery); ?>">
-                    <button type="submit" class="dash-search-btn">Search</button>
-                </div>
-            </form>
-        </div>  
+        </div>
     </div>
 
     <!-- ── DASHBOARD LISTINGS ── -->
@@ -394,6 +402,20 @@ db_close($conn);
         if(dashNav){
             window.addEventListener('scroll', function(){
                 dashNav.classList.toggle('scrolled', window.scrollY > 10);
+            });
+        }
+
+        // Sticky filters one-row compaction
+        var stickyFilters = document.querySelector('.dash-sticky-nav');
+        if(stickyFilters){
+            window.addEventListener('scroll', function(){
+                var rect = stickyFilters.getBoundingClientRect();
+                // When the element's top reaches 69px (navbar is 68px), it's sticking
+                if (rect.top <= 69) {
+                    stickyFilters.classList.add('is-sticky');
+                } else {
+                    stickyFilters.classList.remove('is-sticky');
+                }
             });
         }
     </script>

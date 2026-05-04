@@ -8,7 +8,7 @@ $sqlCarousel = "SELECT L.*, I.FILE_PATH, U.FIRST_NAME, U.LAST_NAME
                 FROM LISTINGS L
                 LEFT JOIN LISTING_IMG I ON L.LISTING_ID = I.LISTING_ID AND I.IS_PRIMARY = 1
                 JOIN USERS U ON L.USER_ID = U.USER_ID
-                WHERE L.STATUS = 'Available' OR L.STATUS IS NULL
+                WHERE (L.STATUS = 'Available' OR L.STATUS IS NULL)
                 ORDER BY L.DATE_POSTED DESC LIMIT 8";
 $stmtCarousel = db_query($conn, $sqlCarousel);
 $carouselItems = [];
@@ -23,19 +23,14 @@ $sqlShowcase = "SELECT L.*, I.FILE_PATH, U.FIRST_NAME, U.LAST_NAME
                 FROM LISTINGS L
                 LEFT JOIN LISTING_IMG I ON L.LISTING_ID = I.LISTING_ID AND I.IS_PRIMARY = 1
                 JOIN USERS U ON L.USER_ID = U.USER_ID
-                WHERE L.STATUS = 'Available' OR L.STATUS IS NULL
-                ORDER BY L.DATE_POSTED DESC LIMIT 6 OFFSET 8";
+                WHERE (L.STATUS = 'Available' OR L.STATUS IS NULL)
+                ORDER BY L.DATE_POSTED DESC LIMIT 12";
 $stmtShowcase = db_query($conn, $sqlShowcase);
 $showcaseItems = [];
 if ($stmtShowcase) {
     while($row = db_fetch_assoc($stmtShowcase)){
         $showcaseItems[] = $row;
     }
-}
-
-// Fallback if not enough listings
-if (empty($showcaseItems)) {
-    $showcaseItems = $carouselItems;
 }
 
 // Helper function to map categories to gradients and emojis
