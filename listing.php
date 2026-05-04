@@ -48,6 +48,7 @@ $resNavImg = db_query($conn,
 $navImg = db_fetch_assoc($resNavImg);
 $navFilePath = $navImg['FILE_PATH'] ?? 'assets/img/default_avatar.png';
 
+    
 // ── Fetch listing + seller ──────────────────────────────────
 $sqlListing = "SELECT L.*,
                       U.FIRST_NAME, U.LAST_NAME, U.USERNAME, U.CYS, U.EMAIL,
@@ -75,7 +76,7 @@ if(empty($images)) $images[] = ['FILE_PATH'=>'assets/img/no_image.png','IS_PRIMA
 $resLikes = db_query($conn,
     "SELECT COUNT(*) AS CNT FROM LISTING_LIKES WHERE LISTING_ID=?", [$listingId]);
 $likeRow  = db_fetch_assoc($resLikes);
-$likeCount = (int)$likeRow['CNT'];
+$likeCount = (int)($likeRow['CNT'] ?? 0);
 
 $resMyLike = db_query($conn,
     "SELECT LIKE_ID FROM LISTING_LIKES WHERE LISTING_ID=? AND USER_ID=?",
@@ -354,4 +355,5 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
 <script src="assets/js/listing.js"></script>
 </body>
 </html>
+
 <?php db_close($conn); ?>

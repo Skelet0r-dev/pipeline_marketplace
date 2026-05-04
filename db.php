@@ -6,8 +6,8 @@ function db_config(): array {
     return [
         'host' => getenv('DB_HOST') ?: 'localhost',
         'database' => getenv('DB_NAME') ?: 'pipeline_db',
-        'user' => getenv('DB_USER') ?: 'root',
-        'password' => getenv('DB_PASS') ?: ''
+        'user' => getenv('DB_USER') ?: 'app_user',
+        'password' => getenv('DB_PASS') ?: 'app_password'
     ];
 }
 
@@ -87,4 +87,10 @@ function db_commit($conn): bool {
 
 function db_rollback($conn): bool {
     return $conn ? $conn->rollBack() : false;
+}
+
+
+function db_fetch_value($result, $key, $default = null) {
+    $row = db_fetch_assoc($result);
+    return ($row && isset($row[$key])) ? $row[$key] : $default;
 }
