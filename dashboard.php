@@ -232,7 +232,7 @@ db_close($conn);
                     <img src="assets/img/cart.svg" alt="Cart" style="width: 16px; height: 16px;"> All Items</a>
                 <a href="dashboard.php?cat=Clothing+%26+Apparel" class="dash-pill <?php echo ($currentCategory === 'Clothing & Apparel') ? 'active' : ''; ?>">
                     <img src="assets/img/shirts.svg" alt="Clothing" style="width: 16px; height: 16px;"> Clothing</a>
-                <a href="dashboard.php?cat=Electronics" class="dash-pill <?php echo ($currentCategory === 'Electronics') ? 'active' : ''; ?>">
+                <a href="dashboard.php?cat=Electronics" class="dash-pill <?php echo ($currentCategory === 'Electronics and Tech') ? 'active' : ''; ?>">
                     <img src="assets/img/keyboard.svg" alt="Electronics" style="width: 16px; height: 16px;"> Electronics</a>
                 <a href="dashboard.php?cat=Books" class="dash-pill <?php echo ($currentCategory === 'Books') ? 'active' : ''; ?>">
                     <img src="assets/img/academics.svg" alt="Books" style="width: 16px; height: 16px;"> Books</a>
