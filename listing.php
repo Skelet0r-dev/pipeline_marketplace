@@ -51,7 +51,7 @@ $navFilePath = $navImg['FILE_PATH'] ?? 'assets/img/avatar.png';
     
 // ── Fetch listing + seller ──────────────────────────────────
 $sqlListing = "SELECT L.*,
-                      U.FIRST_NAME, U.LAST_NAME, U.USERNAME, U.CYS, U.EMAIL,
+                      U.FIRST_NAME, U.LAST_NAME, U.USERNAME, U.COLLEGE, U.SECTION, U.EMAIL,
                       UI.FILE_PATH AS SELLER_AVATAR
                FROM LISTINGS L
                JOIN USERS U    ON L.USER_ID = U.USER_ID
@@ -208,7 +208,7 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
                 <div class="listing-seller-info">
                     <a href="<?php echo htmlspecialchars($sellerProfileLink); ?>" class="listing-seller-name"><?php echo $sellerName; ?></a>
                     <a href="<?php echo htmlspecialchars($sellerProfileLink); ?>" class="listing-seller-handle">@<?php echo htmlspecialchars($listing['USERNAME']); ?></a>
-                    <span class="listing-seller-cys"><?php echo htmlspecialchars($listing['CYS']); ?></span>
+                    <span class="listing-seller-cys"><?php echo htmlspecialchars($listing['COLLEGE'] . ' - ' . $listing['SECTION']); ?></span>
                 </div>
                 <?php if(!$isOwner): ?>
                 <div class="listing-action-group">

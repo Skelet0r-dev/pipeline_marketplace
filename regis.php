@@ -7,7 +7,9 @@ if($conn==false)
 $firstname  = trim($_POST['f_name']);
 $lastname   = trim($_POST['l_name']);
 $stdnum     = trim($_POST['stdnum']);
-$cys        = strtoupper(trim($_POST['cys']));
+$college    = strtoupper(trim($_POST['college']));
+$department = trim($_POST['department']);
+$section    = strtoupper(trim($_POST['section']));
 $sex        = trim($_POST['sex']);
 $username   = trim($_POST['username']);
 $email      = trim($_POST['email']);
@@ -98,10 +100,9 @@ if(!empty($errors)){
 // For now, standard success continues below with HTML.
 
 // ── Insert new user ──
-// ── Insert new user ──
-$sql="INSERT INTO USERS (FIRST_NAME, LAST_NAME, STD_NUM, CYS, SEX, USERNAME, EMAIL, `PASSWORD`, DATE_REGISTERED)
-      VALUES (?,?,?,?,?,?,?,?,NOW())";
-$result=db_query($conn,$sql, [$firstname,$lastname,$stdnum,$cys,$sex,$username,$email,$password]);
+$sql="INSERT INTO USERS (FIRST_NAME, LAST_NAME, STD_NUM, COLLEGE, DEPARTMENT, SECTION, SEX, USERNAME, EMAIL, `PASSWORD`, DATE_REGISTERED)
+      VALUES (?,?,?,?,?,?,?,?,?,?,NOW())";
+$result=db_query($conn,$sql, [$firstname,$lastname,$stdnum,$college,$department,$section,$sex,$username,$email,$password]);
 if($result===false) die(db_last_error());
 
 // ── Get new user ID ──
@@ -179,8 +180,12 @@ if(!empty($_FILES['image']['name'])){
                     <div class="id-field-value"><?php echo htmlspecialchars($stdnum); ?></div>
                 </div>
                 <div class="id-field">
-                    <div class="id-field-label">Course Year Section.</div>
-                    <div class="id-field-value"><?php echo htmlspecialchars($cys); ?></div>
+                    <div class="id-field-label">College / Dept.</div>
+                    <div class="id-field-value"><?php echo htmlspecialchars($college . ' - ' . $department); ?></div>
+                </div>
+                <div class="id-field">
+                    <div class="id-field-label">Section.</div>
+                    <div class="id-field-value"><?php echo htmlspecialchars($section); ?></div>
                 </div>
                 <div class="id-field">
                     <div class="id-field-label">Sex.</div>

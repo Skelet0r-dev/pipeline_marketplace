@@ -628,7 +628,7 @@ if ($recentListingsStmt) {
 }
 
 $recentUsers = [];
-$recentUsersSql = "SELECT USER_ID, FIRST_NAME, LAST_NAME, STD_NUM, CYS
+$recentUsersSql = "SELECT USER_ID, FIRST_NAME, LAST_NAME, STD_NUM, COLLEGE, SECTION
                    FROM USERS
                    ORDER BY USER_ID DESC
                    LIMIT 4";
@@ -646,14 +646,14 @@ $listingStatus = inputValue('status');
 $reportFilter = inputValue('report_status');
 
 $allUsers = [];
-$allUsersSql = "SELECT USER_ID, FIRST_NAME, LAST_NAME, STD_NUM, CYS
+$allUsersSql = "SELECT USER_ID, FIRST_NAME, LAST_NAME, STD_NUM, COLLEGE, SECTION
                 FROM USERS
                 WHERE 1=1";
 $allUsersParams = [];
 if ($studentSearch !== '') {
-    $allUsersSql .= " AND (FIRST_NAME LIKE ? OR LAST_NAME LIKE ? OR USERNAME LIKE ? OR STD_NUM LIKE ? OR CYS LIKE ?)";
+    $allUsersSql .= " AND (FIRST_NAME LIKE ? OR LAST_NAME LIKE ? OR USERNAME LIKE ? OR STD_NUM LIKE ? OR COLLEGE LIKE ? OR SECTION LIKE ?)";
     $like = '%' . $studentSearch . '%';
-    array_push($allUsersParams, $like, $like, $like, $like, $like);
+    array_push($allUsersParams, $like, $like, $like, $like, $like, $like);
 }
 $allUsersSql .= " ORDER BY USER_ID DESC";
 $allUsersStmt = db_query($conn, $allUsersSql, $allUsersParams);
@@ -1019,7 +1019,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
                         </div>
                         <div class="user-info">
                             <div class="uname"><?php echo htmlspecialchars(trim($user['FIRST_NAME'] . ' ' . $user['LAST_NAME'])); ?></div>
-                            <div class="ustd"><?php echo htmlspecialchars((string) $user['STD_NUM']); ?> - <?php echo htmlspecialchars((string) $user['CYS']); ?></div>
+                            <div class="ustd"><?php echo htmlspecialchars((string) $user['STD_NUM']); ?> - <?php echo htmlspecialchars((string) $user['COLLEGE'] . ' ' . $user['SECTION']); ?></div>
                         </div>
                         <div class="user-time">ID #<?php echo (int) $user['USER_ID']; ?></div>
                     </div>
@@ -1071,12 +1071,12 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
             <div class="card-title">Students <span><?php echo number_format(count($allUsers)); ?> shown</span></div>
             <form class="filter-row" method="get" action="admin_dashboard.php">
                 <input type="hidden" name="page" value="students">
-                <input class="filter-input" type="search" name="student_q" placeholder="Search name, username, student no., course, or section" value="<?php echo htmlspecialchars($studentSearch); ?>">
+                <input class="filter-input" type="search" name="student_q" placeholder="Search name, username, student no., college, or section" value="<?php echo htmlspecialchars($studentSearch); ?>">
                 <button class="action-btn primary" type="submit">Apply</button>
                 <a class="action-btn secondary" href="admin_dashboard.php?page=students">Reset</a>
             </form>
             <table>
-                <thead><tr><th>Name</th><th>Student No.</th><th>Course / Year / Section</th><th>User ID</th></tr></thead>
+                <thead><tr><th>Name</th><th>Student No.</th><th>College / Section</th><th>User ID</th></tr></thead>
                 <tbody>
                     <?php if (empty($allUsers)): ?>
                     <tr><td colspan="4">No users found.</td></tr>
@@ -1085,7 +1085,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
                     <tr>
                         <td><div class="item-name"><?php echo htmlspecialchars(trim($user['FIRST_NAME'] . ' ' . $user['LAST_NAME'])); ?></div></td>
                         <td><?php echo htmlspecialchars((string) $user['STD_NUM']); ?></td>
-                        <td><?php echo htmlspecialchars((string) $user['CYS']); ?></td>
+                        <td><?php echo htmlspecialchars((string) $user['COLLEGE'] . ' - ' . $user['SECTION']); ?></td>
                         <td style="color:var(--muted); font-size:11px">ID #<?php echo (int) $user['USER_ID']; ?></td>
                     </tr>
                     <?php endforeach; ?>

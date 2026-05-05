@@ -45,7 +45,8 @@ $user=db_fetch_assoc($result);
 $firstname=$user['FIRST_NAME'];
 $lastname=$user['LAST_NAME'];
 $fullname=$firstname.' '.$lastname;
-$cys=$user['CYS'];
+$college=$user['COLLEGE'];
+$section=$user['SECTION'];
 $username=$user['USERNAME'];
 
 // Get profile image
@@ -316,7 +317,7 @@ if($resComments){
             <div class="sf-info">
                 <div class="sf-name-row">
                     <h2 class="sf-name"><?php echo htmlspecialchars($fullname); ?></h2>
-                    <span class="sf-badge">🎓 <?php echo htmlspecialchars($cys); ?></span>
+                    <span class="sf-badge">🎓 <?php echo htmlspecialchars($college . ' - ' . $section); ?></span>
                 </div>
                 <p class="sf-handle">@<?php echo htmlspecialchars($username); ?></p>
                 <div class="sf-stats">

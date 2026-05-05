@@ -18,14 +18,16 @@ $updateSuccess = false;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
     $fn   = $_POST['first_name'];
     $ln   = $_POST['last_name'];
-    $cys  = $_POST['cys'];
+    $college = $_POST['college'];
+    $dept = $_POST['department'];
+    $sec  = $_POST['section'];
     $sex  = $_POST['sex'];
     $un   = $_POST['username'];
     $em   = $_POST['email'];
     
     // Update basic user info
-    $sqlUpd = "UPDATE USERS SET FIRST_NAME = ?, LAST_NAME = ?, CYS = ?, SEX = ?, USERNAME = ?, EMAIL = ? WHERE USER_ID = ?";
-    $params = [$fn, $ln, $cys, $sex, $un, $em, $loginId];
+    $sqlUpd = "UPDATE USERS SET FIRST_NAME = ?, LAST_NAME = ?, COLLEGE = ?, DEPARTMENT = ?, SECTION = ?, SEX = ?, USERNAME = ?, EMAIL = ? WHERE USER_ID = ?";
+    $params = [$fn, $ln, $college, $dept, $sec, $sex, $un, $em, $loginId];
     db_query($conn, $sqlUpd, $params);
 
     // Update Password if filled
@@ -83,7 +85,9 @@ $rowImg  = db_fetch_assoc($resImg);
 $firstname  = $rowUser['FIRST_NAME']  ?? '';
 $lastname   = $rowUser['LAST_NAME']   ?? '';
 $std_num    = $rowUser['STD_NUM']     ?? '';
-$cys        = $rowUser['CYS']         ?? '';
+$college    = $rowUser['COLLEGE']     ?? '';
+$department = $rowUser['DEPARTMENT']  ?? '';
+$section    = $rowUser['SECTION']     ?? '';
 $sex        = $rowUser['SEX']         ?? '';
 $username   = $rowUser['USERNAME']    ?? '';
 $email      = $rowUser['EMAIL']       ?? '';
@@ -152,7 +156,10 @@ db_close($conn);
         <div class="header-info">
           <h1 id="header-name"><?php echo htmlspecialchars($firstname . ' ' . $lastname); ?></h1>
           <p id="header-username">@<?php echo htmlspecialchars($username); ?></p>
-          <span class="badge-cys" id="header-cys"><?php echo htmlspecialchars($cys); ?></span>
+          <div class="d-flex gap-2">
+            <span class="badge-cys" id="header-college"><?php echo htmlspecialchars($college); ?></span>
+            <span class="badge-cys" id="header-section"><?php echo htmlspecialchars($section); ?></span>
+          </div>
         </div>
       </div>
 
@@ -191,8 +198,16 @@ db_close($conn);
               <span class="field-hint">Cannot be changed.</span>
             </div>
             <div class="field-group">
-              <label class="field-label">Course-Year-Section</label>
-              <input class="field-input" name="cys" id="cys" type="text" value="<?php echo htmlspecialchars($cys); ?>"/>
+              <label class="field-label">College</label>
+              <input class="field-input" name="college" id="college" type="text" value="<?php echo htmlspecialchars($college); ?>"/>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Department</label>
+              <input class="field-input" name="department" id="department" type="text" value="<?php echo htmlspecialchars($department); ?>"/>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Section</label>
+              <input class="field-input" name="section" id="section" type="text" value="<?php echo htmlspecialchars($section); ?>"/>
             </div>
             <div class="field-group">
               <label class="field-label">Sex</label>

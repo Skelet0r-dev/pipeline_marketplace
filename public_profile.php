@@ -30,7 +30,7 @@ $meAvatar = $meImg['FILE_PATH'] ?? 'assets/img/avatar.png';
 
 $profileStmt = db_query(
     $conn,
-    "SELECT U.USER_ID, U.FIRST_NAME, U.LAST_NAME, U.USERNAME, U.CYS, U.EMAIL, UI.FILE_PATH AS AVATAR
+    "SELECT U.USER_ID, U.FIRST_NAME, U.LAST_NAME, U.USERNAME, U.COLLEGE, U.SECTION, U.EMAIL, UI.FILE_PATH AS AVATAR
      FROM USERS U
      LEFT JOIN USER_IMG UI ON U.USER_ID = UI.USER_ID
      WHERE U.USER_ID=?",
@@ -109,7 +109,7 @@ $messageLink = 'mailto:' . rawurlencode($profile['EMAIL']) . '?subject=' . rawur
             <div class="sf-info">
                 <div class="sf-name-row">
                     <h2 class="sf-name"><?php echo htmlspecialchars($fullname); ?></h2>
-                    <span class="sf-badge"><?php echo htmlspecialchars($profile['CYS']); ?></span>
+                    <span class="sf-badge"><?php echo htmlspecialchars($profile['COLLEGE'] . ' - ' . $profile['SECTION']); ?></span>
                 </div>
                 <p class="sf-handle">@<?php echo htmlspecialchars($profile['USERNAME']); ?></p>
                 <div class="sf-stats">
