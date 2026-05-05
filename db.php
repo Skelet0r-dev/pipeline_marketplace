@@ -2,13 +2,29 @@
 declare(strict_types=1);
 
 function db_config(): array {
-    // Defaults are for local development; override with environment variables in production.
-    return [
-        'host' => getenv('DB_HOST') ?: 'localhost',
-        'database' => getenv('DB_NAME') ?: 'pipeline_db',
-        'user' => getenv('DB_USER') ?: 'app_user',
-        'password' => getenv('DB_PASS') ?: 'app_password'
-    ];
+    // Detect if we are running locally or on the production server
+    $is_localhost = isset($_SERVER['HTTP_HOST']) && 
+                   ($_SERVER['HTTP_HOST'] == 'localhost:9090' || 
+                    $_SERVER['HTTP_HOST'] == 'localhost' || 
+                    $_SERVER['HTTP_HOST'] == '127.0.0.1');
+
+    if ($is_localhost) {
+        // Local XAMPP Settings
+        return [
+            'host'     => 'localhost',
+            'database' => 'pipeline_db',
+            'user'     => 'root',
+            'password' => '' 
+        ];
+    } else {
+        // Hostinger Production Settings
+        return [
+            'host'     => 'localhost', // Hostinger uses localhost for internal DB connections
+            'database' => 'u299531047_pipeline_db',
+            'user'     => 'u299531047_myuser',
+            'password' => 'r7L3KziX^'
+        ];
+    }
 }
 
 function db_connect() {

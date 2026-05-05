@@ -6,7 +6,9 @@ require_once __DIR__ . '/../db.php';
 
 // ── 1. Validate CSRF state token ─────────────────────────────────────────────
 if (!isset($_GET['state']) || $_GET['state'] !== ($_SESSION['oauth_state'] ?? '')) {
-    die('Invalid state parameter. Possible CSRF attack.');
+    $received = $_GET['state'] ?? 'NONE';
+    $stored = $_SESSION['oauth_state'] ?? 'NONE';
+    die("Invalid state parameter. <br>Received: $received <br>Stored: $stored <br>Possible CSRF attack or session lost.");
 }
 unset($_SESSION['oauth_state']);
 

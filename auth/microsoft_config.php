@@ -14,7 +14,12 @@ if (file_exists(__DIR__ . '/microsoft_secrets.php')) {
 define('MS_TENANT_ID',     'common');                    // Use 'common' for multi-tenant
 
 // Must match exactly what you put in Azure → Authentication → Redirect URIs
-define('MS_REDIRECT_URI', 'http://localhost:9090/auth/microsoft_callback.php');
+// Auto-detect Redirect URI based on environment
+if (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] == 'localhost:9090' || $_SERVER['HTTP_HOST'] == '127.0.0.1:9090')) {
+    define('MS_REDIRECT_URI', 'http://localhost:9090/auth/microsoft_callback.php');
+} else {
+    define('MS_REDIRECT_URI', 'https://pipelinemarketplace.space/auth/microsoft_callback.php');
+}
 
 // OAuth endpoints
 define('MS_AUTH_URL',  'https://login.microsoftonline.com/' . MS_TENANT_ID . '/oauth2/v2.0/authorize');
