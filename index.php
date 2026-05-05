@@ -19,13 +19,22 @@ if ($stmtCarousel) {
 }
 
 // Fetch recent available listings for the showcase
+$currentCategory = isset($_GET['cat']) ? $_GET['cat'] : 'all';
+
 $sqlShowcase = "SELECT L.*, I.FILE_PATH, U.FIRST_NAME, U.LAST_NAME 
                 FROM LISTINGS L
                 LEFT JOIN LISTING_IMG I ON L.LISTING_ID = I.LISTING_ID AND I.IS_PRIMARY = 1
                 JOIN USERS U ON L.USER_ID = U.USER_ID
-                WHERE (L.STATUS = 'Available' OR L.STATUS IS NULL)
-                ORDER BY L.DATE_POSTED DESC LIMIT 12";
-$stmtShowcase = db_query($conn, $sqlShowcase);
+                WHERE (L.STATUS = 'Available' OR L.STATUS IS NULL)";
+
+$paramsShowcase = [];
+if ($currentCategory !== 'all') {
+    $sqlShowcase .= " AND L.CATEGORY = ?";
+    $paramsShowcase[] = $currentCategory;
+}
+
+$sqlShowcase .= " ORDER BY L.DATE_POSTED DESC LIMIT 12";
+$stmtShowcase = db_query($conn, $sqlShowcase, $paramsShowcase);
 $showcaseItems = [];
 if ($stmtShowcase) {
     while($row = db_fetch_assoc($stmtShowcase)){
@@ -101,13 +110,13 @@ function getCategoryStyle($category) {
                     </div>
                     <!-- Category pills -->
                     <div class="hero-pills">
-                        <a href="browse.php?cat=all" class="pill pill-active">All</a>
-                        <a href="browse.php?cat=Clothing+%26+Apparel" class="pill">Clothing &amp; Apparel</a>
-                        <a href="browse.php?cat=Electronics" class="pill">Electronics</a>
-                        <a href="browse.php?cat=Books" class="pill">Books</a>
-                        <a href="browse.php?cat=Hobbies+%26+Lifestyle" class="pill">Hobbies</a>
-                        <a href="browse.php?cat=Events+%26+Tickets" class="pill">Events</a>
-                        <a href="browse.php?cat=Course-Specific" class="pill">Course-Specific</a>
+                        <a href="index.php?cat=all#showcase" class="pill <?php echo ($currentCategory === 'all') ? 'pill-active' : ''; ?>">All</a>
+                        <a href="index.php?cat=Clothing+%26+Apparel#showcase" class="pill <?php echo ($currentCategory === 'Clothing & Apparel') ? 'pill-active' : ''; ?>">Clothing &amp; Apparel</a>
+                        <a href="index.php?cat=Electronics#showcase" class="pill <?php echo ($currentCategory === 'Electronics and Tech') ? 'pill-active' : ''; ?>">Electronics</a>
+                        <a href="index.php?cat=Books#showcase" class="pill <?php echo ($currentCategory === 'Books') ? 'pill-active' : ''; ?>">Books</a>
+                        <a href="index.php?cat=Hobbies+%26+Lifestyle#showcase" class="pill <?php echo ($currentCategory === 'Hobbies & Lifestyle') ? 'pill-active' : ''; ?>">Hobbies</a>
+                        <a href="index.php?cat=Events+%26+Tickets#showcase" class="pill <?php echo ($currentCategory === 'Events & Tickets') ? 'pill-active' : ''; ?>">Events</a>
+                        <a href="index.php?cat=Course-Specific#showcase" class="pill <?php echo ($currentCategory === 'Course-Specific') ? 'pill-active' : ''; ?>">Course-Specific</a>
                     </div>
                 </div>
 
@@ -171,18 +180,31 @@ function getCategoryStyle($category) {
 
         <!-- ── LISTING SHOWCASE GRID ── -->
 
-        <section class="showcase">
+        <section class="showcase" id="showcase">
             <div class="container">
-                <div class="showcase-grid">
-
-                    <?php if (!empty($showcaseItems)): ?>
+                <div class="section-header" style="margin-bottom: 40px; text-align: left;">
+                    <span class="section-eyebrow">✦ Browse Listings</span>
+                    <h2 style="font-family: 'DM Serif Display', serif; font-size: 42px;">
+                        <?php echo ($currentCategory === 'all') ? 'Recently Listed' : htmlspecialchars($currentCategory) . ' Listings'; ?>
+                    </h2>
+                </div>
+                
+                <?php if (empty($showcaseItems)): ?>
+                    <div style="text-align: center; padding: 60px 0; color: var(--text-soft); background: var(--white); border-radius: var(--radius-md); border: 1px solid var(--border); animation: fadeInUp 0.6s ease forwards;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">🛍️</div>
+                        <h3>No listings found in this category</h3>
+                        <p>Check back later or explore other categories!</p>
+                    </div>
+                <?php else: ?>
+                    <div class="showcase-grid">
                         <?php foreach($showcaseItems as $index => $item): ?>
                             <?php 
                             $imgSrc = !empty($item['FILE_PATH']) ? htmlspecialchars($item['FILE_PATH']) : '';
                             list($emoji, $bg) = getCategoryStyle($item['CATEGORY']);
                             $tallClass = ($index === 1 || $index === 4) ? ' shot-card--tall' : '';
+                            $delay = $index * 0.08; // 80ms stagger
                             ?>
-                            <article class="shot-card<?php echo $tallClass; ?> js-auth-trigger">
+                            <article class="shot-card<?php echo $tallClass; ?> js-auth-trigger" style="animation-delay: <?php echo $delay; ?>s;">
                                 <div class="shot-img" style="background: <?php echo $bg; ?>; position: relative;">
                                     <?php if ($imgSrc): ?>
                                         <img src="<?php echo $imgSrc; ?>" alt="<?php echo htmlspecialchars($item['TITLE']); ?>" style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">
@@ -197,18 +219,8 @@ function getCategoryStyle($category) {
                                 </div>
                             </article>
                         <?php endforeach; ?>
-                    <?php else: ?>
-                        <article class="shot-card">
-                            <div class="shot-img" style="background: linear-gradient(135deg,#d4edda,#a8d5b5);">
-                                <span class="shot-emoji">📚</span>
-                            </div>
-                            <div class="shot-meta">
-                                <span class="shot-category">Books</span>
-                                <h3 class="shot-title">Pre-loved Textbooks</h3>
-                                <p class="shot-desc">Engineering, Nursing, Business — all courses covered.</p>
-                            </div>
-                        </article>
-                    <?php endif; ?>
+                    </div>
+                <?php endif; ?>
 
                 </div>
 
