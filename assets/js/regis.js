@@ -57,14 +57,38 @@ function validateField(id) {
     var ok  = true;
 
     if(id === 'stdnum')        ok = /^\d{9}$/.test(val);
-    else if(id === 'email')    ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+    else if(id === 'email')    ok = /^[^\s@]+@dlsud\.edu\.ph$/.test(val);
     else if(id === 'password') ok = isStrongPassword(el.value);
     else                       ok = val !== '';
 
-    el.classList.toggle('is-ok',  ok);
-    el.classList.toggle('is-bad', !ok);
-    document.getElementById('err-' + id).classList.toggle('show', !ok);
+    el.classList.toggle('is-valid',  ok);
+    el.classList.toggle('is-invalid', !ok);
+
+    // If basic validation passed, check if it's already taken (remote check)
+    if (ok && (id === 'stdnum' || id === 'email' || id === 'username')) {
+        checkRemoteAvailability(id, id === 'f_name' || id === 'l_name' ? null : id);
+    }
+
     return ok;
+}
+
+function checkRemoteAvailability(id, type) {
+    if (!type) return;
+    var el = document.getElementById(id);
+    var val = el.value.trim();
+    if (!val) return;
+
+    fetch('check_availability.php?type=' + type + '&value=' + encodeURIComponent(val))
+        .then(r => r.json())
+        .then(data => {
+            if (!data.available) {
+                el.classList.add('is-invalid');
+                el.classList.remove('is-valid');
+                var label = (type === 'stdnum' ? 'Student number' : (type === 'email' ? 'Email' : 'Username'));
+                document.getElementById('err-' + id).textContent = label + ' is already taken.';
+            }
+        })
+        .catch(err => console.error('Availability check error:', err));
 }
 
 // Attach blur/change listeners to all fields
@@ -74,7 +98,7 @@ for(var i = 0; i < fields.length; i++) {
         var evt = (el.tagName === 'SELECT') ? 'change' : 'input';
         el.addEventListener('blur', function() { validateField(id); });
         el.addEventListener(evt, function() {
-            if(el.classList.contains('is-bad') || el.classList.contains('is-ok')) {
+            if(el.classList.contains('is-invalid') || el.classList.contains('is-valid')) {
                 validateField(id);
             }
         });
@@ -145,5 +169,71 @@ document.getElementById('regisForm').addEventListener('submit', function(e) {
     }
 
     d.count = 0; d.until = 0; saveAttempts(d);
-    this.submit();
+    
+    // AJAX Submission to keep user on "same tab" for errors
+    var formData = new FormData(this);
+    var submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Registering...';
+
+    fetch('regis.php', {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => {
+        var contentType = response.headers.get('content-type');
+        if (contentType && contentType.indexOf('application/json') !== -1) {
+            return response.json().then(data => {
+                if (!data.success) {
+                    // Clear previous server errors
+                    fields.forEach(id => {
+                        var el = document.getElementById(id);
+                        el.classList.remove('is-invalid');
+                    });
+
+                    data.errors.forEach(err => {
+                        var targetId = null;
+                        var msg = err;
+
+                        if (err.toLowerCase().includes('student number')) targetId = 'stdnum';
+                        else if (err.toLowerCase().includes('email')) targetId = 'email';
+                        else if (err.toLowerCase().includes('username')) targetId = 'username';
+                        else if (err.toLowerCase().includes('password')) targetId = 'password';
+                        else if (err.toLowerCase().includes('first name')) targetId = 'f_name';
+                        else if (err.toLowerCase().includes('last name')) targetId = 'l_name';
+                        else if (err.toLowerCase().includes('sex')) targetId = 'sex';
+                        else if (err.toLowerCase().includes('course')) targetId = 'cys';
+
+                        if (targetId) {
+                            var el = document.getElementById(targetId);
+                            var errDiv = document.getElementById('err-' + targetId);
+                            el.classList.add('is-invalid');
+                            el.classList.remove('is-valid');
+                            errDiv.textContent = msg;
+                        } else {
+                            // Fallback for unknown errors
+                            alert(msg);
+                        }
+                    });
+
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Register';
+                }
+            });
+        } else {
+            // Success or HTML error page - redirect or replace content
+            return response.text().then(html => {
+                document.open();
+                document.write(html);
+                document.close();
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An unexpected error occurred. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Register';
+    });
 });

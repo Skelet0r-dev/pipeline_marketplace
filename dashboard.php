@@ -40,7 +40,7 @@ if(!isset($_POST['stdnum']) && isset($_SESSION['user_id'])){
         $sqlprofile="SELECT * FROM USER_IMG WHERE USER_ID=?";
         $resultprofile=db_query($conn,$sqlprofile, [$loginId]);
         $rowprofile=db_fetch_assoc($resultprofile);
-        $file_path=$rowprofile['FILE_PATH'];
+        $file_path = $rowprofile ? $rowprofile['FILE_PATH'] : 'assets/img/avatar.png';
     }
 }
 
@@ -90,7 +90,7 @@ if(!$locked && isset($_POST['stdnum'])){
             if($resultprofile===false)
                 die(db_last_error());
             $rowprofile=db_fetch_assoc($resultprofile);
-            $file_path=$rowprofile['FILE_PATH'];
+            $file_path = $rowprofile ? $rowprofile['FILE_PATH'] : 'assets/img/avatar.png';
         }
     }
 }
@@ -158,7 +158,7 @@ db_close($conn);
 
     <!-- ── DASHBOARD ── -->
     <div class="dash-navbar">
-        <a href="index.php"><img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Pipeline Logo"></a>
+        <a href="dashboard.php"><img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Pipeline Logo"></a>
         <div class="dash-nav-right">
             <div class="dash-greeting">
                 <span class="dash-hello">Hello,</span>
@@ -292,7 +292,7 @@ db_close($conn);
 
     <!-- ── LOGIN FORM WITH ERROR ── -->
     <div class="login-header">
-        <a href="index.php"><img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo-light" alt="Pipeline Logo"></a>
+        <a href="dashboard.php"><img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo-light" alt="Pipeline Logo"></a>
         <div class="header-links">
             <a href="#" class="header-link" data-bs-toggle="modal" data-bs-target="#aboutModal">ABOUT US</a>
             <span class="header-sep">|</span>

@@ -26,7 +26,7 @@ $meStmt = db_query($conn, "SELECT FIRST_NAME FROM USERS WHERE USER_ID=?", [$logi
 $me = db_fetch_assoc($meStmt);
 $meImgStmt = db_query($conn, "SELECT FILE_PATH FROM USER_IMG WHERE USER_ID=?", [$loginId]);
 $meImg = db_fetch_assoc($meImgStmt);
-$meAvatar = $meImg['FILE_PATH'] ?? 'assets/img/default_avatar.png';
+$meAvatar = $meImg['FILE_PATH'] ?? 'assets/img/avatar.png';
 
 $profileStmt = db_query(
     $conn,
@@ -58,7 +58,7 @@ $listingsStmt = db_query(
 );
 
 $fullname = $profile['FIRST_NAME'] . ' ' . $profile['LAST_NAME'];
-$avatar = $profile['AVATAR'] ?? 'assets/img/default_avatar.png';
+$avatar = $profile['AVATAR'] ?? 'assets/img/avatar.png';
 $messageLink = 'mailto:' . rawurlencode($profile['EMAIL']) . '?subject=' . rawurlencode('Pipeline Marketplace Inquiry');
 ?>
 <!DOCTYPE html>

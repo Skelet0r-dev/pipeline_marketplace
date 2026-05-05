@@ -46,7 +46,7 @@ $me = db_fetch_assoc($resMe);
 $resNavImg = db_query($conn,
     "SELECT FILE_PATH FROM USER_IMG WHERE USER_ID=?", [$loginId]);
 $navImg = db_fetch_assoc($resNavImg);
-$navFilePath = $navImg['FILE_PATH'] ?? 'assets/img/default_avatar.png';
+$navFilePath = $navImg['FILE_PATH'] ?? 'assets/img/avatar.png';
 
     
 // ── Fetch listing + seller ──────────────────────────────────
@@ -132,7 +132,7 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
 
 <!-- ── NAVBAR ── -->
 <div class="dash-navbar">
-    <a href="index.php"><img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Logo"></a>
+    <a href="dashboard.php"><img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Logo"></a>
     <div class="dash-nav-right">
         <div class="dash-greeting">
             <span class="dash-hello">Hello,</span>
@@ -170,7 +170,7 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
 </div>
 
 <!-- ── MAIN CONTENT ── -->
-<div class="container listing-container">
+<div class="container listing-container" data-listing-id="<?php echo $listingId; ?>">
     <div class="listing-card">
 
         <!-- LEFT: Photo gallery -->
@@ -202,7 +202,7 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
             <!-- Seller card -->
             <div class="listing-seller-card">
                 <a href="<?php echo htmlspecialchars($sellerProfileLink); ?>" class="listing-seller-avatar-link" aria-label="View seller profile">
-                    <img src="<?php echo htmlspecialchars($listing['SELLER_AVATAR'] ?? 'assets/img/default_avatar.png'); ?>"
+                    <img src="<?php echo htmlspecialchars(!empty($listing['SELLER_AVATAR']) ? $listing['SELLER_AVATAR'] : 'assets/img/avatar.png'); ?>"
                          class="listing-seller-avatar" alt="Seller">
                 </a>
                 <div class="listing-seller-info">
@@ -283,7 +283,7 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
             <?php foreach($comments as $c): ?>
             <div class="comment-item">
                 <a href="public_profile.php?id=<?php echo (int)$c['USER_ID']; ?>" class="comment-avatar-link">
-                    <img src="<?php echo htmlspecialchars($c['AVATAR'] ?? 'assets/img/default_avatar.png'); ?>"
+                    <img src="<?php echo htmlspecialchars(!empty($c['AVATAR']) ? $c['AVATAR'] : 'assets/img/avatar.png'); ?>"
                          class="comment-avatar" alt="Avatar">
                 </a>
                 <div class="comment-bubble">
@@ -353,6 +353,7 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/listing.js"></script>
+
 </body>
 </html>
 

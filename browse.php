@@ -57,7 +57,7 @@ $userRow = db_fetch_assoc($resUser);
 $sqlImgNavbar = "SELECT FILE_PATH FROM USER_IMG WHERE USER_ID=?";
 $resImgNav = db_query($conn, $sqlImgNavbar, [$loginId]);
 $navImgRow = db_fetch_assoc($resImgNav);
-$nav_file_path = $navImgRow['FILE_PATH'] ?? 'assets/img/default_avatar.png';
+$nav_file_path = $navImgRow['FILE_PATH'] ?? 'assets/img/avatar.png';
 
 // BUILD THE MAIN QUERY (treat legacy listings without status as available)
 $sql = "SELECT L.*, I.FILE_PATH, U.USER_ID AS SELLER_ID, U.FIRST_NAME, U.LAST_NAME 

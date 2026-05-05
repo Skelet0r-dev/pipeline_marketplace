@@ -52,7 +52,7 @@ $username=$user['USERNAME'];
 $sqlimg="SELECT FILE_PATH FROM USER_IMG WHERE USER_ID=?";
 $resultimg=db_query($conn,$sqlimg, [$loginId]);
 $rowimg=db_fetch_assoc($resultimg);
-$file_path=$rowimg['FILE_PATH'] ?? 'assets/img/default_avatar.png';
+$file_path=$rowimg['FILE_PATH'] ?? 'assets/img/avatar.png';
 
 // Get listing count
 $sqlcount="SELECT COUNT(*) AS CNT FROM LISTINGS WHERE USER_ID=? AND `STATUS`='Available'";
@@ -282,7 +282,7 @@ if($resComments){
 
     <!-- Navbar -->
     <div class="dash-navbar">
-        <a href="index.php"><img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Pipeline Logo"></a>
+        <a href="dashboard.php"><img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Pipeline Logo"></a>
         <div class="dash-nav-right">
             <div class="dash-greeting">
                 <span class="dash-hello">Hello,</span>
@@ -483,7 +483,7 @@ if($resComments){
                 <div class="sf-activity-list">
                     <?php foreach($activityLikes as $like): ?>
                     <div class="sf-activity-item">
-                        <img src="<?php echo htmlspecialchars($like['AVATAR'] ?? 'assets/img/default_avatar.png'); ?>"
+                        <img src="<?php echo htmlspecialchars($like['AVATAR'] ?? 'assets/img/avatar.png'); ?>"
                              class="sf-activity-avatar" alt="Avatar">
                         <div class="sf-activity-body">
                             <span class="sf-activity-user"><?php echo htmlspecialchars($like['FIRST_NAME'].' '.$like['LAST_NAME']); ?></span>
@@ -509,7 +509,7 @@ if($resComments){
                 <div class="sf-activity-list">
                     <?php foreach($activityComments as $comment): ?>
                     <div class="sf-activity-item sf-activity-item-comment">
-                        <img src="<?php echo htmlspecialchars($comment['AVATAR'] ?? 'assets/img/default_avatar.png'); ?>"
+                        <img src="<?php echo htmlspecialchars($comment['AVATAR'] ?? 'assets/img/avatar.png'); ?>"
                              class="sf-activity-avatar" alt="Avatar">
                         <div class="sf-activity-body">
                             <span class="sf-activity-user"><?php echo htmlspecialchars($comment['FIRST_NAME'].' '.$comment['LAST_NAME']); ?></span>

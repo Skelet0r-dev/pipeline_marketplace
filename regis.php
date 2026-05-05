@@ -27,6 +27,9 @@ if(!preg_match('/^\d{9}$/', $stdnum))
 if(!filter_var($email, FILTER_VALIDATE_EMAIL))
     $errors[] = "Please enter a valid email address.";
 
+if(!str_ends_with($email, '@dlsud.edu.ph'))
+    $errors[] = "Email must be a valid @dlsud.edu.ph address.";
+
 $pwlen = strlen($password);
 if($pwlen < 8 || $pwlen > 16)          $errors[] = "Password must be 8 to 16 characters.";
 if(!preg_match('/[A-Z]/', $password))  $errors[] = "Password needs at least one uppercase letter.";
@@ -38,7 +41,32 @@ $allowedsex = ['Male','Female','Prefer Not To Say'];
 if(!in_array($sex, $allowedsex))
     $errors[] = "Invalid value for sex.";
 
+// Errors will be checked after database queries below
+
+// ── Check if student number already exists ──
+$sql="SELECT * FROM USERS WHERE STD_NUM=?";
+$result=db_query($conn,$sql, [$stdnum]);
+if($result===false) die(db_last_error());
+
+if(db_fetch($result)===true){
+    $errors[] = "An account with this student number already exists.";
+}
+
+// ── Check if email already exists ──
+$sql="SELECT * FROM USERS WHERE EMAIL=?";
+$result=db_query($conn,$sql, [$email]);
+if($result===false) die(db_last_error());
+
+if(db_fetch($result)===true){
+    $errors[] = "An account with this email address already exists.";
+}
+
 if(!empty($errors)){
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'errors' => $errors]);
+        exit;
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -65,38 +93,9 @@ if(!empty($errors)){
     exit;
 }
 
-// ── Check if student number already exists ──
-$sql="SELECT * FROM USERS WHERE STD_NUM=?";
-$result=db_query($conn,$sql, [$stdnum]);
-if($result===false) die(db_last_error());
-
-if(db_fetch($result)===true){
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Registration Error</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/regis.css">
-    <link rel="stylesheet" href="assets/css/regis_success.css">
-</head>
-<body>
-    <div class="error-card">
-        <h2>⚠ Registration Error</h2>
-        <ul class="error-list">
-            <li>An account with this student number already exists.</li>
-        </ul>
-        <a href="javascript:history.back()" class="btn-back">← Go Back</a>
-    </div>
-</body>
-</html>
-<?php
-    exit;
-}
+// If it's an AJAX request but successful, we'll return success:true
+// so the JS can either redirect or show a message.
+// For now, standard success continues below with HTML.
 
 // ── Insert new user ──
 // ── Insert new user ──

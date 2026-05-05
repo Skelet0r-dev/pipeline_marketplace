@@ -107,7 +107,7 @@ db_close($conn);
     <div class="lm-info-col">
         <div class="lm-seller-row">
             <a href="<?php echo htmlspecialchars($sellerProfileLink); ?>" class="lm-seller-profile-link" aria-label="View seller profile">
-                <img src="<?php echo htmlspecialchars($listing['SELLER_AVATAR'] ?? 'assets/img/default_avatar.png'); ?>" class="lm-seller-avatar" alt="Seller">
+                <img src="<?php echo htmlspecialchars($listing['SELLER_AVATAR'] ?? 'assets/img/avatar.png'); ?>" class="lm-seller-avatar" alt="Seller">
             </a>
             <a href="<?php echo htmlspecialchars($sellerProfileLink); ?>" class="lm-seller-text-link">
                 <div class="lm-seller-name"><?php echo $sellerName; ?></div>
@@ -178,7 +178,7 @@ db_close($conn);
                 <?php foreach($comments as $c): ?>
                 <div class="lm-comment">
                     <a href="public_profile.php?id=<?php echo (int)$c['USER_ID']; ?>" class="lm-comment-profile-link">
-                        <img src="<?php echo htmlspecialchars($c['AVATAR'] ?? 'assets/img/default_avatar.png'); ?>" class="lm-comment-avatar" alt="Avatar">
+                        <img src="<?php echo htmlspecialchars($c['AVATAR'] ?? 'assets/img/avatar.png'); ?>" class="lm-comment-avatar" alt="Avatar">
                     </a>
                     <div class="lm-comment-body">
                         <a href="public_profile.php?id=<?php echo (int)$c['USER_ID']; ?>" class="lm-comment-user"><?php echo htmlspecialchars($c['FIRST_NAME'].' '.$c['LAST_NAME']); ?></a>

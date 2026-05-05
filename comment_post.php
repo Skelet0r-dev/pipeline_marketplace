@@ -68,7 +68,7 @@ echo json_encode([
     'first_name'   => htmlspecialchars($row['FIRST_NAME']),
     'last_name'    => htmlspecialchars($row['LAST_NAME']),
     'username'     => htmlspecialchars($row['USERNAME']),
-    'avatar'       => htmlspecialchars($row['AVATAR'] ?? 'assets/img/default_avatar.png'),
+    'avatar'       => htmlspecialchars(!empty($row['AVATAR']) ? $row['AVATAR'] : 'assets/img/avatar.png'),
     'created_at'   => $createdAt
 ]);
 

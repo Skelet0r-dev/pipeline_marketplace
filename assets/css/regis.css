@@ -53,7 +53,7 @@ body {
 
 /* ── Main card ── */
 .regis-card {
-    background:#F2F0EF;
+    background: #F2F0EF;
     border-radius: 24px;
     border: 2px solid #054d20;
     box-shadow: 0 8px 32px rgba(8, 120, 50, 0.13);
@@ -62,17 +62,30 @@ body {
     width: 1420px;
     max-width: 97vw;
     min-height: 740px;
-    transition: width 0.3s ease, min-height 0.3s ease;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), min-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .regis-card.step-one {
-    width: 600px;
-    min-height: 400px;
+    width: 520px;
+    min-height: 0;
 }
 
-.regis-card.step-one .regis-left,
+.regis-card.step-one .regis-left {
+    width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
+
 .regis-card.step-one .regis-divider {
-    display: none;
+    width: 0;
+    opacity: 0;
+}
+
+.regis-card.step-one .regis-right {
+    padding: 24px 48px;
 }
 
 /* ── Left panel ── */
@@ -86,6 +99,11 @@ body {
     justify-content: center;
     padding: 60px 40px;
     gap: 20px;
+    overflow: hidden;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+        padding 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+        visibility 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .photo-preview-box {
@@ -141,6 +159,8 @@ body {
     align-self: stretch;
     margin: 0;
     flex-shrink: 0;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ── Right panel ── */
@@ -150,6 +170,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    transition: padding 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .regis-form-header {
@@ -267,26 +288,36 @@ body {
 }
 
 /* ── Inline validation ── */
-.field-error {
+.invalid-feedback {
     display: none;
-    color: #dc3545;
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 600;
-    margin-top: 4px;
+    color: #dc3545;
+    margin-top: 5px;
 }
 
-.field-error.show {
+.regis-input.is-invalid,
+.regis-select.is-invalid {
+    border-color: #dc3545 !important;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.regis-input.is-valid,
+.regis-select.is-valid {
+    border-color: #087832 !important;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23087832' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.is-invalid ~ .invalid-feedback {
     display: block;
-}
-
-.regis-input.is-bad,
-.regis-select.is-bad {
-    border-color: #dc3545;
-}
-
-.regis-input.is-ok,
-.regis-select.is-ok {
-    border-color: #087832;
 }
 
 /* ── Password strength ── */
@@ -413,22 +444,40 @@ body {
 }
 
 /* ── Step transition animations ── */
-.step-hidden { display: none !important; }
+.step-hidden {
+    display: none !important;
+}
 
 .step-exit {
     animation: stepOut 0.25s ease forwards;
 }
+
 .step-enter {
     animation: stepIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes stepOut {
-    from { opacity: 1; transform: translateX(0); }
-    to   { opacity: 0; transform: translateX(-20px); }
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
 }
+
 @keyframes stepIn {
-    from { opacity: 0; transform: translateX(20px); }
-    to   { opacity: 1; transform: translateX(0); }
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 /* ── Login method buttons ── */
@@ -453,15 +502,26 @@ body {
 
 .btn-method:hover {
     background: #f8f9fa;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     transform: translateY(-1px);
 }
 
-.btn-method:active { transform: scale(0.99); }
+.btn-method:active {
+    transform: scale(0.99);
+}
 
-.btn-microsoft { border-color: #d1d5db; }
-.btn-stdnum   { border-color: #087832; color: #087832; }
-.btn-stdnum:hover { background: #f0fdf4; }
+.btn-microsoft {
+    border-color: #d1d5db;
+}
+
+.btn-stdnum {
+    border-color: #087832;
+    color: #087832;
+}
+
+.btn-stdnum:hover {
+    background: #f0fdf4;
+}
 
 /* ── Method divider ── */
 .method-divider {
@@ -472,6 +532,7 @@ body {
     color: #6b7280;
     font-size: 13px;
 }
+
 .method-divider::before,
 .method-divider::after {
     content: '';
@@ -495,4 +556,7 @@ body {
     gap: 4px;
     transition: color 0.2s;
 }
-.btn-back:hover { color: #087832; }
+
+.btn-back:hover {
+    color: #087832;
+}
