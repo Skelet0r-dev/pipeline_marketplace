@@ -285,6 +285,14 @@ if($resComments){
     <!-- Navbar -->
     <div class="dash-navbar">
         <a href="dashboard.php"><img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Pipeline Logo"></a>
+        
+        <!-- Center Nav Links -->
+        <div class="dash-nav-links">
+            <a href="dashboard.php" class="dash-nav-link">Browse Products</a>
+            <a href="storefront.php" class="dash-nav-link active">My Storefront</a>
+            <a href="edit_profile.php" class="dash-nav-link">My Profile</a>
+        </div>
+
         <div class="dash-nav-right">
             <div class="dash-greeting">
                 <span class="dash-hello">Hello,</span>
@@ -293,14 +301,6 @@ if($resComments){
             <div class="profile-wrapper">
                 <img src="<?php echo htmlspecialchars($file_path); ?>" class="img-profile" alt="Profile Picture" id="profileBtn">
                 <div class="profile-dropdown" id="profileDropdown">
-                    <div class="dropdown-profile-header">
-                        <img src="<?php echo htmlspecialchars($file_path); ?>" alt="Profile">
-                        <span class="dropdown-profile-name"><?php echo htmlspecialchars($firstname); ?></span>
-                    </div>
-                    <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon">🏬</span> Browse Products</a>
-                    <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">🏪</span> My Storefront</a>
-                    <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
-                    <div class="dropdown-divider-custom"></div>
                     <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
                 </div>
             </div>
@@ -618,7 +618,7 @@ if($resComments){
                                     <label class="listing-label">Category</label>
                                     <select name="edit_category" id="editCategory" class="listing-select" required>
                                         <option value="" disabled>Select</option>
-                                        <option value="Academics">📚 Academics / Books</option>
+                                        <option value="Academics">📚 Academics</option>
                                         <option value="Electronics and Tech">💻 Electronics & Tech</option>
                                         <option value="Clothing & Apparel">👕 Clothing & Apparel</option>
                                         <option value="Hobbies & Lifestyle">🐇 Hobbies & Lifestyle</option>
@@ -766,7 +766,7 @@ if($resComments){
                                     <label class="listing-label">Category</label>
                                     <select name="category" class="listing-select" id="categorySelect" required>
                                         <option value="" disabled selected>Select</option>
-                                        <option value="Academics">📚 Academics / Books</option>
+                                        <option value="Academics">📚 Academics</option>
                                         <option value="Electronics and Tech">💻 Electronics & Tech</option>
                                         <option value="Clothing & Apparel">👕 Clothing & Apparel</option>
                                         <option value="Hobbies & Lifestyle">🐇 Hobbies & Lifestyle</option>

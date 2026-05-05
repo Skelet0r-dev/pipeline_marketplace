@@ -187,6 +187,24 @@ body.body {
 .toast.show { opacity: 1; transform: translateY(0); }
 .toast svg { width: 18px; height: 18px; }
 
+/* ── Info Banner ── */
+.info-banner-green {
+    background: #e8f5e9;
+    border-left: 4px solid #087832;
+    padding: 12px 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #1b5e20;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    grid-column: span 2;
+}
+
+.info-icon { font-size: 16px; color: #087832; }
+
 /* Responsive */
 @media (max-width: 768px) {
     .section { grid-template-columns: 1fr; }
@@ -194,4 +212,5 @@ body.body {
     .card-header { padding: 24px 20px; }
     .card-body { padding: 0 20px; }
     .card-footer { padding: 16px 20px; }
+    .info-banner-green { grid-column: span 1; }
 }

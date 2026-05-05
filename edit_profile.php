@@ -23,11 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
     $sec  = $_POST['section'];
     $sex  = $_POST['sex'];
     $un   = $_POST['username'];
-    $em   = $_POST['email'];
     
     // Update basic user info
-    $sqlUpd = "UPDATE USERS SET FIRST_NAME = ?, LAST_NAME = ?, COLLEGE = ?, DEPARTMENT = ?, SECTION = ?, SEX = ?, USERNAME = ?, EMAIL = ? WHERE USER_ID = ?";
-    $params = [$fn, $ln, $college, $dept, $sec, $sex, $un, $em, $loginId];
+    $sqlUpd = "UPDATE USERS SET FIRST_NAME = ?, LAST_NAME = ?, COLLEGE = ?, DEPARTMENT = ?, SECTION = ?, SEX = ?, USERNAME = ? WHERE USER_ID = ?";
+    $params = [$fn, $ln, $college, $dept, $sec, $sex, $un, $loginId];
     db_query($conn, $sqlUpd, $params);
 
     // Update Password if filled
@@ -116,30 +115,30 @@ db_close($conn);
 <body class="body">
 
 <!-- Navbar mirroring dashboard.php -->
-<div class="dash-navbar">
-  <a href="index.php"><img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Pipeline Logo"></a>
-  <div class="dash-nav-right">
-    <div class="dash-greeting">
-      <span class="dash-hello">Hello,</span>
-      <span class="dash-name"><?php echo htmlspecialchars($firstname); ?></span>
+  <div class="dash-navbar">
+    <a href="dashboard.php"><img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Pipeline Logo"></a>
+    
+    <!-- Center Nav Links -->
+    <div class="dash-nav-links">
+      <a href="dashboard.php" class="dash-nav-link">Browse Products</a>
+      <a href="storefront.php" class="dash-nav-link">My Storefront</a>
+      <a href="edit_profile.php" class="dash-nav-link active">My Profile</a>
     </div>
 
-    <div class="profile-wrapper">
-      <img src="<?php echo $avatarSrc; ?>" class="img-profile" alt="Profile Picture" id="profileBtn">
-      <div class="profile-dropdown" id="profileDropdown">
-        <div class="dropdown-profile-header">
-          <img src="<?php echo $avatarSrc; ?>" alt="Profile">
-          <span class="dropdown-profile-name"><?php echo htmlspecialchars($firstname . ' ' . $lastname); ?></span>
+    <div class="dash-nav-right">
+      <div class="dash-greeting">
+        <span class="dash-hello">Hello,</span>
+        <span class="dash-name"><?php echo htmlspecialchars($firstname); ?></span>
+      </div>
+
+      <div class="profile-wrapper">
+        <img src="<?php echo $avatarSrc; ?>" class="img-profile" alt="Profile Picture" id="profileBtn">
+        <div class="profile-dropdown" id="profileDropdown">
+          <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
         </div>
-        <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon">🏬</span> Browse Products</a>
-        <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">🏪</span> My Storefront</a>
-        <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
-        <div class="dropdown-divider-custom"></div>
-        <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
       </div>
     </div>
   </div>
-</div>
 
 <div class="dash-header-bar"></div>
 
@@ -241,11 +240,18 @@ db_close($conn);
             </div>
             <div class="field-group">
               <label class="field-label">Email Address</label>
-              <input class="field-input" name="email" id="email" type="email" value="<?php echo htmlspecialchars($email); ?>"/>
+              <div class="readonly-chip">
+                <input class="field-input" type="email" value="<?php echo htmlspecialchars($email); ?>" disabled/>
+                <div class="lock-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+              </div>
+              <span class="field-hint">Cannot be changed.</span>
             </div>
           </div>
         </div>
 
+        <?php if (!empty($rowUser['PASSWORD'])): ?>
         <div class="section">
           <div class="section-label">
             <h3>Change Password</h3>
@@ -264,6 +270,20 @@ db_close($conn);
             </div>
           </div>
         </div>
+        <?php else: ?>
+        <div class="section">
+          <div class="section-label">
+            <h3>Security</h3>
+            <p>Your account is managed via Microsoft SSO.</p>
+          </div>
+          <div class="section-fields">
+             <div class="info-banner-green">
+                <span class="info-icon"><i class="bi bi-info-circle"></i></span>
+                <span style="font-weight: normal; font-size: 12px; font-family: 'DM Sans', sans-serif;">You are signed in with Microsoft. To change your password, please visit your DLSUD account settings.</span>
+             </div>
+          </div>
+        </div>
+        <?php endif; ?>
       </div>
 
       <div class="card-footer">

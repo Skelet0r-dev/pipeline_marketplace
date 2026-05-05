@@ -178,15 +178,15 @@
 
                     <div class="mb-4">
                         <label class="field-label">Password</label>
-                        <input type="password" class="regis-input" name="password" id="password" maxlength="16"
+                        <input type="password" class="regis-input" name="password" id="password" maxlength="255"
                             required>
                         <div class="pw-bar" id="pwBar"></div>
                         <div class="pw-label" id="pwLabel"></div>
-                        <div class="invalid-feedback" id="err-password">8–16 chars with uppercase, lowercase, number, and symbol.</div>
+                        <div class="invalid-feedback" id="err-password">At least 8 chars with uppercase, lowercase, number, and symbol.</div>
 
                         <!-- Live password checklist -->
                         <ul class="pw-checklist" id="pwChecklist">
-                            <li id="chk-length">  8–16 characters</li>
+                            <li id="chk-length">  8+ characters</li>
                             <li id="chk-upper">   One uppercase letter (A–Z)</li>
                             <li id="chk-lower">   One lowercase letter (a–z)</li>
                             <li id="chk-number">  One number (0–9)</li>
@@ -280,7 +280,7 @@
         const pwInput     = document.getElementById('password');
         const pwChecklist = document.getElementById('pwChecklist');
         const checks = {
-            'chk-length': v => v.length >= 8 && v.length <= 16,
+            'chk-length': v => v.length >= 8,
             'chk-upper':  v => /[A-Z]/.test(v),
             'chk-lower':  v => /[a-z]/.test(v),
             'chk-number': v => /[0-9]/.test(v),

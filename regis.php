@@ -36,7 +36,7 @@ if(!str_ends_with($email, '@dlsud.edu.ph'))
     $errors[] = "Email must be a valid @dlsud.edu.ph address.";
 
 $pwlen = strlen($password);
-if($pwlen < 8 || $pwlen > 16)          $errors[] = "Password must be 8 to 16 characters.";
+if($pwlen < 8 || $pwlen > 255)          $errors[] = "Password must be at least 8 characters.";
 if(!preg_match('/[A-Z]/', $password))  $errors[] = "Password needs at least one uppercase letter.";
 if(!preg_match('/[a-z]/', $password))  $errors[] = "Password needs at least one lowercase letter.";
 if(!preg_match('/[0-9]/', $password))  $errors[] = "Password needs at least one number.";

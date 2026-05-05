@@ -140,6 +140,34 @@ if ($firstname != '') {
     }
 }
 
+// Independent Carousel items (always most recent 5 available)
+$carouselItems = [];
+$sqlCarousel = "SELECT L.*, I.FILE_PATH AS IMG, U.FIRST_NAME, U.LAST_NAME 
+                FROM LISTINGS L 
+                LEFT JOIN LISTING_IMG I ON L.LISTING_ID = I.LISTING_ID AND I.IS_PRIMARY = 1
+                JOIN USERS U ON L.USER_ID = U.USER_ID
+                WHERE L.STATUS = 'Available'
+                ORDER BY L.DATE_POSTED DESC LIMIT 5";
+$stmtCarousel = db_query($conn, $sqlCarousel);
+if ($stmtCarousel) {
+    while($row = db_fetch_assoc($stmtCarousel)){
+        $carouselItems[] = $row;
+    }
+}
+
+function getCategoryStyle($cat) {
+    $styles = [
+        'Clothing & Apparel'   => ['👕', 'linear-gradient(135deg, #dcfce7, #86efac)'],
+        'Electronics and Tech' => ['💻', 'linear-gradient(135deg, #dbeafe, #93c5fd)'],
+        'Academics'            => ['📚', 'linear-gradient(135deg, #fef3c7, #fcd34d)'],
+        'Hobbies & Lifestyle'  => ['🎨', 'linear-gradient(135deg, #fce7f3, #f9a8d4)'],
+        'Events & Tickets'     => ['🎟️', 'linear-gradient(135deg, #ede9fe, #c4b5fd)'],
+        'Course-Specific'      => ['🔬', 'linear-gradient(135deg, #ffedd5, #fdba74)'],
+        'Food'                 => ['🍪', 'linear-gradient(135deg, #fef2f2, #fecaca)']
+    ];
+    return $styles[$cat] ?? ['📦', 'linear-gradient(135deg, #f3f4f6, #d1d5db)'];
+}
+
 db_close($conn);
 ?>
 <!DOCTYPE html>
@@ -165,13 +193,21 @@ db_close($conn);
     <!-- ── DASHBOARD ── -->
     <div class="dash-navbar">
         <a href="dashboard.php"><img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Pipeline Logo"></a>
+        
+        <!-- Center Nav Links -->
+        <div class="dash-nav-links">
+            <a href="dashboard.php" class="dash-nav-link active">Browse Products</a>
+            <a href="storefront.php" class="dash-nav-link">My Storefront</a>
+            <a href="edit_profile.php" class="dash-nav-link">My Profile</a>
+        </div>
+
         <div class="dash-nav-right">
             <div class="dash-greeting">
                 <span class="dash-hello">Hello,</span>
                 <span class="dash-name"><?php echo htmlspecialchars($firstname); ?></span>
             </div>
 
-            <!-- Profile picture with dropdown -->
+            <!-- Profile picture with simplified dropdown -->
             <div class="profile-wrapper">
                 <img src="<?php echo htmlspecialchars($file_path); ?>"
                      class="img-profile"
@@ -179,23 +215,6 @@ db_close($conn);
                      id="profileBtn">
 
                 <div class="profile-dropdown" id="profileDropdown">
-                    <div class="dropdown-profile-header">
-                        <img src="<?php echo htmlspecialchars($file_path); ?>" alt="Profile">
-                        <span class="dropdown-profile-name"><?php echo htmlspecialchars($firstname); ?></span>
-                    </div>
-
-                    <a href="dashboard.php" class="dropdown-item-custom">
-                        <span class="item-icon">🏬</span> Browse Products
-                    </a>
-                    <a href="storefront.php" class="dropdown-item-custom">
-                        <span class="item-icon">🏪</span> My Storefront
-                    </a>
-                    <a href="edit_profile.php" class="dropdown-item-custom">
-                        <span class="item-icon">👤</span> My Profile
-                    </a>
-
-                    <div class="dropdown-divider-custom"></div>
-
                     <a href="logout.php" class="dropdown-item-custom logout">
                         <span class="item-icon">🚪</span> Log Out
                     </a>
@@ -208,23 +227,133 @@ db_close($conn);
 
     <!-- ── DASHBOARD HERO ── -->
     <div class="dash-hero">
+        <div class="dash-hero-inner">
+            <!-- LEFT: Dribbble-style text -->
+            <div class="dash-hero-left-alt">
+                <span class="dash-eyebrow">✦ Welcome back, <?php echo htmlspecialchars($firstname); ?>!</span>
+                <h1 class="dash-title-main">Everything You Need,<br>Within Campus Reach</h1>
+                <p class="dash-desc-main">Explore work from the most talented and accomplished 
+                    students ready to sell their items on campus.</p>
+                
+                <!-- Category Tabs (Hero) -->
+                <div class="dash-design-tabs">
+                    <a href="dashboard.php?cat=all" class="dash-design-tab <?php echo ($currentCategory === 'all') ? 'active' : ''; ?>">
+                        <img src="assets/img/cart.svg" alt="Cart" style="width: 16px; height: 16px;">
+                        All Items
+                    </a>
+                    <a href="dashboard.php?cat=Clothing+%26+Apparel" class="dash-design-tab <?php echo ($currentCategory === 'Clothing & Apparel') ? 'active' : ''; ?>">
+                        <img src="assets/img/shirts.svg" alt="Cart" style="width: 16px; height: 16px;">
+                        Clothing
+                    </a>
+                    <a href="dashboard.php?cat=Electronics+and+Tech" class="dash-design-tab <?php echo ($currentCategory === 'Electronics and Tech') ? 'active' : ''; ?>">
+                        <img src="assets/img/keyboard.svg" alt="Cart" style="width: 16px; height: 16px;">
+                        Electronics
+                    </a>
+                    <a href="dashboard.php?cat=Academics" class="dash-design-tab <?php echo ($currentCategory === 'Academics') ? 'active' : ''; ?>">
+                        <img src="assets/img/academics.svg" alt="Cart" style="width: 16px; height: 16px;">
+                        Academics
+                    </a>
+                    <a href="dashboard.php?cat=Hobbies+%26+Lifestyle" class="dash-design-tab <?php echo ($currentCategory === 'Hobbies & Lifestyle') ? 'active' : ''; ?>">
+                        <img src="assets/img/labubus.svg" alt="Cart" style="width: 16px; height: 16px;">
+                        Hobbies
+                    </a>
+                    <a href="dashboard.php?cat=Events+%26+Tickets" class="dash-design-tab <?php echo ($currentCategory === 'Events & Tickets') ? 'active' : ''; ?>">
+                        <img src="assets/img/tickets.svg" alt="Cart" style="width: 16px; height: 16px;">
+                        Events
+                    </a>
+                    <a href="dashboard.php?cat=Course-Specific" class="dash-design-tab <?php echo ($currentCategory === 'Course-Specific') ? 'active' : ''; ?>">
+                        <img src="assets/img/electronics.svg" alt="Cart" style="width: 16px; height: 16px;">
+                        Course
+                    </a>
+                    <a href="dashboard.php?cat=Food" class="dash-design-tab <?php echo ($currentCategory === 'Food') ? 'active' : ''; ?>">
+                        <img src="assets/img/cookies.svg" alt="Cart" style="width: 16px; height: 16px;">
+                        Food
+                    </a>
+                </div>
 
-        <!-- LEFT: headline + categories -->
-        <div class="dash-hero-left">
-            <span class="dash-eyebrow">✦ Welcome back, <?php echo htmlspecialchars($firstname); ?>!</span>
-            <h1 class="h1">Everything You Need,</h1>
-            <h1 class="h1">Within Campus Reach</h1>
+                <!-- Search Bar -->
+                <div class="dash-hero-search-wrap">
+                    <form action="dashboard.php" method="GET" class="dash-hero-search-form">
+                        <div class="dash-search-input-box">
+                            <input type="text" name="search" placeholder="What type of item are you interested in?" class="dash-search-main-input" value="<?php echo htmlspecialchars($searchQuery); ?>">
+                            <button type="submit" class="dash-search-main-btn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
 
+                <!-- Popular Tags -->
+                <div class="dash-hero-popular">
+                    <span class="pop-label">Popular:</span>
+                    <div class="pop-pills">
+                        <a href="dashboard.php?search=iphone" class="pop-pill">iphone</a>
+                        <a href="dashboard.php?search=books" class="pop-pill">textbooks</a>
+                        <a href="dashboard.php?search=clothes" class="pop-pill">clothes</a>
+                        <a href="dashboard.php?search=gadgets" class="pop-pill">gadgets</a>
+                        <a href="dashboard.php?search=dorm" class="pop-pill">dorm essentials</a>
+                    </div>
+                </div>
             </div>
-        </div>  
+
+            <!-- RIGHT: Carousel -->
+            <div class="dash-hero-right-alt">
+                <div class="dash-carousel-wrap">
+                    <button class="dc-arrow dc-arrow--prev" id="dcPrev" aria-label="Previous">↑</button>
+                    <div class="dc-track-outer">
+                        <div class="dc-track" id="dcTrack">
+                            <?php if (!empty($carouselItems)): ?>
+                                <?php foreach($carouselItems as $item): ?>
+                                    <?php 
+                                    $imgSrc = !empty($item['IMG']) ? htmlspecialchars($item['IMG']) : '';
+                                    $price = '₱' . number_format($item['PRICE'], 2);
+                                    list($emoji, $bg) = getCategoryStyle($item['CATEGORY']);
+                                    ?>
+                                    <div class="dc-card" onclick="window.location.href='listing.php?id=<?php echo $item['LISTING_ID']; ?>'">
+                                        <div class="dc-card-img" style="background:<?php echo $bg; ?>; position: relative;">
+                                            <?php if ($imgSrc): ?>
+                                                <img src="<?php echo $imgSrc; ?>" alt="<?php echo htmlspecialchars($item['TITLE']); ?>" style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">
+                                            <?php else: ?>
+                                                <span class="dc-emoji"><?php echo $emoji; ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="dc-card-body">
+                                            <div class="dc-tags-row">
+                                                <span class="dc-tag"><?php echo htmlspecialchars($item['CATEGORY']); ?></span>
+                                                <span class="dc-status-tag">Available</span>
+                                            </div>
+                                            <p class="dc-title"><?php echo htmlspecialchars($item['TITLE']); ?></p>
+                                            <p class="dc-price"><?php echo $price; ?></p>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="dc-card">
+                                    <div class="dc-card-img" style="background:linear-gradient(135deg,#dcfce7,#86efac)">
+                                        <span class="dc-emoji">🎒</span>
+                                    </div>
+                                    <div class="dc-card-body">
+                                        <span class="dc-tag">Featured</span>
+                                        <p class="dc-title">Browse New Listings</p>
+                                        <p class="dc-price">Starting low</p>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <button class="dc-arrow dc-arrow--next" id="dcNext" aria-label="Next">↓</button>
+                </div>
+                <div class="dc-dots" id="dcDots"></div>
+            </div>
+        </div>
     </div>
 
     <!-- ── STICKY FILTERS & SEARCH ── -->
     <div class="dash-sticky-nav">
-        <div class="dash-sticky-inner" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+        <div class="dash-sticky-inner">
 
             <!-- Row 1: Search Bar -->
-            <form action="dashboard.php" method="GET" class="dash-search-form" style="width: 300px; margin: 0;">
+            <form action="dashboard.php" method="GET" class="dash-search-form" style="width: 280px; margin: 0; flex-shrink: 0;">
                 <input type="hidden" name="cat" value="<?php echo htmlspecialchars($currentCategory); ?>">
                 <div class="dash-search-wrapper">
                     <span class="dash-search-icon">🔍</span>
@@ -234,7 +363,7 @@ db_close($conn);
             </form>
 
             <!-- Row 2: Category pills -->
-            <div class="dash-filter-pills" style="margin: 0; width: 100%;">
+            <div class="dash-filter-pills" style="margin: 0; flex-grow: 1;">
                 <a href="dashboard.php?cat=all" class="dash-pill <?php echo ($currentCategory === 'all') ? 'active' : ''; ?>">
                     <img src="assets/img/cart.svg" alt="Cart" style="width: 16px; height: 16px;"> All Items</a>
                 <a href="dashboard.php?cat=Clothing+%26+Apparel" class="dash-pill <?php echo ($currentCategory === 'Clothing & Apparel') ? 'active' : ''; ?>">
@@ -242,7 +371,7 @@ db_close($conn);
                 <a href="dashboard.php?cat=Electronics+and+Tech" class="dash-pill <?php echo ($currentCategory === 'Electronics and Tech') ? 'active' : ''; ?>">
                     <img src="assets/img/keyboard.svg" alt="Electronics" style="width: 16px; height: 16px;"> Electronics</a>
                 <a href="dashboard.php?cat=Academics" class="dash-pill <?php echo ($currentCategory === 'Academics') ? 'active' : ''; ?>">
-                    <img src="assets/img/academics.svg" alt="Academics/Books" style="width: 16px; height: 16px;"> Academics / Books</a>
+                    <img src="assets/img/academics.svg" alt="Academics" style="width: 16px; height: 16px;"> Academics</a>
                 <a href="dashboard.php?cat=Hobbies+%26+Lifestyle" class="dash-pill <?php echo ($currentCategory === 'Hobbies & Lifestyle') ? 'active' : ''; ?>">
                     <img src="assets/img/labubus.svg" alt="Hobbies" style="width: 16px; height: 16px;"> Hobbies</a>
                 <a href="dashboard.php?cat=Events+%26+Tickets" class="dash-pill <?php echo ($currentCategory === 'Events & Tickets') ? 'active' : ''; ?>">
@@ -250,21 +379,21 @@ db_close($conn);
                 <a href="dashboard.php?cat=Course-Specific" class="dash-pill <?php echo ($currentCategory === 'Course-Specific') ? 'active' : ''; ?>">
                     <img src="assets/img/electronics.svg" alt="Course-Specific" style="width: 16px; height: 16px;"> Course-Specific</a>
                 <a href="dashboard.php?cat=Food" class="dash-pill <?php echo ($currentCategory === 'Food') ? 'active' : ''; ?>">
-                    🍔 Food</a>
+                    <img src="assets/img/cookies.svg" alt="Cookies" style="width: 16px; height: 16px;"> Food</a>
             </div>
 
         </div>
     </div>
 
     <!-- ── DASHBOARD LISTINGS ── -->
-    <div class="container" style="max-width: 1200px; padding: 0 4% 60px;">
+    <div class="container" id="listingsSection" style="max-width: 1200px; padding: 0 4% 60px;">
         <h3 style="font-family: 'DM Serif Display', serif; font-size: 28px; margin-bottom: 24px; color: var(--text-dark);">
             <?php
             $categoryHeadings = [
                 'all'                => 'Recent Listings',
                 'Clothing & Apparel' => 'Clothing Listings',
                 'Electronics and Tech' => 'Electronics Listings',
-                'Academics'          => 'Academics / Books Listings',
+                'Academics'          => 'Academics Listings',
                 'Hobbies & Lifestyle'=> 'Hobbies & Lifestyle Listings',
                 'Events & Tickets'   => 'Events & Tickets Listings',
                 'Course-Specific'    => 'Course-Specific Listings',
@@ -294,6 +423,7 @@ db_close($conn);
                     <div class="dash-listing-img-wrap">
                         <img src="<?php echo $imgSrc; ?>" class="dash-listing-img" alt="<?php echo htmlspecialchars($item['TITLE']); ?>" loading="lazy">
                         <span class="dash-listing-badge"><?php echo htmlspecialchars($item['CATEGORY']); ?></span>
+                        <span class="dash-listing-status-badge">Available</span>
                     </div>
                     <div class="dash-listing-body">
                         <div class="dash-listing-seller">Listed by <?php echo $sellerName; ?></div>
@@ -399,27 +529,25 @@ db_close($conn);
             });
         }
 
-        // Profile dropdown toggle
-        var profileBtn = document.getElementById('profileBtn');
-        var profileDropdown = document.getElementById('profileDropdown');
+        /* ── Profile Dropdown ── */
+        const profileBtn = document.getElementById('profileBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
 
-        if(profileBtn && profileDropdown){
-            profileBtn.addEventListener('click', function(e){
+        if (profileBtn && profileDropdown) {
+            profileBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 profileDropdown.classList.toggle('show');
             });
 
-            document.addEventListener('click', function(){
-                profileDropdown.classList.remove('show');
-            });
-
-            profileDropdown.addEventListener('click', function(e){
-                e.stopPropagation();
+            document.addEventListener('click', (e) => {
+                if (!profileDropdown.contains(e.target)) {
+                    profileDropdown.classList.remove('show');
+                }
             });
         }
 
         // Sticky navbar shadow on scroll
-        var dashNav = document.querySelector('.dash-navbar');
+        const dashNav = document.querySelector('.dash-navbar');
         if(dashNav){
             window.addEventListener('scroll', function(){
                 dashNav.classList.toggle('scrolled', window.scrollY > 10);
@@ -431,15 +559,122 @@ db_close($conn);
         if(stickyFilters){
             window.addEventListener('scroll', function(){
                 var rect = stickyFilters.getBoundingClientRect();
-                // When the element's top reaches 69px (navbar is 68px), it's sticking
-                if (rect.top <= 69) {
+                if (rect.top <= 113) {
                     stickyFilters.classList.add('is-sticky');
                 } else {
                     stickyFilters.classList.remove('is-sticky');
                 }
             });
         }
+
+        /* ── Hero Carousel (Infinite Seamless) ── */
+        (function () {
+            const track = document.getElementById('dcTrack');
+            const prevBtn = document.getElementById('dcPrev');
+            const nextBtn = document.getElementById('dcNext');
+            const dotsWrap = document.getElementById('dcDots');
+
+            if (!track || !prevBtn || !nextBtn || !dotsWrap) return;
+
+            const originalCards = Array.from(track.children);
+            if (originalCards.length === 0) return;
+
+            // Clone for infinite loop
+            originalCards.forEach(card => {
+                const clone = card.cloneNode(true);
+                track.appendChild(clone);
+            });
+
+            const allCards = Array.from(track.children);
+            const CARD_H = 140; 
+            const GAP = 16;
+            const STEP = CARD_H + GAP;
+            let current = 0;
+            let autoTimer;
+            let isTransitioning = false;
+
+            /* Build dots based on original length only */
+            originalCards.forEach((_, i) => {
+                const d = document.createElement('button');
+                d.className = 'dc-dot' + (i === 0 ? ' dc-dot--active' : '');
+                d.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+                d.addEventListener('click', () => { if(!isTransitioning) goTo(i); });
+                dotsWrap.appendChild(d);
+            });
+            const dots = Array.from(dotsWrap.children);
+
+            function updateDots(idx) {
+                const normalized = idx % originalCards.length;
+                dots.forEach((d, i) => d.classList.toggle('dc-dot--active', i === normalized));
+            }
+
+            function goTo(idx, immediate = false) {
+                if (isTransitioning && !immediate) return;
+                
+                current = idx;
+                track.style.transition = immediate ? 'none' : 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+                track.style.transform = `translateY(-${current * STEP}px)`;
+                
+                updateDots(current);
+
+                if (!immediate) {
+                    isTransitioning = true;
+                    track.addEventListener('transitionend', function handleEnd() {
+                        track.removeEventListener('transitionend', handleEnd);
+                        isTransitioning = false;
+                        
+                        // If we reached the end of the clones, jump back to start
+                        if (current >= originalCards.length) {
+                            goTo(0, true);
+                        }
+                        // If we reached the start (negative), jump to end of originals
+                        // (Though prev is disabled at 0 for simplicity, we could enable it)
+                    });
+                }
+            }
+
+            prevBtn.addEventListener('click', () => { 
+                resetAuto(); 
+                if (current > 0) goTo(current - 1);
+                else goTo(originalCards.length - 1); 
+            });
+
+            nextBtn.addEventListener('click', () => { 
+                resetAuto(); 
+                goTo(current + 1); 
+            });
+
+            function autoPlay() {
+                goTo(current + 1);
+            }
+
+            function resetAuto() {
+                clearInterval(autoTimer);
+                autoTimer = setInterval(autoPlay, 4000);
+            }
+
+            goTo(0, true);
+            autoTimer = setInterval(autoPlay, 4000);
+
+            track.closest('.dc-track-outer').addEventListener('mouseenter', () => clearInterval(autoTimer));
+            track.closest('.dc-track-outer').addEventListener('mouseleave', () => resetAuto());
+        })();
     </script>
 
+
+    <script>
+        // Auto-scroll to results if searching or filtered
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if ((urlParams.has('search') && urlParams.get('search') !== '') || (urlParams.has('cat') && urlParams.get('cat') !== 'all')) {
+                const target = document.getElementById('listingsSection');
+                if (target) {
+                    setTimeout(() => {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 150);
+                }
+            }
+        });
+    </script>
 </body>
 </html>
