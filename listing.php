@@ -24,7 +24,8 @@ function normalizeCategoryBrowseParam($category){
     $map = [
         'Clothing and Apparel'  => 'Clothing & Apparel',
         'Hobbies and Lifestyle' => 'Hobbies & Lifestyle',
-        'Events and Tickets'    => 'Events & Tickets'
+        'Events and Tickets'    => 'Events & Tickets',
+        'Books'                 => 'Academics',
     ];
 
     return $map[$category] ?? $category;

@@ -114,8 +114,14 @@ if ($firstname != '') {
     
     $params = [];
     if ($currentCategory !== 'all') {
-        $sqlDash .= " AND L.CATEGORY = ?";
-        $params[] = $currentCategory;
+        if ($currentCategory === 'Course-Specific') {
+            // Course-Specific items are stored as "Course-Specific (COLLEGE)"
+            $sqlDash .= " AND L.CATEGORY LIKE ?";
+            $params[] = "Course-Specific%";
+        } else {
+            $sqlDash .= " AND L.CATEGORY = ?";
+            $params[] = $currentCategory;
+        }
     }
     
     if ($searchQuery !== '') {
@@ -233,10 +239,10 @@ db_close($conn);
                     <img src="assets/img/cart.svg" alt="Cart" style="width: 16px; height: 16px;"> All Items</a>
                 <a href="dashboard.php?cat=Clothing+%26+Apparel" class="dash-pill <?php echo ($currentCategory === 'Clothing & Apparel') ? 'active' : ''; ?>">
                     <img src="assets/img/shirts.svg" alt="Clothing" style="width: 16px; height: 16px;"> Clothing</a>
-                <a href="dashboard.php?cat=Electronics" class="dash-pill <?php echo ($currentCategory === 'Electronics and Tech') ? 'active' : ''; ?>">
+                <a href="dashboard.php?cat=Electronics+and+Tech" class="dash-pill <?php echo ($currentCategory === 'Electronics and Tech') ? 'active' : ''; ?>">
                     <img src="assets/img/keyboard.svg" alt="Electronics" style="width: 16px; height: 16px;"> Electronics</a>
-                <a href="dashboard.php?cat=Books" class="dash-pill <?php echo ($currentCategory === 'Books') ? 'active' : ''; ?>">
-                    <img src="assets/img/academics.svg" alt="Books" style="width: 16px; height: 16px;"> Books</a>
+                <a href="dashboard.php?cat=Academics" class="dash-pill <?php echo ($currentCategory === 'Academics') ? 'active' : ''; ?>">
+                    <img src="assets/img/academics.svg" alt="Academics/Books" style="width: 16px; height: 16px;"> Academics / Books</a>
                 <a href="dashboard.php?cat=Hobbies+%26+Lifestyle" class="dash-pill <?php echo ($currentCategory === 'Hobbies & Lifestyle') ? 'active' : ''; ?>">
                     <img src="assets/img/labubus.svg" alt="Hobbies" style="width: 16px; height: 16px;"> Hobbies</a>
                 <a href="dashboard.php?cat=Events+%26+Tickets" class="dash-pill <?php echo ($currentCategory === 'Events & Tickets') ? 'active' : ''; ?>">
@@ -253,7 +259,19 @@ db_close($conn);
     <!-- ── DASHBOARD LISTINGS ── -->
     <div class="container" style="max-width: 1200px; padding: 0 4% 60px;">
         <h3 style="font-family: 'DM Serif Display', serif; font-size: 28px; margin-bottom: 24px; color: var(--text-dark);">
-            <?php echo ($currentCategory === 'all') ? 'Recent Listings' : htmlspecialchars($currentCategory) . ' Listings'; ?>
+            <?php
+            $categoryHeadings = [
+                'all'                => 'Recent Listings',
+                'Clothing & Apparel' => 'Clothing Listings',
+                'Electronics and Tech' => 'Electronics Listings',
+                'Academics'          => 'Academics / Books Listings',
+                'Hobbies & Lifestyle'=> 'Hobbies & Lifestyle Listings',
+                'Events & Tickets'   => 'Events & Tickets Listings',
+                'Course-Specific'    => 'Course-Specific Listings',
+                'Food'               => 'Food Listings',
+            ];
+            echo $categoryHeadings[$currentCategory] ?? htmlspecialchars($currentCategory) . ' Listings';
+            ?>
         </h3>
         
         <?php if(empty($dashItems)): ?>
