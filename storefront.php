@@ -618,7 +618,7 @@ if($resComments){
                                     <label class="listing-label">Category</label>
                                     <select name="edit_category" id="editCategory" class="listing-select" required>
                                         <option value="" disabled>Select</option>
-                                        <option value="Academics">📚 Academics</option>
+                                        <option value="Academics">📚 Academics / Books</option>
                                         <option value="Electronics and Tech">💻 Electronics & Tech</option>
                                         <option value="Clothing & Apparel">👕 Clothing & Apparel</option>
                                         <option value="Hobbies & Lifestyle">🐇 Hobbies & Lifestyle</option>
@@ -766,7 +766,7 @@ if($resComments){
                                     <label class="listing-label">Category</label>
                                     <select name="category" class="listing-select" id="categorySelect" required>
                                         <option value="" disabled selected>Select</option>
-                                        <option value="Academics">📚 Academics</option>
+                                        <option value="Academics">📚 Academics / Books</option>
                                         <option value="Electronics and Tech">💻 Electronics & Tech</option>
                                         <option value="Clothing & Apparel">👕 Clothing & Apparel</option>
                                         <option value="Hobbies & Lifestyle">🐇 Hobbies & Lifestyle</option>
