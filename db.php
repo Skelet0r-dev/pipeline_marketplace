@@ -2,26 +2,42 @@
 declare(strict_types=1);
 
 function db_config(): array {
+    // Check for environment variables first (common in Docker/Production)
+    $env_host     = getenv('DB_HOST');
+    $env_database = getenv('DB_NAME');
+    $env_user     = getenv('DB_USER');
+    $env_pass     = getenv('DB_PASSWORD');
+
+    if ($env_host) {
+        return [
+            'host'     => $env_host,
+            'database' => $env_database ?: 'pipeline_db',
+            'user'     => $env_user ?: 'app_user',
+            'password' => $env_pass ?: 'app_password'
+        ];
+    }
+
     // Detect if we are running locally or on the production server
-    $is_localhost = isset($_SERVER['HTTP_HOST']) && 
-                   ($_SERVER['HTTP_HOST'] == 'localhost:9090' || 
-                    $_SERVER['HTTP_HOST'] == 'localhost' || 
-                    $_SERVER['HTTP_HOST'] == '127.0.0.1');
+    $http_host = $_SERVER['HTTP_HOST'] ?? '';
+    $is_docker = ($http_host === 'localhost:9090');
+    $is_localhost = $is_docker || 
+                   ($http_host === 'localhost' || 
+                    $http_host === '127.0.0.1');
 
     if ($is_localhost) {
         return [
-            'host'     => 'localhost',
+            'host'     => $is_docker ? 'db' : '127.0.0.1',
             'database' => 'pipeline_db',
-            'user'     => 'root',
-            'password' => '' 
+            'user'     => $is_docker ? 'app_user' : 'root',
+            'password' => $is_docker ? 'app_password' : '' 
         ];
     } else {
         // Hostinger Production Settings
         return [
-            'host'     => 'localhost', // Hostinger uses localhost for internal DB connections
+            'host'     => 'localhost',
             'database' => 'u299531047_pipeline_db',
             'user'     => 'u299531047_myuser',
-            'password' => 'r7L3KziX^'
+            'password' => 'HelloWorld123_1'
         ];
     }
 }
@@ -80,7 +96,7 @@ function db_fetch($stmt): bool {
     return (bool) $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-function db_last_error(string $message = null): string {
+function db_last_error(?string $message = null): string {
     static $lastError = '';
     if ($message !== null) {
         $lastError = $message;
