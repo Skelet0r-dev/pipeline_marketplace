@@ -183,20 +183,29 @@ body {
 .id-card-body {
     background: #F2F0EF;
     padding: 24px 28px 20px 28px;
-    display: flex;
-    gap: 20px;
-    align-items: center;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 14px 20px;
     position: relative;
+}
+
+/* ── Left column: photo + identity fields stacked ── */
+.id-left-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    grid-column: 1;
+    grid-row: 1 / span 2;
 }
 
 /* ── Photo ───────────────────────────── */
 .id-photo-box {
     border: 3px solid #087832;
     border-radius: 12px;
-    width: 300px;
-    height: 300px;
+    width: 100%;
+    aspect-ratio: 1 / 1;
     overflow: hidden;
-    flex-shrink: 0;
     background: #fff;
     display: flex;
     align-items: center;
@@ -212,14 +221,24 @@ body {
     object-fit: cover;
 }
 
-/* ── Fields ──────────────────────────── */
+/* ── Identity fields below photo ─────── */
+.id-identity-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+/* ── Right column: remaining fields ──── */
 .id-fields {
-    flex: 1;
+    grid-column: 2;
+    grid-row: 1 / span 2;
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
+/* ── All .id-field elements ──────────── */
 .id-field {
     display: flex;
     flex-direction: column;
@@ -228,30 +247,22 @@ body {
     animation: fadeUp 0.4s ease forwards;
 }
 
-/* stagger each row */
-.id-field:nth-child(1) {
-    animation-delay: 1.40s;
-}
+/* ── Stagger: identity fields (below photo, nth-child within .id-identity-fields) */
+.id-identity-fields .id-field:nth-child(1) { animation-delay: 1.40s; }
+.id-identity-fields .id-field:nth-child(2) { animation-delay: 1.55s; }
+.id-identity-fields .id-field:nth-child(3) { animation-delay: 1.70s; }
 
-.id-field:nth-child(2) {
-    animation-delay: 1.55s;
-}
-
-.id-field:nth-child(3) {
-    animation-delay: 1.70s;
-}
-
-.id-field:nth-child(4) {
-    animation-delay: 1.85s;
-}
-
-.id-field:nth-child(5) {
-    animation-delay: 2.00s;
-}
-
-.id-field:nth-child(6) {
-    animation-delay: 2.15s;
-}
+/* ── Stagger: right-column fields (nth-child within .id-fields) */
+.id-fields .id-field:nth-child(1)  { animation-delay: 1.45s; }
+.id-fields .id-field:nth-child(2)  { animation-delay: 1.60s; }
+.id-fields .id-field:nth-child(3)  { animation-delay: 1.75s; }
+.id-fields .id-field:nth-child(4)  { animation-delay: 1.90s; }
+.id-fields .id-field:nth-child(5)  { animation-delay: 2.05s; }
+.id-fields .id-field:nth-child(6)  { animation-delay: 2.20s; }
+.id-fields .id-field:nth-child(7)  { animation-delay: 2.35s; }
+.id-fields .id-field:nth-child(8)  { animation-delay: 2.50s; }
+.id-fields .id-field:nth-child(9)  { animation-delay: 2.65s; }
+.id-fields .id-field:nth-child(10) { animation-delay: 2.80s; }
 
 .id-field-label {
     font-size: 9px;
