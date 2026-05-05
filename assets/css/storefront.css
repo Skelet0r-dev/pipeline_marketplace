@@ -24,6 +24,8 @@
     background: #fff;
     border-bottom: 1px solid #eee;
     padding: 24px 40px;
+    position: relative;
+    z-index: 1;
 }
 
 .sf-profile-row {
@@ -179,7 +181,7 @@
     padding: 9px 20px;
     border: none;
     border-radius: 8px;
-    background: linear-gradient(135deg, #606c38, #283618);
+    background: #087832;
     color: #fefae0;
     font-family: "DM Sans", sans-serif;
     font-size: 13px;

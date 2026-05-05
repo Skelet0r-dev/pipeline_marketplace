@@ -215,19 +215,20 @@ db_close($conn);
 
     <!-- ── STICKY FILTERS & SEARCH ── -->
     <div class="dash-sticky-nav">
-        <div class="dash-sticky-inner">
-            <!-- Category pill quick-filters -->
-            <div class="dash-filter-pills" style="margin: 0;">
-                <!-- Search Bar Inline (First element) -->
-                <form action="dashboard.php" method="GET" class="dash-search-form" style="width: 300px; margin: 0;">
-                    <input type="hidden" name="cat" value="<?php echo htmlspecialchars($currentCategory); ?>">
-                    <div class="dash-search-wrapper">
-                        <span class="dash-search-icon">🔍</span>
-                        <input type="text" name="search" class="dash-search-input" placeholder="Search..." value="<?php echo htmlspecialchars($searchQuery); ?>">
-                        <button type="submit" class="dash-search-btn">Search</button>
-                    </div>
-                </form>
-                
+        <div class="dash-sticky-inner" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+
+            <!-- Row 1: Search Bar -->
+            <form action="dashboard.php" method="GET" class="dash-search-form" style="width: 300px; margin: 0;">
+                <input type="hidden" name="cat" value="<?php echo htmlspecialchars($currentCategory); ?>">
+                <div class="dash-search-wrapper">
+                    <span class="dash-search-icon">🔍</span>
+                    <input type="text" name="search" class="dash-search-input" placeholder="Search..." value="<?php echo htmlspecialchars($searchQuery); ?>">
+                    <button type="submit" class="dash-search-btn">Search</button>
+                </div>
+            </form>
+
+            <!-- Row 2: Category pills -->
+            <div class="dash-filter-pills" style="margin: 0; width: 100%;">
                 <a href="dashboard.php?cat=all" class="dash-pill <?php echo ($currentCategory === 'all') ? 'active' : ''; ?>">
                     <img src="assets/img/cart.svg" alt="Cart" style="width: 16px; height: 16px;"> All Items</a>
                 <a href="dashboard.php?cat=Clothing+%26+Apparel" class="dash-pill <?php echo ($currentCategory === 'Clothing & Apparel') ? 'active' : ''; ?>">
@@ -242,8 +243,10 @@ db_close($conn);
                     <img src="assets/img/tickets.svg" alt="Events" style="width: 16px; height: 16px;"> Events</a>
                 <a href="dashboard.php?cat=Course-Specific" class="dash-pill <?php echo ($currentCategory === 'Course-Specific') ? 'active' : ''; ?>">
                     <img src="assets/img/electronics.svg" alt="Course-Specific" style="width: 16px; height: 16px;"> Course-Specific</a>
+                <a href="dashboard.php?cat=Food" class="dash-pill <?php echo ($currentCategory === 'Food') ? 'active' : ''; ?>">
+                    🍔 Food</a>
             </div>
-            
+
         </div>
     </div>
 

@@ -39,9 +39,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
         $resCheck = db_query($conn, $sqlCheck, [$loginId]);
         $rowCheck = db_fetch_assoc($resCheck);
         
-        if ($rowCheck['PASSWORD'] === $currentPwInput) {
+        if (password_verify($currentPwInput, $rowCheck['PASSWORD'])) {
+            $hashedNew = password_hash($newPwInput, PASSWORD_DEFAULT);
             $sqlPw = "UPDATE USERS SET `PASSWORD` = ? WHERE USER_ID = ?";
-            db_query($conn, $sqlPw, [$newPwInput, $loginId]);
+            db_query($conn, $sqlPw, [$hashedNew, $loginId]);
         }
     }
 
@@ -96,6 +97,8 @@ $file_path  = $rowImg['FILE_PATH']    ?? '';
 $avatarSrc  = ($file_path && file_exists($file_path))
               ? htmlspecialchars($file_path)
               : 'https://api.dicebear.com/7.x/adventurer/svg?seed=' . urlencode($firstname);
+
+$colleges = ['CEAT', 'CLAC', 'CBAA', 'COS', 'CICS', 'COED', 'CCJE', 'CTHM'];
 
 db_close($conn);
 ?>
@@ -156,8 +159,9 @@ db_close($conn);
         <div class="header-info">
           <h1 id="header-name"><?php echo htmlspecialchars($firstname . ' ' . $lastname); ?></h1>
           <p id="header-username">@<?php echo htmlspecialchars($username); ?></p>
-          <div class="d-flex gap-2">
+          <div class="d-flex gap-2 flex-wrap">
             <span class="badge-cys" id="header-college"><?php echo htmlspecialchars($college); ?></span>
+            <span class="badge-cys" id="header-department"><?php echo htmlspecialchars($department); ?></span>
             <span class="badge-cys" id="header-section"><?php echo htmlspecialchars($section); ?></span>
           </div>
         </div>
@@ -199,15 +203,20 @@ db_close($conn);
             </div>
             <div class="field-group">
               <label class="field-label">College</label>
-              <input class="field-input" name="college" id="college" type="text" value="<?php echo htmlspecialchars($college); ?>"/>
+              <select class="field-select" name="college" id="college" onchange="updateHeaderBadge('header-college', this.value)">
+                <option value="" disabled <?php echo $college === '' ? 'selected' : ''; ?>>Select college…</option>
+                <?php foreach ($colleges as $c): ?>
+                  <option value="<?php echo $c; ?>" <?php echo $college === $c ? 'selected' : ''; ?>><?php echo $c; ?></option>
+                <?php endforeach; ?>
+              </select>
             </div>
             <div class="field-group">
               <label class="field-label">Department</label>
-              <input class="field-input" name="department" id="department" type="text" value="<?php echo htmlspecialchars($department); ?>"/>
+              <input class="field-input" name="department" id="department" type="text" value="<?php echo htmlspecialchars($department); ?>" oninput="updateHeaderBadge('header-department', this.value)"/>
             </div>
             <div class="field-group">
               <label class="field-label">Section</label>
-              <input class="field-input" name="section" id="section" type="text" value="<?php echo htmlspecialchars($section); ?>"/>
+              <input class="field-input" name="section" id="section" type="text" value="<?php echo htmlspecialchars($section); ?>" oninput="updateHeaderBadge('header-section', this.value)"/>
             </div>
             <div class="field-group">
               <label class="field-label">Sex</label>
@@ -304,19 +313,24 @@ db_close($conn);
     if (/[A-Z]/.test(val)) score++;
     if (/[0-9]/.test(val)) score++;
     if (/[^A-Za-z0-9]/.test(val)) score++;
-    const map = { 0:{w:'0%',bg:'#ccc',txt:''}, 1:{w:'25%',bg:'#e74c3c',txt:'Weak'}, 2:{w:'50%',bg:'#e67e22',txt:'Fair'}, 3:{w:'75%',bg:'#f1c40f',txt:'Good'}, 4:{w:'100%',bg:'#27ae60',txt:'Strong'} };
+    const map = { 0:{w:'0%',bg:'#ccc',txt:''}, 1:{w:'25%',bg:'#e74c3c',txt:'Weak'}, 2:{w:'50%',bg:'#e67e22',txt:'Fair'}, 3:{w:'75%',bg:'#f1c40f',txt:'Good'}, 4:{w:'100%',bg:'#087832',txt:'Strong'} };
     const s = map[score] || map[0];
     fill.style.width = s.w; fill.style.background = s.bg;
     label.textContent = s.txt; label.style.color = s.bg;
   }
 
-  // Header update
+  // Header update for name
   document.getElementById('first-name').addEventListener('input', updateHeader);
   document.getElementById('last-name').addEventListener('input',  updateHeader);
   function updateHeader() {
     const fn = document.getElementById('first-name').value.trim();
     const ln = document.getElementById('last-name').value.trim();
     document.getElementById('header-name').textContent = (fn + ' ' + ln).trim() || '—';
+  }
+
+  // Generic badge updater
+  function updateHeaderBadge(id, value) {
+    document.getElementById(id).textContent = value || '—';
   }
 
   <?php if($updateSuccess): ?>

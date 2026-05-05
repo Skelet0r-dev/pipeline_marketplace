@@ -51,7 +51,7 @@ $navFilePath = $navImg['FILE_PATH'] ?? 'assets/img/avatar.png';
     
 // ── Fetch listing + seller ──────────────────────────────────
 $sqlListing = "SELECT L.*,
-                      U.FIRST_NAME, U.LAST_NAME, U.USERNAME, U.COLLEGE, U.SECTION, U.EMAIL,
+                      U.FIRST_NAME, U.LAST_NAME, U.USERNAME, U.COLLEGE, U.DEPARTMENT,U.SECTION, U.EMAIL,
                       UI.FILE_PATH AS SELLER_AVATAR
                FROM LISTINGS L
                JOIN USERS U    ON L.USER_ID = U.USER_ID
@@ -162,7 +162,6 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="dashboard.php" class="lbc-link">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="browse.php?cat=<?php echo urlencode($browseCategory); ?>" class="lbc-link"><?php echo htmlspecialchars($categoryLabel); ?></a></li>
                 <li class="breadcrumb-item active lbc-active"><?php echo htmlspecialchars($listing['TITLE']); ?></li>
             </ol>
         </nav>
@@ -177,7 +176,7 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
         <div class="listing-gallery">
             <div class="listing-main-img-wrap">
                 <img src="<?php echo htmlspecialchars($images[0]['FILE_PATH']); ?>"
-                     class="listing-main-img" id="mainImg"
+                     class="listing-main-img" id="mainImg" onclick="openLightbox(this.src)" style="cursor:zoom-in;"
                      alt="<?php echo htmlspecialchars($listing['TITLE']); ?>">
                 <?php if($listing['STATUS']==='Sold'): ?>
                 <div class="listing-sold-ribbon">SOLD</div>
@@ -208,7 +207,7 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
                 <div class="listing-seller-info">
                     <a href="<?php echo htmlspecialchars($sellerProfileLink); ?>" class="listing-seller-name"><?php echo $sellerName; ?></a>
                     <a href="<?php echo htmlspecialchars($sellerProfileLink); ?>" class="listing-seller-handle">@<?php echo htmlspecialchars($listing['USERNAME']); ?></a>
-                    <span class="listing-seller-cys"><?php echo htmlspecialchars($listing['COLLEGE'] . ' - ' . $listing['SECTION']); ?></span>
+                    <span class="listing-seller-cys"><?php echo htmlspecialchars($listing['DEPARTMENT'] . ' - ' . $listing['SECTION']); ?></span>
                 </div>
                 <?php if(!$isOwner): ?>
                 <div class="listing-action-group">
@@ -354,6 +353,26 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/listing.js"></script>
 
+
+<!-- ── LIGHTBOX ── -->
+<div class="listing-lightbox" id="listingLightbox" onclick="closeLightbox()">
+    <button class="listing-lightbox-close" onclick="closeLightbox()">✕</button>
+    <img src="" id="lightboxImg" alt="Full view" onclick="event.stopPropagation()">
+</div>
+<script>
+function openLightbox(src) {
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('listingLightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+    document.getElementById('listingLightbox').classList.remove('open');
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLightbox();
+});
+</script>
 </body>
 </html>
 

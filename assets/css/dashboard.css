@@ -1,6 +1,5 @@
 /* ═══════════════════════════════════════════
    dashboard.css  –  Pipeline Dashboard
-   Dribbble-inspired: clean white + green accent
    ═══════════════════════════════════════════ */
 
 /* ── Tokens (mirrors index.css) ─────────── */
@@ -42,11 +41,11 @@ img { display: block; max-width: 100%; }
 .dash-navbar {
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 9999;
     background: var(--white);
     border-bottom: 1px solid var(--border);
-    padding: 0 48px;
-    height: 68px;
+    padding: 20px 40px;
+    height: auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -59,8 +58,8 @@ img { display: block; max-width: 100%; }
 }
 
 .dash-navbar .img-logo {
-    max-width: none;
-    height: 36px;
+    max-width: 140px;
+    height: auto;
     width: auto;
     filter: none;
 }
@@ -96,13 +95,13 @@ img { display: block; max-width: 100%; }
 /* accent bar under navbar */
 .dash-header-bar {
     height: 3px;
-    background: linear-gradient(90deg, var(--green-900), var(--green-600), #86efac);
+    background: #0b3d20;
 }
 
 /* ── Profile avatar ──────────────────────── */
 .img-profile {
-    width: 42px;
-    height: 42px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--border);
@@ -130,7 +129,7 @@ img { display: block; max-width: 100%; }
     border: 1px solid var(--border);
     box-shadow: var(--shadow-lg);
     min-width: 220px;
-    z-index: 1000;
+    z-index: 10000;
     overflow: hidden;
     animation: dropIn 0.16s ease;
 }
@@ -586,7 +585,7 @@ img { display: block; max-width: 100%; }
 /* ── STICKY NAV FILTERS & SEARCH ──────────────────────── */
 .dash-sticky-nav {
     position: sticky;
-    top: 68px; /* Match navbar height */
+    top: 77px;
     z-index: 90;
     background: rgba(249, 250, 251, 0.95); /* Matches --off-white with opacity */
     backdrop-filter: blur(12px);
@@ -644,5 +643,3 @@ img { display: block; max-width: 100%; }
 .dash-sticky-nav.is-sticky .dash-pill {
     white-space: nowrap;
 }
-
-
