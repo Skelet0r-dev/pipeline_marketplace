@@ -4,15 +4,23 @@ $conn = db_connect();
 if($conn==false)
     die(db_last_error());
 
+<<<<<<< Updated upstream
 $firstname  = trim($_POST['f_name']);
 $lastname   = trim($_POST['l_name']);
 $stdnum     = trim($_POST['stdnum']);
 $college    = strtoupper(trim($_POST['college']));
 $department = trim($_POST['department']);
+=======
+$firstname  = strtoupper(trim($_POST['first_name']));
+$lastname   = strtoupper(trim($_POST['last_name']));
+$stdnum     = trim($_POST['std_num']);
+$college    = strtoupper(trim($_POST['college']));
+$department = strtoupper(trim($_POST['department']));
+>>>>>>> Stashed changes
 $section    = strtoupper(trim($_POST['section']));
 $sex        = trim($_POST['sex']);
-$username   = trim($_POST['username']);
-$email      = trim($_POST['email']);
+$username   = strtoupper(trim($_POST['username']));
+$email      = strtolower(trim($_POST['email']));
 $password   = $_POST['password'];
 
 // ── Server-side validation ──
@@ -22,6 +30,9 @@ if(empty($firstname))  $errors[] = "First name is required.";
 if(empty($lastname))   $errors[] = "Last name is required.";
 if(empty($username))   $errors[] = "Username is required.";
 if(empty($sex))        $errors[] = "Sex is required.";
+if(empty($college))    $errors[] = "College is required.";
+if(empty($department)) $errors[] = "Department is required.";
+if(empty($section))    $errors[] = "Section is required.";
 
 if(!preg_match('/^\d{9}$/', $stdnum))
     $errors[] = "Student number must be exactly 9 digits.";
@@ -100,9 +111,16 @@ if(!empty($errors)){
 // For now, standard success continues below with HTML.
 
 // ── Insert new user ──
+<<<<<<< Updated upstream
 $sql="INSERT INTO USERS (FIRST_NAME, LAST_NAME, STD_NUM, COLLEGE, DEPARTMENT, SECTION, SEX, USERNAME, EMAIL, `PASSWORD`, DATE_REGISTERED)
       VALUES (?,?,?,?,?,?,?,?,?,?,NOW())";
 $result=db_query($conn,$sql, [$firstname,$lastname,$stdnum,$college,$department,$section,$sex,$username,$email,$password]);
+=======
+$hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+$sql="INSERT INTO USERS (FIRST_NAME, LAST_NAME, STD_NUM, COLLEGE, DEPARTMENT, SECTION, SEX, USERNAME, EMAIL, `PASSWORD`, DATE_REGISTERED)
+      VALUES (?,?,?,?,?,?,?,?,?,?,NOW())";
+$result=db_query($conn,$sql, [$firstname,$lastname,$stdnum,$college,$department,$section,$sex,$username,$email,$hashedPassword]);
+>>>>>>> Stashed changes
 if($result===false) die(db_last_error());
 
 // ── Get new user ID ──
@@ -180,8 +198,17 @@ if(!empty($_FILES['image']['name'])){
                     <div class="id-field-value"><?php echo htmlspecialchars($stdnum); ?></div>
                 </div>
                 <div class="id-field">
+<<<<<<< Updated upstream
                     <div class="id-field-label">College / Dept.</div>
                     <div class="id-field-value"><?php echo htmlspecialchars($college . ' - ' . $department); ?></div>
+=======
+                    <div class="id-field-label">College.</div>
+                    <div class="id-field-value"><?php echo htmlspecialchars($college); ?></div>
+                </div>
+                <div class="id-field">
+                    <div class="id-field-label">Department.</div>
+                    <div class="id-field-value"><?php echo htmlspecialchars($department); ?></div>
+>>>>>>> Stashed changes
                 </div>
                 <div class="id-field">
                     <div class="id-field-label">Section.</div>

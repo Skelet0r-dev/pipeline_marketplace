@@ -431,9 +431,9 @@ if ($registered && $user) {
                     name="section"
                     class="id-field-input"
                     value="<?php echo htmlspecialchars($section); ?>"
-                    placeholder="e.g. CPE31"
+                    placeholder="e.g. 31"
                     required>
-                <div class="id-field-hint">Enter your section code.</div>
+                <div class="id-field-hint">Enter your year and section code.</div>
             </div>
             <div class="id-field">
                 <div class="id-field-label">Sex.</div>
