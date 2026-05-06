@@ -145,6 +145,11 @@ function getCategoryStyle($category) {
                                                 <?php endif; ?>
                                             </div>
                                             <div class="hc-card-body">
+                                                <div class="hc-status-row">
+                                                    <span class="hc-status-tag <?php echo (strtolower($item['STATUS']) === 'sold') ? 'sold' : ''; ?>">
+                                                        <?php echo htmlspecialchars($item['STATUS'] ?? 'Available'); ?>
+                                                    </span>
+                                                </div>
                                                 <span class="hc-tag"><?php echo htmlspecialchars($item['CATEGORY']); ?></span>
                                                 <p class="hc-title"><?php echo htmlspecialchars($item['TITLE']); ?></p>
                                                 <p class="hc-price"><?php echo $price; ?></p>
@@ -206,6 +211,9 @@ function getCategoryStyle($category) {
                             ?>
                             <article class="shot-card<?php echo $tallClass; ?> js-auth-trigger" style="animation-delay: <?php echo $delay; ?>s;">
                                 <div class="shot-img" style="background: <?php echo $bg; ?>; position: relative;">
+                                    <div class="listing-status-badge <?php echo (strtolower($item['STATUS']) === 'sold') ? 'sold' : ''; ?>">
+                                        <?php echo htmlspecialchars($item['STATUS'] ?? 'Available'); ?>
+                                    </div>
                                     <?php if ($imgSrc): ?>
                                         <img src="<?php echo $imgSrc; ?>" alt="<?php echo htmlspecialchars($item['TITLE']); ?>" style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">
                                     <?php else: ?>

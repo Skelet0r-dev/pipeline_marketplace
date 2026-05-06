@@ -387,7 +387,7 @@ db_close($conn);
 
     <!-- ── DASHBOARD LISTINGS ── -->
     <div class="container" id="listingsSection" style="max-width: 1200px; padding: 0 4% 60px;">
-        <h3 style="font-family: 'DM Serif Display', serif; font-size: 28px; margin-bottom: 24px; color: var(--text-dark);">
+        <h3 style="font-family: 'DM Sans', sans-serif; font-size: 28px; font-weight: 800; margin-bottom: 24px; color: var(--text-dark);">
             <?php
             $categoryHeadings = [
                 'all'                => 'Recent Listings',
