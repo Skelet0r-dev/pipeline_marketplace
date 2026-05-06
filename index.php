@@ -189,7 +189,7 @@ function getCategoryStyle($category) {
             <div class="container">
                 <div class="section-header" style="margin-bottom: 40px; text-align: left;">
                     <span class="section-eyebrow">✦ Browse Listings</span>
-                    <h2 style="font-family: 'DM Serif Display', serif; font-size: 42px;">
+                    <h2 style="font-family: 'DM Sans', sans-serif; font-size: 42px; font-weight: 800;">
                         <?php echo ($currentCategory === 'all') ? 'Recently Listed' : htmlspecialchars($currentCategory) . ' Listings'; ?>
                     </h2>
                 </div>
