@@ -197,7 +197,7 @@ db_close($conn);
         <!-- Center Nav Links -->
         <div class="dash-nav-links">
             <a href="dashboard.php" class="dash-nav-link active">Browse Products</a>
-            <a href="storefront.php" class="dash-nav-link">My Storefront</a>
+            <a href="storefront.php" class="dash-nav-link">My Items for Sale</a>
             <a href="edit_profile.php" class="dash-nav-link">My Profile</a>
         </div>
 
@@ -230,8 +230,8 @@ db_close($conn);
         <div class="dash-hero-inner">
             <!-- LEFT: Dribbble-style text -->
             <div class="dash-hero-left-alt">
-                <span class="dash-eyebrow">✦ Welcome back, <?php echo htmlspecialchars($firstname); ?>!</span>
-                <h1 class="dash-title-main">Everything You Need,<br>Within Campus Reach</h1>
+                <span class="dash-eyebrow">✦ Welcome, <?php echo htmlspecialchars($firstname); ?>!</span>
+                <h1 class="dash-title-main">Featured Items<br>Within Campus Reach</h1>
                 <p class="dash-desc-main">Explore work from the most talented and accomplished 
                     students ready to sell their items on campus.</p>
                 
@@ -386,7 +386,7 @@ db_close($conn);
     </div>
 
     <!-- ── DASHBOARD LISTINGS ── -->
-    <div class="container" id="listingsSection" style="max-width: 1200px; padding: 0 4% 60px;">
+    <div class="container" id="listingsSection" style="max-width: 1700px; padding: 0 4% 60px;">
         <h3 style="font-family: 'DM Sans', sans-serif; font-size: 28px; font-weight: 800; margin-bottom: 24px; color: var(--text-dark);">
             <?php
             $categoryHeadings = [
@@ -419,7 +419,7 @@ db_close($conn);
                     $price = '₱' . number_format($item['PRICE'], 2);
                     $delay = $index * 0.05; // 50ms stagger
                 ?>
-                <div class="dash-listing-card" style="animation-delay: <?php echo $delay; ?>s;" onclick="window.location.href='listing.php?id=<?php echo $item['LISTING_ID']; ?>'">
+                <div class="dash-listing-card" onclick="window.location.href='listing.php?id=<?php echo $item['LISTING_ID']; ?>'">
                     <div class="dash-listing-img-wrap">
                         <img src="<?php echo $imgSrc; ?>" class="dash-listing-img" alt="<?php echo htmlspecialchars($item['TITLE']); ?>" loading="lazy">
                         <span class="dash-listing-badge"><?php echo htmlspecialchars($item['CATEGORY']); ?></span>
@@ -674,6 +674,59 @@ db_close($conn);
                     }, 150);
                 }
             }
+        });
+    </script>
+    <!-- ── GSAP ANIMATIONS ── -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initial states (force visibility)
+            gsap.set([".dash-eyebrow", ".dash-title-main", ".dash-desc-main", ".dash-design-tab", ".dash-hero-search-wrap", ".dash-hero-popular"], { opacity: 1 });
+
+            const tl = gsap.timeline({ defaults: { ease: "power3.out", duration: 0.5 }});
+            
+            tl.from(".dash-eyebrow", { y: 20, opacity: 0, delay: 0.2 })
+              .from(".dash-title-main", { y: 30, opacity: 0 }, "-=0.3")
+              .from(".dash-desc-main", { y: 20, opacity: 0 }, "-=0.3")
+              .from(".dash-design-tab", { y: 15, opacity: 0, stagger: 0.03 }, "-=0.3")
+              .from(".dash-hero-search-wrap", { y: 20, opacity: 0 }, "-=0.3")
+              .from(".dash-hero-popular", { y: 15, opacity: 0 }, "-=0.3")
+              .from(".dash-hero-right-alt", { x: 40, opacity: 0, duration: 0.7 }, "-=0.5");
+
+            // Navbar entrance
+            gsap.from(".dash-navbar", { y: -20, opacity: 0, duration: 0.5, delay: 0.1 });
+
+            // Sticky nav reveal
+            if (document.querySelector('.dash-sticky-nav')) {
+                gsap.from(".dash-sticky-nav", {
+                    scrollTrigger: {
+                        trigger: ".dash-hero",
+                        start: "bottom 80%",
+                        toggleActions: "play none none reverse"
+                    },
+                    y: -20,
+                    opacity: 0,
+                    duration: 0.3
+                });
+            }
+
+            // Grid Scroll Reveal
+            gsap.utils.toArray('.dash-listing-card').forEach((card, i) => {
+                gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top 92%",
+                        toggleActions: "play none none none"
+                    },
+                    y: 40,
+                    opacity: 0,
+                    duration: 0.4,
+                    delay: (i % 5) * 0.06
+                });
+            });
         });
     </script>
 </body>

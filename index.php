@@ -209,7 +209,7 @@ function getCategoryStyle($category) {
                             $tallClass = ($index === 1 || $index === 4) ? ' shot-card--tall' : '';
                             $delay = $index * 0.08; // 80ms stagger
                             ?>
-                            <article class="shot-card<?php echo $tallClass; ?> js-auth-trigger" style="animation-delay: <?php echo $delay; ?>s;">
+                            <article class="shot-card<?php echo $tallClass; ?> js-auth-trigger">
                                 <div class="shot-img" style="background: <?php echo $bg; ?>; position: relative;">
                                     <div class="listing-status-badge <?php echo (strtolower($item['STATUS']) === 'sold') ? 'sold' : ''; ?>">
                                         <?php echo htmlspecialchars($item['STATUS'] ?? 'Available'); ?>
@@ -463,6 +463,30 @@ function getCategoryStyle($category) {
         })();
     </script>
 
-</body>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        document.addEventListener('DOMContentLoaded', () => {
+            const tl = gsap.timeline({ defaults: { ease: "power3.out", duration: 0.5 }});
+            tl.from(".hero-eyebrow", { y: 20, opacity: 0, delay: 0.2 })
+              .from(".hero-headline", { y: 30, opacity: 0 }, "-=0.3")
+              .from(".hero-sub", { y: 20, opacity: 0 }, "-=0.3")
+              .from(".hero-ctas", { y: 20, opacity: 0 }, "-=0.3")
+              .from(".hero-pills .pill", { y: 15, opacity: 0, stagger: 0.03 }, "-=0.3")
+              .from(".hero-right", { x: 40, opacity: 0, duration: 0.7 }, "-=0.5");
+
+            gsap.utils.toArray('.shot-card').forEach((card, i) => {
+                gsap.from(card, {
+                    scrollTrigger: { trigger: card, start: "top 88%" },
+                    y: 40, opacity: 0, duration: 0.4, delay: (i % 3) * 0.06
+                });
+            });
+
+            gsap.from(".community-text", { scrollTrigger: { trigger: ".community", start: "top 75%" }, x: -40, opacity: 0, duration: 0.5 });
+            gsap.from(".community-media", { scrollTrigger: { trigger: ".community", start: "top 75%" }, x: 40, opacity: 0, duration: 0.5 });
+        });
+    </script>
+</body>
 </html>

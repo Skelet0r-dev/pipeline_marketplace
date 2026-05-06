@@ -23,7 +23,10 @@
     font-weight: 600;
     transition: color 0.15s;
 }
-.lbc-link:hover { color: #087832; }
+
+.lbc-link:hover {
+    color: #087832;
+}
 
 .lbc-active {
     color: #087832;
@@ -31,7 +34,9 @@
     font-weight: 700;
 }
 
-.breadcrumb-item + .breadcrumb-item::before { color: #aaa; }
+.breadcrumb-item+.breadcrumb-item::before {
+    color: #aaa;
+}
 
 /* ── Main container ── */
 .listing-container {
@@ -46,21 +51,41 @@
     gap: 40px;
     background: #ffffff;
     border-radius: 20px;
-    box-shadow: 0 4px 24px rgba(40,54,24,0.10);
+    box-shadow: 0 4px 24px rgba(40, 54, 24, 0.10);
     overflow: hidden;
     padding: 32px;
     margin-bottom: 32px;
 }
 
 @media (max-width: 768px) {
-    .listing-card { grid-template-columns: 1fr; gap: 24px; }
-    .listing-seller-card { align-items: flex-start; flex-wrap: wrap; }
-    .listing-action-group { width: 100%; }
+    .listing-card {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .listing-seller-card {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .listing-action-group {
+        width: 100%;
+    }
+
     .listing-contact-btn,
-    .listing-report-btn { text-align: center; flex: 1; }
-    .listing-report-actions { justify-content: stretch; }
+    .listing-report-btn {
+        text-align: center;
+        flex: 1;
+    }
+
+    .listing-report-actions {
+        justify-content: stretch;
+    }
+
     .listing-report-cancel,
-    .listing-report-submit { flex: 1; }
+    .listing-report-submit {
+        flex: 1;
+    }
 }
 
 /* ── Gallery ── */
@@ -298,7 +323,7 @@
 .listing-report-textarea:focus {
     outline: none;
     border-color: #c0392b;
-    box-shadow: 0 0 0 3px rgba(192,57,43,0.12);
+    box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
 }
 
 .listing-report-textarea {
@@ -360,7 +385,7 @@
 }
 
 .listing-cat-badge {
-    background: rgba(40,54,24,0.10);
+    background: rgba(40, 54, 24, 0.10);
     color: #087832;
     font-size: 11px;
     font-weight: 700;
@@ -376,9 +401,20 @@
     padding: 4px 12px;
 }
 
-.cond-new      { background: #e8f4fd; color: #0a5fa8; }
-.cond-likenew  { background: #e6f4ea; color: #1e6b2e; }
-.cond-used     { background: #fff8e1; color: #a07000; }
+.cond-new {
+    background: #e8f4fd;
+    color: #0a5fa8;
+}
+
+.cond-likenew {
+    background: #e6f4ea;
+    color: #1e6b2e;
+}
+
+.cond-used {
+    background: #fff8e1;
+    color: #a07000;
+}
 
 .listing-status-sold {
     background: #fde8e6;
@@ -484,7 +520,7 @@
 .like-heart {
     font-size: 20px;
     line-height: 1;
-    transition: transform 0.2s cubic-bezier(.34,1.56,.64,1);
+    transition: transform 0.2s cubic-bezier(.34, 1.56, .64, 1);
 }
 
 .listing-like-btn:active .like-heart {
@@ -506,7 +542,7 @@
 .listing-comments-section {
     background: #ffffff;
     border-radius: 20px;
-    box-shadow: 0 4px 24px rgba(40,54,24,0.08);
+    box-shadow: 0 4px 24px rgba(40, 54, 24, 0.08);
     padding: 28px 32px 32px;
 }
 
@@ -560,8 +596,15 @@
 }
 
 @keyframes commentIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .comment-avatar {
@@ -666,7 +709,9 @@
     background: #fff;
 }
 
-.comment-input::placeholder { color: #bbb; }
+.comment-input::placeholder {
+    color: #bbb;
+}
 
 .comment-submit-btn {
     background: #087832;
@@ -682,8 +727,16 @@
     flex-shrink: 0;
 }
 
-.comment-submit-btn:hover  { background: #087832; transform: scale(1.04); }
-.comment-submit-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+.comment-submit-btn:hover {
+    background: #087832;
+    transform: scale(1.04);
+}
+
+.comment-submit-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
 
 .comment-char-count {
     font-size: 11px;
@@ -699,22 +752,25 @@
     position: fixed;
     inset: 0;
     z-index: 99999;
-    background: rgba(0,0,0,0.88);
+    background: rgba(0, 0, 0, 0.88);
     align-items: center;
     justify-content: center;
     cursor: zoom-out;
 }
+
 .listing-lightbox.open {
     display: flex;
 }
+
 .listing-lightbox img {
     max-width: 90vw;
     max-height: 90vh;
     object-fit: contain;
     border-radius: 12px;
-    box-shadow: 0 8px 48px rgba(0,0,0,0.5);
+    box-shadow: 0 8px 48px rgba(0, 0, 0, 0.5);
     cursor: default;
 }
+
 .listing-lightbox-close {
     position: absolute;
     top: 20px;
@@ -728,4 +784,7 @@
     opacity: 0.8;
     transition: opacity 0.15s;
 }
-.listing-lightbox-close:hover { opacity: 1; }
+
+.listing-lightbox-close:hover {
+    opacity: 1;
+}

@@ -345,10 +345,8 @@ img {
     cursor: pointer;
     transition: transform var(--transition), box-shadow var(--transition);
     box-shadow: var(--shadow-sm);
-    /* Animation */
-    opacity: 0;
-    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     position: relative;
+    /* Animation state will be handled by GSAP */
 }
 
 .listing-status-badge {
