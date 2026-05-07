@@ -84,6 +84,11 @@ $resMyLike = db_query($conn,
     [$listingId, $loginId]);
 $iLiked = (bool)db_fetch_assoc($resMyLike);
 
+$resMySave = db_query($conn,
+    "SELECT SAVE_ID FROM LISTING_SAVED WHERE LISTING_ID=? AND USER_ID=?",
+    [$listingId, $loginId]);
+$iSaved = (bool)db_fetch_assoc($resMySave);
+
 // ── Fetch comments ─────────────────────────────────────────
 $resComments = db_query($conn,
     "SELECT C.COMMENT_ID, C.COMMENT_TEXT, C.CREATED_AT,
@@ -134,6 +139,18 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
 <!-- ── NAVBAR ── -->
 <div class="dash-navbar">
     <a href="dashboard.php"><img src="assets/img/pipeline_wireframe-removebg.png" class="img-logo" alt="Logo"></a>
+    
+    <!-- Center Nav Links -->
+    <div class="dash-nav-links">
+        <a href="dashboard.php" class="dash-nav-link">Browse Products</a>
+        <a href="storefront.php" class="dash-nav-link">My Storefront</a>
+        <a href="edit_profile.php" class="dash-nav-link">My Profile</a>
+        <a href="saved_listings.php" class="dash-nav-link" title="Saved Listings">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-bookmark-star-fill" viewBox="0 0 16 16" style="vertical-align: middle; margin-top: -3px;">
+                <path fill-rule="evenodd" d="M2 15.5V2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.74.439L8 13.069l-5.26 2.87A.5.5 0 0 1 2 15.5M8.16 4.1a.178.178 0 0 0-.32 0l-.634 1.285a.18.18 0 0 1-.134.098l-1.42.206a.178.178 0 0 0-.098.303L6.58 6.993c.042.041.061.1.051.158L6.39 8.565a.178.178 0 0 0 .258.187l1.27-.668a.18.18 0 0 1 .165 0l1.27.668a.178.178 0 0 0 .257-.187L9.368 7.15a.18.18 0 0 1 .05-.158l1.028-1.001a.178.178 0 0 0-.098-.303l-1.42-.206a.18.18 0 0 1-.134-.098z"/>
+            </svg>
+        </a>
+    </div>
     <div class="dash-nav-right">
         <div class="dash-greeting">
             <span class="dash-hello">Hello,</span>
@@ -253,7 +270,7 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
                 </div>
             </div>
 
-            <!-- ── LIKE BUTTON ── -->
+            <!-- ── LIKE & SAVE BUTTONS ── -->
             <div class="listing-social-row">
                 <button class="listing-like-btn <?php echo $iLiked?'liked':''; ?>"
                         id="likeBtn"
@@ -262,6 +279,14 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
                     <span class="like-heart"><?php echo $iLiked?'❤️':'🤍'; ?></span>
                     <span class="like-count" id="likeCount"><?php echo $likeCount; ?></span>
                     <span class="like-label"><?php echo $likeCount===1?'like':'likes'; ?></span>
+                </button>
+
+                <button class="listing-save-btn <?php echo $iSaved?'saved':''; ?>"
+                        id="saveBtn"
+                        data-id="<?php echo $listingId; ?>"
+                        data-saved="<?php echo $iSaved?'1':'0'; ?>">
+                    <span class="save-icon"><?php echo $iSaved?'🔖':'📑'; ?></span>
+                    <span class="save-label"><?php echo $iSaved?'Saved':'Save for Later'; ?></span>
                 </button>
             </div>
 

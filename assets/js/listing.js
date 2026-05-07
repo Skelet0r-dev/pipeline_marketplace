@@ -39,6 +39,29 @@ likeBtn.addEventListener('click', function () {
         .catch(err => console.error('Like error:', err));
 });
 
+// ── Save toggle ──────────────────────────────────────────
+const SAVE_ENDPOINT = 'save_toggle.php';
+const saveBtn = document.getElementById('saveBtn');
+
+if (saveBtn) {
+    saveBtn.addEventListener('click', function () {
+        const listingId = this.dataset.id;
+        const body = new FormData();
+        body.append('listing_id', listingId);
+
+        fetch(SAVE_ENDPOINT, { method: 'POST', body })
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) { console.error(data.error); return; }
+                this.dataset.saved = data.saved ? '1' : '0';
+                this.classList.toggle('saved', data.saved);
+                this.querySelector('.save-icon').textContent = data.saved ? '🔖' : '📑';
+                this.querySelector('.save-label').textContent = data.saved ? 'Saved' : 'Save for Later';
+            })
+            .catch(err => console.error('Save error:', err));
+    });
+}
+
 // ── Report modal ─────────────────────────────────────────
 const REPORT_ENDPOINT = 'report_item.php';
 const toggleReportBtn = document.getElementById('toggleReportBtn');

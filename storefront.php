@@ -206,6 +206,19 @@ if(isset($_POST['mark_available'])){
     }
 }
 
+// ── NEW: Handle "Mark as Sold" ──────────────────────────────
+if(isset($_POST['mark_sold'])){
+    $markId = (int)trim($_POST['mark_listing_id']);
+    $sqlMark = "UPDATE LISTINGS SET `STATUS`='Sold' WHERE LISTING_ID=? AND USER_ID=?";
+    $resMark = db_query($conn, $sqlMark, [$markId, $loginId]);
+    if($resMark){
+        db_close($conn);
+        $_SESSION['flash_success'] = 'Listing marked as Sold!';
+        header("Location: storefront.php");
+        exit;
+    }
+}
+
 // ── Fetch active listings ───────────────────────────────────
 $sqllistings="SELECT L.*, I.FILE_PATH AS IMG
               FROM LISTINGS L
@@ -291,6 +304,11 @@ if($resComments){
             <a href="dashboard.php" class="dash-nav-link">Browse Products</a>
             <a href="storefront.php" class="dash-nav-link active">My Storefront</a>
             <a href="edit_profile.php" class="dash-nav-link">My Profile</a>
+            <a href="saved_listings.php" class="dash-nav-link" title="Saved Listings">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-bookmark-star-fill" viewBox="0 0 16 16" style="vertical-align: middle; margin-top: -3px;">
+                    <path fill-rule="evenodd" d="M2 15.5V2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.74.439L8 13.069l-5.26 2.87A.5.5 0 0 1 2 15.5M8.16 4.1a.178.178 0 0 0-.32 0l-.634 1.285a.18.18 0 0 1-.134.098l-1.42.206a.178.178 0 0 0-.098.303L6.58 6.993c.042.041.061.1.051.158L6.39 8.565a.178.178 0 0 0 .258.187l1.27-.668a.18.18 0 0 1 .165 0l1.27.668a.178.178 0 0 0 .257-.187L9.368 7.15a.18.18 0 0 1 .05-.158l1.028-1.001a.178.178 0 0 0-.098-.303l-1.42-.206a.18.18 0 0 1-.134-.098z"/>
+                </svg>
+            </a>
         </div>
 
         <div class="dash-nav-right">
@@ -390,6 +408,13 @@ if($resComments){
             echo '<div class="sf-card-hover">';
             echo '<button class="sf-card-view">View Item</button>';
             echo '<button class="sf-card-edit-btn" onclick="event.stopPropagation(); openEditModal(this.closest(\'.sf-card\'))">✏️ Edit</button>';
+            
+            // ── SOLD Button ──
+            echo '<form method="POST" action="storefront.php" style="display:inline;" onclick="event.stopPropagation()">';
+            echo '<input type="hidden" name="mark_listing_id" value="'.$item['LISTING_ID'].'">';
+            echo '<button type="submit" name="mark_sold" class="sf-card-sold-btn" onclick="return confirm(\'Mark this item as SOLD?\')">✅ Sold</button>';
+            echo '</form>';
+            
             echo '</div>';
             echo '</div>';
             echo '<div class="sf-card-body">';

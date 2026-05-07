@@ -79,10 +79,11 @@ function getCategoryStyle($category) {
                 <img src="assets/img/pipeline_wireframe-removebg.png" alt="Pipeline Logo">
             </a>
             <nav class="nav-links">
-                <a href="browse.php" class="nav-link">Browse</a>
-                <a href="browse.php?cat=Clothing+%26+Apparel" class="nav-link">Clothing</a>
-                <a href="browse.php?cat=Hobbies+%26+Lifestyle" class="nav-link">Hobbies</a>
-                <a href="browse.php?cat=Electronics" class="nav-link">Electronics</a>
+                <a href="index.php" class="nav-link js-auth-trigger">Browse</a> 
+                <a href="index.php?cat=Clothing+%26+Apparel#showcase" class="nav-link">Clothing</a>
+                <a href="index.php?cat=Hobbies+%26+Lifestyle#showcase" class="nav-link">Hobbies</a>
+                <a href="index.php?cat=Electronics#showcase" class="nav-link">Electronics</a>
+                <a href="index.php?cat=Books#showcase" class="nav-link">Books</a>
                 <a href="#about" class="nav-link">About</a>
             </nav>
         </div>

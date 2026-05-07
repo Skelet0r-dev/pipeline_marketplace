@@ -23,12 +23,14 @@
 .sf-profile-section {
     background: #fff;
     border-bottom: 1px solid #eee;
-    padding: 24px 40px;
+    padding: 24px 4%;
     position: relative;
     z-index: 1;
 }
 
 .sf-profile-row {
+    max-width: 1700px;
+    margin: 0 auto;
     display: flex;
     align-items: center;
     gap: 28px;
@@ -197,13 +199,15 @@
 .sf-tabs-wrap {
     background: #fff;
     border-bottom: 1px solid #eee;
-    padding: 0 40px;
+    padding: 0 4%;
     position: sticky;
     top: 0;
     z-index: 100;
 }
 
 .sf-tabs {
+    max-width: 1700px;
+    margin: 0 auto;
     display: flex;
 }
 
@@ -230,16 +234,16 @@
 
 /* ── Content Area ── */
 .sf-content {
-    max-width: 1100px;
+    max-width: 1700px;
     margin: 0 auto;
-    padding: 28px 24px;
+    padding: 28px 4%;
 }
 
 /* ── Grid ── */
 .sf-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 24px;
 }
 
 /* ── Card ── */
@@ -542,7 +546,7 @@
     border: 1px solid #c3e6cb;
     border-radius: 10px;
     padding: 12px 20px;
-    margin: 16px 40px 0;
+    margin: 16px 4% 0;
     font-family: "DM Sans", sans-serif;
     font-size: 14px;
     font-weight: 600;
@@ -728,7 +732,7 @@
 }
 
 /* ── Edit Listing ── */
-.sf-card-edit-btn {
+.sf-card-edit-btn, .sf-card-sold-btn {
     padding: 9px 22px;
     width: 130px;
     background: #606c38;
@@ -740,6 +744,16 @@
     font-weight: 700;
     cursor: pointer;
     text-align: center;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.sf-card-sold-btn {
+    background: #283618; /* Darker green for SOLD */
+}
+
+.sf-card-edit-btn:hover, .sf-card-sold-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
 }
 
 .edit-current-img-wrap {
@@ -804,9 +818,9 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 32px;
-    max-width: 1100px;
+    max-width: 1700px;
     margin: 0 auto;
-    padding: 32px 40px 60px;
+    padding: 10px 0 60px;
 }
 
 @media (max-width: 768px) {
