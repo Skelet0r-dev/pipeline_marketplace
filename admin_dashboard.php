@@ -343,6 +343,15 @@ $reportsTableExists = tableExists($conn, 'LISTING_REPORTS');
 $listingImagesTableExists = tableExists($conn, 'LISTING_IMG');
 $userReportsTableExists = tableExists($conn, 'USER_REPORTS');
 
+if ($reportsTableExists) {
+    if (!columnExists($conn, 'LISTING_REPORTS', 'REPORT_TYPE')) {
+        db_query($conn, "ALTER TABLE LISTING_REPORTS ADD COLUMN REPORT_TYPE VARCHAR(30) NOT NULL DEFAULT 'listing' AFTER REPORT_ID");
+    }
+    if (!columnExists($conn, 'LISTING_REPORTS', 'COMMENT_ID')) {
+        db_query($conn, "ALTER TABLE LISTING_REPORTS ADD COLUMN COMMENT_ID INT NULL AFTER LISTING_ID");
+    }
+}
+
 $adminName = $_SESSION['admin_username'];
 $adminInitials = strtoupper(substr($adminName, 0, 2));
 $activePage = currentPage();
@@ -379,7 +388,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['report_action'])) {
 
     $reportStmt = db_query(
         $conn,
-        "SELECT R.REPORT_ID, R.LISTING_ID, R.REPORT_STATUS, L.TITLE
+        "SELECT R.REPORT_ID, R.LISTING_ID, R.COMMENT_ID, R.REPORT_TYPE, R.REPORT_STATUS, L.TITLE
          FROM LISTING_REPORTS R
          LEFT JOIN LISTINGS L ON R.LISTING_ID = L.LISTING_ID
          WHERE R.REPORT_ID = ?",
@@ -429,6 +438,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['report_action'])) {
         } else {
             db_rollback($conn);
             $_SESSION['admin_flash'] = 'Unable to delete the reported listing.';
+        }
+
+        safeRedirect('admin_dashboard.php?page=reports');
+    }
+
+    if ($action === 'delete_comment') {
+        $commentId = (int) ($report['COMMENT_ID'] ?? 0);
+        if ($commentId <= 0) {
+            $_SESSION['admin_flash'] = 'This report is not linked to a comment.';
+            safeRedirect('admin_dashboard.php?page=reports');
+        }
+
+        db_begin_transaction($conn);
+        $deleteOk = (bool) db_query($conn, "DELETE FROM LISTING_REPORTS WHERE COMMENT_ID = ?", [$commentId]);
+        $deleteOk = $deleteOk && (bool) db_query($conn, "DELETE FROM LISTING_COMMENTS WHERE COMMENT_ID = ?", [$commentId]);
+
+        if ($deleteOk) {
+            db_commit($conn);
+            $_SESSION['admin_flash'] = 'Reported comment deleted from the database.';
+        } else {
+            db_rollback($conn);
+            $_SESSION['admin_flash'] = 'Unable to delete the reported comment.';
         }
 
         safeRedirect('admin_dashboard.php?page=reports');
@@ -704,8 +735,9 @@ $allReports = [];
 if ($reportsTableExists) {
     $reportImageSelect = $listingImagesTableExists ? "I.FILE_PATH AS LISTING_IMAGE," : "NULL AS LISTING_IMAGE,";
     $reportImageJoin = $listingImagesTableExists ? "LEFT JOIN LISTING_IMG I ON L.LISTING_ID = I.LISTING_ID AND I.IS_PRIMARY = 1" : "";
-    $allReportsSql = "SELECT R.REPORT_ID, R.LISTING_ID, R.REPORT_REASON, R.REPORT_DETAILS,
+    $allReportsSql = "SELECT R.REPORT_ID, R.REPORT_TYPE, R.LISTING_ID, R.COMMENT_ID, R.REPORT_REASON, R.REPORT_DETAILS,
                               R.REPORT_STATUS, R.CREATED_AT,
+                              C.COMMENT_TEXT,
                               L.TITLE, L.DESCRIPTION, L.CATEGORY, L.PRICE, L.`CONDITION`,
                               L.MEETUP_SPOT, L.PAYMENT_METHOD, L.DATE_POSTED,
                               L.`STATUS` AS LISTING_STATUS,
@@ -714,6 +746,7 @@ if ($reportsTableExists) {
                               OWNER.USERNAME AS OWNER_USERNAME
                       FROM LISTING_REPORTS R
                       LEFT JOIN LISTINGS L ON R.LISTING_ID = L.LISTING_ID
+                      LEFT JOIN LISTING_COMMENTS C ON R.COMMENT_ID = C.COMMENT_ID
                       {$reportImageJoin}
                       LEFT JOIN USERS REPORTER ON R.REPORTER_USER_ID = REPORTER.USER_ID
                       LEFT JOIN USERS OWNER ON R.LISTING_OWNER_USER_ID = OWNER.USER_ID
@@ -1125,6 +1158,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
                     <?php
                         $listingImage = !empty($report['LISTING_IMAGE']) ? (string) $report['LISTING_IMAGE'] : 'assets/img/no_image.png';
                         $listingTitle = $report['TITLE'] ?? 'Listing deleted';
+                        $reportType = $report['REPORT_TYPE'] ?? 'listing';
                     ?>
                     <tr>
                         <td>
@@ -1162,6 +1196,13 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
                         </td>
                         <td>
                             <div class="item-name"><?php echo htmlspecialchars($report['REPORT_REASON']); ?></div>
+                            <div class="report-person"><?php echo $reportType === 'comment' ? 'Comment report' : 'Listing report'; ?></div>
+                            <?php if ($reportType === 'comment'): ?>
+                            <details class="report-details">
+                                <summary>View reported comment</summary>
+                                <p><?php echo nl2br(htmlspecialchars((string) ($report['COMMENT_TEXT'] ?? 'Comment already deleted.'))); ?></p>
+                            </details>
+                            <?php endif; ?>
                             <details class="report-details">
                                 <summary>View report details</summary>
                                 <p><?php echo nl2br(htmlspecialchars((string) $report['REPORT_DETAILS'])); ?></p>
@@ -1181,7 +1222,14 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
                                     <button class="mini-btn" type="submit" name="report_action" value="deny">Deny</button>
                                 </form>
                                 <?php endif; ?>
-                                <?php if (!empty($report['LISTING_ID']) && !empty($report['TITLE'])): ?>
+                                <?php if ($reportType === 'comment' && !empty($report['COMMENT_ID'])): ?>
+                                <form method="post" action="admin_dashboard.php?page=reports" onsubmit="return confirm('Delete this comment from the database? This cannot be undone.');">
+                                    <input type="hidden" name="report_id" value="<?php echo (int) $report['REPORT_ID']; ?>">
+                                    <button class="mini-btn danger" type="submit" name="report_action" value="delete_comment">Delete Comment</button>
+                                </form>
+                                <?php elseif ($reportType === 'comment'): ?>
+                                <span class="report-person">Comment already deleted.</span>
+                                <?php elseif (!empty($report['LISTING_ID']) && !empty($report['TITLE'])): ?>
                                 <form method="post" action="admin_dashboard.php?page=reports" onsubmit="return confirm('Delete this listing from the database? This cannot be undone.');">
                                     <input type="hidden" name="report_id" value="<?php echo (int) $report['REPORT_ID']; ?>">
                                     <button class="mini-btn danger" type="submit" name="report_action" value="delete_listing">Delete Item</button>

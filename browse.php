@@ -307,23 +307,94 @@ $accentColor = $catColors[$category] ?? '#606c38';
         function initializeListingModalInteractions(scope){
             if(!scope) return;
 
-            const likeBtn = scope.querySelector('.lm-like-btn');
-            if(likeBtn && !likeBtn.dataset.bound){
-                likeBtn.dataset.bound = '1';
-                likeBtn.addEventListener('click', function(){
-                    const id = this.dataset.id;
+            const reactions = scope.querySelector('.lm-reactions');
+            const reactorsPanel = scope.querySelector('[data-reactors-panel]');
+            const reactorsTitle = scope.querySelector('[data-reactors-title]');
+            const reactorsList = scope.querySelector('[data-reactors-list]');
+            const reactorsClose = scope.querySelector('[data-reactors-close]');
+
+            function escapeHtml(value){
+                return String(value || '').replace(/[&<>"']/g, char => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                }[char]));
+            }
+
+            function showReactors(listingId, reactionType){
+                if(!reactorsPanel || !reactorsTitle || !reactorsList) return;
+                reactorsPanel.classList.add('open');
+                reactorsTitle.textContent = 'Reactions';
+                reactorsList.innerHTML = '<p class="lm-reactors-empty">Loading...</p>';
+
+                const params = new URLSearchParams({ listing_id: listingId, reaction_type: reactionType });
+                fetch('reaction_reactors.php?' + params.toString())
+                    .then(r => r.json())
+                    .then(data => {
+                        if(data.error){
+                            reactorsList.innerHTML = `<p class="lm-reactors-empty">${escapeHtml(data.error)}</p>`;
+                            return;
+                        }
+                        reactorsTitle.innerHTML = `${data.emoji || ''} ${escapeHtml(data.label)} reactions`;
+                        if(!data.users || data.users.length === 0){
+                            reactorsList.innerHTML = '<p class="lm-reactors-empty">No one has picked this reaction yet.</p>';
+                            return;
+                        }
+                        reactorsList.innerHTML = data.users.map(user => `
+                            <a class="lm-reactor-row" href="public_profile.php?id=${encodeURIComponent(user.user_id)}">
+                                <img src="${escapeHtml(user.avatar)}" class="lm-reactor-avatar" alt="">
+                                <span class="lm-reactor-main">
+                                    <span class="lm-reactor-name">${escapeHtml(user.name || user.username)}</span>
+                                    <span class="lm-reactor-handle">@${escapeHtml(user.username)}</span>
+                                </span>
+                                <span class="lm-reactor-time">${escapeHtml(user.created_at)}</span>
+                            </a>
+                        `).join('');
+                    })
+                    .catch(() => {
+                        reactorsList.innerHTML = '<p class="lm-reactors-empty">Could not load reactions right now.</p>';
+                    });
+            }
+
+            if(reactorsClose && reactorsPanel && !reactorsClose.dataset.bound){
+                reactorsClose.dataset.bound = '1';
+                reactorsClose.addEventListener('click', () => reactorsPanel.classList.remove('open'));
+            }
+
+            if(reactions && !reactions.dataset.bound){
+                reactions.dataset.bound = '1';
+                reactions.addEventListener('click', function(event){
+                    const reactionBtn = event.target.closest('.lm-reaction-btn');
+                    if(!reactionBtn) return;
+
+                    if(event.target.closest('.lm-reaction-count')){
+                        event.preventDefault();
+                        event.stopPropagation();
+                        showReactors(this.dataset.id, reactionBtn.dataset.reaction);
+                        return;
+                    }
+
                     const body = new FormData();
-                    body.append('listing_id', id);
+                    body.append('listing_id', this.dataset.id);
+                    body.append('reaction_type', reactionBtn.dataset.reaction);
 
                     fetch('like_toggle.php', { method:'POST', body })
                         .then(r => r.json())
                         .then(data => {
                             if(data.error) return;
-                            this.classList.toggle('liked', data.liked);
-                            const heart = this.querySelector('.lm-heart');
-                            const count = this.querySelector('.lm-like-count');
-                            if(heart) heart.textContent = data.liked ? '❤️' : '🤍';
-                            if(count) count.textContent = data.count;
+
+                            this.querySelectorAll('.lm-reaction-btn').forEach(btn => {
+                                const selected = data.reaction === btn.dataset.reaction;
+                                btn.classList.toggle('selected', selected);
+                                btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
+                            });
+
+                            Object.entries(data.counts || {}).forEach(([reaction, count]) => {
+                                const countEl = this.querySelector(`[data-count-for="${reaction}"]`);
+                                if(countEl) countEl.textContent = count;
+                            });
                         });
                 });
             }

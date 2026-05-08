@@ -35,6 +35,24 @@ if(!$listingId || $commentText === ''){
 // Truncate for safety
 $commentText = mb_substr($commentText, 0, 1000);
 
+// Older installs used DATE here, which drops the time. Keep future comments precise.
+$resCreatedAtType = db_query(
+    $conn,
+    "SELECT DATA_TYPE
+     FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = 'LISTING_COMMENTS'
+       AND COLUMN_NAME = 'CREATED_AT'"
+);
+$createdAtType = db_fetch_assoc($resCreatedAtType);
+if(strtolower((string)($createdAtType['DATA_TYPE'] ?? '')) === 'date'){
+    db_query(
+        $conn,
+        "ALTER TABLE LISTING_COMMENTS
+         MODIFY CREATED_AT DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    );
+}
+
 $sqlInsert = "INSERT INTO LISTING_COMMENTS (LISTING_ID, USER_ID, COMMENT_TEXT, CREATED_AT) VALUES (?,?,?,NOW())";
 $result    = db_query($conn, $sqlInsert, [$listingId, $userId, $commentText]);
 
@@ -59,7 +77,7 @@ $row    = db_fetch_assoc($resNew);
 
 $createdAt = $row['CREATED_AT'] instanceof DateTime
     ? $row['CREATED_AT']->format('M d, Y g:i A')
-    : date('M d, Y g:i A');
+    : date('M d, Y g:i A', strtotime((string)$row['CREATED_AT']));
 
 echo json_encode([
     'success'      => true,

@@ -3,7 +3,9 @@ session_start();
 if(!isset($_SESSION['user_id'])){ http_response_code(403); exit; }
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/listing_reactions.php';
 $conn = db_connect();
+listing_reactions_ensure_schema($conn);
 
 $loginId = (int)$_SESSION['user_id'];
 $listingId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -45,16 +47,10 @@ $resImg = db_query(
 $imgRow = db_fetch_assoc($resImg);
 $imgSrc = $imgRow['FILE_PATH'] ?? 'assets/img/no_image.png';
 
-$resLikes = db_query($conn, "SELECT COUNT(*) AS CNT FROM LISTING_LIKES WHERE LISTING_ID=?", [$listingId]);
-$likeRow = db_fetch_assoc($resLikes);
-$likeCount = (int)$likeRow['CNT'];
-
-$resMyLike = db_query(
-    $conn,
-    "SELECT LIKE_ID FROM LISTING_LIKES WHERE LISTING_ID=? AND USER_ID=?",
-    [$listingId, $loginId]
-);
-$iLiked = (bool)db_fetch_assoc($resMyLike);
+$reactionOptions = listing_reaction_options();
+$reactionCounts = listing_reaction_counts($conn, $listingId);
+$myReactionRow = listing_user_reaction($conn, $listingId, $loginId);
+$myReaction = $myReactionRow['REACTION_TYPE'] ?? null;
 
 $resC = db_query(
     $conn,
@@ -73,7 +69,7 @@ $comments = [];
 while($cRow = db_fetch_assoc($resC)){
     $cRow['CREATED_AT'] = $cRow['CREATED_AT'] instanceof DateTime
         ? $cRow['CREATED_AT']->format('M d, Y g:i A')
-        : date('M d, Y g:i A');
+        : date('M d, Y g:i A', strtotime((string)$cRow['CREATED_AT']));
     $comments[] = $cRow;
 }
 $comments = array_reverse($comments);
@@ -156,11 +152,26 @@ db_close($conn);
         </div>
 
         <div class="lm-social">
-            <button class="lm-like-btn <?php echo $iLiked?'liked':''; ?>" data-id="<?php echo $listingId; ?>">
-                <span class="lm-heart"><?php echo $iLiked?'❤️':'🤍'; ?></span>
-                <span class="lm-like-count"><?php echo $likeCount; ?></span>
-                <span><?php echo $likeCount===1?'like':'likes'; ?></span>
-            </button>
+            <div class="lm-reactions" data-id="<?php echo $listingId; ?>">
+                <?php foreach($reactionOptions as $reactionKey => $reaction): ?>
+                <?php $isSelectedReaction = $myReaction === $reactionKey; ?>
+                <button type="button"
+                        class="lm-reaction-btn <?php echo $isSelectedReaction?'selected':''; ?>"
+                        data-reaction="<?php echo htmlspecialchars($reactionKey); ?>"
+                        aria-pressed="<?php echo $isSelectedReaction?'true':'false'; ?>"
+                        title="<?php echo htmlspecialchars($reaction['label']); ?>">
+                    <span class="lm-reaction-emoji"><?php echo $reaction['emoji']; ?></span>
+                    <span class="lm-reaction-count" data-count-for="<?php echo htmlspecialchars($reactionKey); ?>"><?php echo (int)$reactionCounts['types'][$reactionKey]; ?></span>
+                </button>
+                <?php endforeach; ?>
+            </div>
+            <div class="lm-reactors-panel" data-reactors-panel>
+                <div class="lm-reactors-head">
+                    <p class="lm-reactors-title" data-reactors-title>Reactions</p>
+                    <button type="button" class="lm-reactors-close" data-reactors-close aria-label="Close">&times;</button>
+                </div>
+                <div class="lm-reactors-list" data-reactors-list></div>
+            </div>
         </div>
 
         <div class="lm-comments-preview">
@@ -195,21 +206,93 @@ db_close($conn);
 
 <script>
 (function(){
-    const btn = document.querySelector('.lm-like-btn');
-    if(btn){
-        btn.addEventListener('click', function(){
-            const id = this.dataset.id;
-            const body = new FormData();
-            body.append('listing_id', id);
-            fetch('like_toggle.php', { method:'POST', body })
-                .then(r => r.json())
-                .then(data => {
-                    if(data.error) return;
-                    this.classList.toggle('liked', data.liked);
-                    this.querySelector('.lm-heart').textContent = data.liked ? '❤️' : '🤍';
-                    this.querySelector('.lm-like-count').textContent = data.count;
-                });
-        });
+    const reactions = document.querySelector('.lm-reactions');
+    if(!reactions) return;
+    const panel = document.querySelector('[data-reactors-panel]');
+    const title = document.querySelector('[data-reactors-title]');
+    const list = document.querySelector('[data-reactors-list]');
+    const closeBtn = document.querySelector('[data-reactors-close]');
+
+    function escapeHtml(value){
+        return String(value || '').replace(/[&<>"']/g, char => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        }[char]));
     }
+
+    function showReactors(listingId, reactionType){
+        if(!panel || !title || !list) return;
+        panel.classList.add('open');
+        title.textContent = 'Reactions';
+        list.innerHTML = '<p class="lm-reactors-empty">Loading...</p>';
+
+        const params = new URLSearchParams({ listing_id: listingId, reaction_type: reactionType });
+        fetch('reaction_reactors.php?' + params.toString())
+            .then(r => r.json())
+            .then(data => {
+                if(data.error){
+                    list.innerHTML = `<p class="lm-reactors-empty">${escapeHtml(data.error)}</p>`;
+                    return;
+                }
+                title.innerHTML = `${data.emoji || ''} ${escapeHtml(data.label)} reactions`;
+                if(!data.users || data.users.length === 0){
+                    list.innerHTML = '<p class="lm-reactors-empty">No one has picked this reaction yet.</p>';
+                    return;
+                }
+                list.innerHTML = data.users.map(user => `
+                    <a class="lm-reactor-row" href="public_profile.php?id=${encodeURIComponent(user.user_id)}">
+                        <img src="${escapeHtml(user.avatar)}" class="lm-reactor-avatar" alt="">
+                        <span class="lm-reactor-main">
+                            <span class="lm-reactor-name">${escapeHtml(user.name || user.username)}</span>
+                            <span class="lm-reactor-handle">@${escapeHtml(user.username)}</span>
+                        </span>
+                        <span class="lm-reactor-time">${escapeHtml(user.created_at)}</span>
+                    </a>
+                `).join('');
+            })
+            .catch(() => {
+                list.innerHTML = '<p class="lm-reactors-empty">Could not load reactions right now.</p>';
+            });
+    }
+
+    if(closeBtn && panel){
+        closeBtn.addEventListener('click', () => panel.classList.remove('open'));
+    }
+
+    reactions.addEventListener('click', function(event){
+        const btn = event.target.closest('.lm-reaction-btn');
+        if(!btn) return;
+
+        if(event.target.closest('.lm-reaction-count')){
+            event.preventDefault();
+            event.stopPropagation();
+            showReactors(this.dataset.id, btn.dataset.reaction);
+            return;
+        }
+
+        const body = new FormData();
+        body.append('listing_id', this.dataset.id);
+        body.append('reaction_type', btn.dataset.reaction);
+
+        fetch('like_toggle.php', { method:'POST', body })
+            .then(r => r.json())
+            .then(data => {
+                if(data.error) return;
+
+                this.querySelectorAll('.lm-reaction-btn').forEach(reactionBtn => {
+                    const selected = data.reaction === reactionBtn.dataset.reaction;
+                    reactionBtn.classList.toggle('selected', selected);
+                    reactionBtn.setAttribute('aria-pressed', selected ? 'true' : 'false');
+                });
+
+                Object.entries(data.counts || {}).forEach(([reaction, count]) => {
+                    const countEl = this.querySelector(`[data-count-for="${reaction}"]`);
+                    if(countEl) countEl.textContent = count;
+                });
+            });
+    });
 })();
 </script>

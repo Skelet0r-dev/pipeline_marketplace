@@ -1,6 +1,11 @@
 <?php
 declare(strict_types=1);
 
+const APP_TIMEZONE = 'Asia/Manila';
+const DB_TIMEZONE_OFFSET = '+08:00';
+
+date_default_timezone_set(APP_TIMEZONE);
+
 function db_config(): array {
     // Check for environment variables first (common in Docker/Production)
     $env_host     = getenv('DB_HOST');
@@ -47,11 +52,13 @@ function db_connect() {
     $dsn = sprintf('mysql:host=%s;dbname=%s;charset=utf8mb4', $config['host'], $config['database']);
 
     try {
-        return new PDO($dsn, $config['user'], $config['password'], [
+        $conn = new PDO($dsn, $config['user'], $config['password'], [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_EMULATE_PREPARES => false
         ]);
+        $conn->exec("SET time_zone = '" . DB_TIMEZONE_OFFSET . "'");
+        return $conn;
     } catch (PDOException $e) {
         db_last_error($e->getMessage());
         return false;

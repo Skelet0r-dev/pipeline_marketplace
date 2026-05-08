@@ -13,7 +13,9 @@ if(!isset($_SESSION['user_id'])){
 }
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/listing_reactions.php';
 $conn = db_connect();
+listing_reactions_ensure_schema($conn);
 if($conn==false)
     die(db_last_error());
 
@@ -237,7 +239,8 @@ $resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
 
 // ── Fetch activity: likes on your listings ──────────────────
 // (join with LISTING_LIKES and LISTING_COMMENTS tables)
-$sqlLikes = "SELECT LL.LIKE_ID, LL.CREATED_AT,
+$reactionOptions = listing_reaction_options();
+$sqlLikes = "SELECT LL.LIKE_ID, LL.REACTION_TYPE, LL.CREATED_AT,
                     L.TITLE, L.LISTING_ID,
                     U.FIRST_NAME, U.LAST_NAME, U.USERNAME,
                     UI.FILE_PATH AS AVATAR
@@ -253,7 +256,8 @@ if($resLikes){
     while($row = db_fetch_assoc($resLikes)){
         $row['CREATED_AT'] = $row['CREATED_AT'] instanceof DateTime
             ? $row['CREATED_AT']->format('M d, Y g:i A')
-            : date('M d, Y g:i A');
+            : date('M d, Y g:i A', strtotime((string)$row['CREATED_AT']));
+        $row['REACTION_TYPE'] = normalize_listing_reaction($row['REACTION_TYPE'] ?? null);
         $activityLikes[] = $row;
     }
 }
@@ -275,7 +279,7 @@ if($resComments){
     while($row = db_fetch_assoc($resComments)){
         $row['CREATED_AT'] = $row['CREATED_AT'] instanceof DateTime
             ? $row['CREATED_AT']->format('M d, Y g:i A')
-            : date('M d, Y g:i A');
+            : date('M d, Y g:i A', strtotime((string)$row['CREATED_AT']));
         $activityComments[] = $row;
     }
 }
@@ -501,21 +505,22 @@ if($resComments){
     <div class="sf-content d-none" id="tab-activity">
         <div class="sf-activity-wrap">
 
-            <!-- Likes feed -->
+            <!-- Reactions feed -->
             <div class="sf-activity-col">
-                <h4 class="sf-activity-heading">❤️ Likes</h4>
+                <h4 class="sf-activity-heading">Reactions</h4>
                 <?php if(empty($activityLikes)): ?>
-                <div class="sf-activity-empty">No likes yet on your listings.</div>
+                <div class="sf-activity-empty">No reactions yet on your listings.</div>
                 <?php else: ?>
                 <div class="sf-activity-list">
                     <?php foreach($activityLikes as $like): ?>
+                    <?php $reaction = $reactionOptions[$like['REACTION_TYPE']] ?? $reactionOptions[LISTING_REACTION_DEFAULT]; ?>
                     <div class="sf-activity-item">
                         <img src="<?php echo htmlspecialchars($like['AVATAR'] ?? 'assets/img/avatar.png'); ?>"
                              class="sf-activity-avatar" alt="Avatar">
                         <div class="sf-activity-body">
                             <span class="sf-activity-user"><?php echo htmlspecialchars($like['FIRST_NAME'].' '.$like['LAST_NAME']); ?></span>
                             <span class="sf-activity-handle">@<?php echo htmlspecialchars($like['USERNAME']); ?></span>
-                            liked your listing
+                            reacted <?php echo $reaction['emoji']; ?> <?php echo htmlspecialchars(strtolower($reaction['label'])); ?> to your listing
                             <a href="listing.php?id=<?php echo $like['LISTING_ID']; ?>" class="sf-activity-listing-link">
                                 <?php echo htmlspecialchars($like['TITLE']); ?>
                             </a>

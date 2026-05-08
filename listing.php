@@ -7,7 +7,9 @@ session_start();
 if(!isset($_SESSION['user_id'])){ header("Location: dashboard.php"); exit; }
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/listing_reactions.php';
 $conn = db_connect();
+listing_reactions_ensure_schema($conn);
 
 $loginId   = (int)$_SESSION['user_id'];
 $listingId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -74,15 +76,10 @@ while($imgRow = db_fetch_assoc($resImgs)){
 if(empty($images)) $images[] = ['FILE_PATH'=>'assets/img/no_image.png','IS_PRIMARY'=>1];
 
 // ── Like status & count ────────────────────────────────────
-$resLikes = db_query($conn,
-    "SELECT COUNT(*) AS CNT FROM LISTING_LIKES WHERE LISTING_ID=?", [$listingId]);
-$likeRow  = db_fetch_assoc($resLikes);
-$likeCount = (int)($likeRow['CNT'] ?? 0);
-
-$resMyLike = db_query($conn,
-    "SELECT LIKE_ID FROM LISTING_LIKES WHERE LISTING_ID=? AND USER_ID=?",
-    [$listingId, $loginId]);
-$iLiked = (bool)db_fetch_assoc($resMyLike);
+$reactionOptions = listing_reaction_options();
+$reactionCounts = listing_reaction_counts($conn, $listingId);
+$myReactionRow = listing_user_reaction($conn, $listingId, $loginId);
+$myReaction = $myReactionRow['REACTION_TYPE'] ?? null;
 
 $resMySave = db_query($conn,
     "SELECT SAVE_ID FROM LISTING_SAVED WHERE LISTING_ID=? AND USER_ID=?",
@@ -104,7 +101,7 @@ $comments = [];
 while($cRow = db_fetch_assoc($resComments)){
     $cRow['CREATED_AT'] = $cRow['CREATED_AT'] instanceof DateTime
         ? $cRow['CREATED_AT']->format('M d, Y g:i A')
-        : date('M d, Y g:i A');
+        : date('M d, Y g:i A', strtotime((string)$cRow['CREATED_AT']));
     $comments[] = $cRow;
 }
 
@@ -272,14 +269,19 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
 
             <!-- ── LIKE & SAVE BUTTONS ── -->
             <div class="listing-social-row">
-                <button class="listing-like-btn <?php echo $iLiked?'liked':''; ?>"
-                        id="likeBtn"
-                        data-id="<?php echo $listingId; ?>"
-                        data-liked="<?php echo $iLiked?'1':'0'; ?>">
-                    <span class="like-heart"><?php echo $iLiked?'❤️':'🤍'; ?></span>
-                    <span class="like-count" id="likeCount"><?php echo $likeCount; ?></span>
-                    <span class="like-label"><?php echo $likeCount===1?'like':'likes'; ?></span>
-                </button>
+                <div class="listing-reactions" id="reactionGroup" data-id="<?php echo $listingId; ?>">
+                    <?php foreach($reactionOptions as $reactionKey => $reaction): ?>
+                    <?php $isSelectedReaction = $myReaction === $reactionKey; ?>
+                    <button type="button"
+                            class="listing-reaction-btn <?php echo $isSelectedReaction?'selected':''; ?>"
+                            data-reaction="<?php echo htmlspecialchars($reactionKey); ?>"
+                            aria-pressed="<?php echo $isSelectedReaction?'true':'false'; ?>"
+                            title="<?php echo htmlspecialchars($reaction['label']); ?>">
+                        <span class="reaction-emoji"><?php echo $reaction['emoji']; ?></span>
+                        <span class="reaction-count" data-count-for="<?php echo htmlspecialchars($reactionKey); ?>"><?php echo (int)$reactionCounts['types'][$reactionKey]; ?></span>
+                    </button>
+                    <?php endforeach; ?>
+                </div>
 
                 <button class="listing-save-btn <?php echo $iSaved?'saved':''; ?>"
                         id="saveBtn"
@@ -306,7 +308,7 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
             <p class="comments-empty" id="commentsEmpty">No comments yet. Be the first to ask!</p>
             <?php else: ?>
             <?php foreach($comments as $c): ?>
-            <div class="comment-item">
+            <div class="comment-item" data-comment-id="<?php echo (int)$c['COMMENT_ID']; ?>">
                 <a href="public_profile.php?id=<?php echo (int)$c['USER_ID']; ?>" class="comment-avatar-link">
                     <img src="<?php echo htmlspecialchars(!empty($c['AVATAR']) ? $c['AVATAR'] : 'assets/img/avatar.png'); ?>"
                          class="comment-avatar" alt="Avatar">
@@ -316,6 +318,13 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
                         <a href="public_profile.php?id=<?php echo (int)$c['USER_ID']; ?>" class="comment-user"><?php echo htmlspecialchars($c['FIRST_NAME'].' '.$c['LAST_NAME']); ?></a>
                         <a href="public_profile.php?id=<?php echo (int)$c['USER_ID']; ?>" class="comment-handle">@<?php echo htmlspecialchars($c['USERNAME']); ?></a>
                         <span class="comment-time"><?php echo htmlspecialchars($c['CREATED_AT']); ?></span>
+                        <span class="comment-actions">
+                            <?php if((int)$c['USER_ID'] === $loginId): ?>
+                            <button type="button" class="comment-action-btn comment-delete-btn" data-comment-id="<?php echo (int)$c['COMMENT_ID']; ?>">Delete</button>
+                            <?php else: ?>
+                            <button type="button" class="comment-action-btn comment-report-btn" data-comment-id="<?php echo (int)$c['COMMENT_ID']; ?>">Report</button>
+                            <?php endif; ?>
+                        </span>
                     </div>
                     <p class="comment-text"><?php echo nl2br(htmlspecialchars($c['COMMENT_TEXT'])); ?></p>
                 </div>
@@ -375,6 +384,40 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
     </div>
 </div>
 <?php endif; ?>
+
+<!-- COMMENT REPORT MODAL -->
+<div class="modal fade" id="commentReportModal" tabindex="-1" aria-labelledby="commentReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="commentReportModalLabel">Report this comment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="listing-report-copy">Choose a reason and add details. The report will be saved for admin review.</p>
+                <form id="commentReportForm">
+                    <input type="hidden" name="comment_id" id="commentReportId" value="">
+                    <label class="listing-report-label" for="commentReportReason">Reason</label>
+                    <select id="commentReportReason" name="report_reason" class="listing-report-select form-select mb-3" required>
+                        <option value="" disabled selected>Select a reason</option>
+                        <option value="Harassment or Abuse">Harassment or Abuse</option>
+                        <option value="Spam">Spam</option>
+                        <option value="Offensive Language">Offensive Language</option>
+                        <option value="Misleading Information">Misleading Information</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <label class="listing-report-label" for="commentReportDetails">Details</label>
+                    <textarea id="commentReportDetails" name="report_details" class="listing-report-textarea form-control mb-3" rows="4" maxlength="1000" placeholder="Tell the admin what is wrong with this comment." required></textarea>
+                    <div class="listing-report-feedback" id="commentReportFeedback" hidden></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="listing-report-cancel" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="listing-report-submit" id="submitCommentReportBtn">Submit Report</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/listing.js"></script>

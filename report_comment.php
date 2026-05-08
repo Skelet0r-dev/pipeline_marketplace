@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 header('Content-Type: application/json');
 
 require_once __DIR__ . '/db.php';
@@ -18,12 +17,7 @@ if($conn === false){
     exit;
 }
 
-$loginId = (int)$_SESSION['user_id'];
-$listingId = isset($_POST['listing_id']) ? (int)$_POST['listing_id'] : 0;
-$reportReason = isset($_POST['report_reason']) ? trim($_POST['report_reason']) : '';
-$reportDetails = isset($_POST['report_details']) ? trim($_POST['report_details']) : '';
-
-function ensureListingReportTypeColumns($conn): bool {
+function ensureCommentReportColumns($conn): bool {
     $columns = [
         'REPORT_TYPE' => "ALTER TABLE LISTING_REPORTS ADD COLUMN REPORT_TYPE VARCHAR(30) NOT NULL DEFAULT 'listing' AFTER REPORT_ID",
         'COMMENT_ID' => "ALTER TABLE LISTING_REPORTS ADD COLUMN COMMENT_ID INT NULL AFTER LISTING_ID",
@@ -49,9 +43,14 @@ function ensureListingReportTypeColumns($conn): bool {
     return true;
 }
 
-if($listingId <= 0){
+$loginId = (int)$_SESSION['user_id'];
+$commentId = isset($_POST['comment_id']) ? (int)$_POST['comment_id'] : 0;
+$reportReason = isset($_POST['report_reason']) ? trim($_POST['report_reason']) : '';
+$reportDetails = isset($_POST['report_details']) ? trim($_POST['report_details']) : '';
+
+if($commentId <= 0){
     http_response_code(422);
-    echo json_encode(['error' => 'Invalid listing selected.']);
+    echo json_encode(['error' => 'Invalid comment selected.']);
     exit;
 }
 
@@ -61,29 +60,33 @@ if($reportReason === '' || $reportDetails === ''){
     exit;
 }
 
-if(!ensureListingReportTypeColumns($conn)){
+if(!ensureCommentReportColumns($conn)){
     http_response_code(500);
-    echo json_encode(['error' => 'Could not prepare the reports table.']);
+    echo json_encode(['error' => 'Could not prepare comment reports.']);
     exit;
 }
 
-$listingStmt = db_query(
+$commentStmt = db_query(
     $conn,
-    "SELECT LISTING_ID, USER_ID, TITLE FROM LISTINGS WHERE LISTING_ID=?",
-    [$listingId]
+    "SELECT C.COMMENT_ID, C.LISTING_ID, C.USER_ID, C.COMMENT_TEXT,
+            L.USER_ID AS LISTING_OWNER_ID
+     FROM LISTING_COMMENTS C
+     JOIN LISTINGS L ON C.LISTING_ID = L.LISTING_ID
+     WHERE C.COMMENT_ID=?",
+    [$commentId]
 );
-$listing = db_fetch_assoc($listingStmt);
+$comment = $commentStmt ? db_fetch_assoc($commentStmt) : null;
 
-if(!$listing){
+if(!$comment){
     http_response_code(404);
-    echo json_encode(['error' => 'Listing not found.']);
+    echo json_encode(['error' => 'Comment not found.']);
     exit;
 }
 
-$ownerId = (int)$listing['USER_ID'];
-if($ownerId === $loginId){
+$commentOwnerId = (int)$comment['USER_ID'];
+if($commentOwnerId === $loginId){
     http_response_code(403);
-    echo json_encode(['error' => 'You cannot report your own listing.']);
+    echo json_encode(['error' => 'You cannot report your own comment.']);
     exit;
 }
 
@@ -91,35 +94,42 @@ $existingStmt = db_query(
     $conn,
     "SELECT REPORT_ID
      FROM LISTING_REPORTS
-     WHERE LISTING_ID=? AND REPORTER_USER_ID=? AND REPORT_TYPE='listing' AND REPORT_STATUS='Pending'
+     WHERE COMMENT_ID=? AND REPORTER_USER_ID=? AND REPORT_TYPE='comment' AND REPORT_STATUS='Pending'
      ORDER BY CREATED_AT DESC
      LIMIT 1",
-    [$listingId, $loginId]
+    [$commentId, $loginId]
 );
 
 if($existingStmt && db_fetch_assoc($existingStmt)){
-    echo json_encode(['error' => 'You already sent a pending report for this item.']);
+    echo json_encode(['error' => 'You already sent a pending report for this comment.']);
     exit;
 }
 
+$detailsWithContext = $reportDetails . "\n\nReported comment:\n" . mb_substr((string)$comment['COMMENT_TEXT'], 0, 500);
 $insertStmt = db_query(
     $conn,
     "INSERT INTO LISTING_REPORTS
-        (REPORT_TYPE, LISTING_ID, REPORTER_USER_ID, LISTING_OWNER_USER_ID, REPORT_REASON, REPORT_DETAILS, REPORT_STATUS)
-     VALUES ('listing', ?, ?, ?, ?, ?, 'Pending')",
-    [$listingId, $loginId, $ownerId, $reportReason, $reportDetails]
+        (REPORT_TYPE, LISTING_ID, COMMENT_ID, REPORTER_USER_ID, LISTING_OWNER_USER_ID, REPORT_REASON, REPORT_DETAILS, REPORT_STATUS)
+     VALUES ('comment', ?, ?, ?, ?, ?, ?, 'Pending')",
+    [
+        (int)$comment['LISTING_ID'],
+        $commentId,
+        $loginId,
+        $commentOwnerId,
+        $reportReason,
+        $detailsWithContext,
+    ]
 );
 
 if($insertStmt === false){
     http_response_code(500);
-    echo json_encode(['error' => db_last_error() ?: 'Could not save the report.']);
+    echo json_encode(['error' => db_last_error() ?: 'Could not save the comment report.']);
     exit;
 }
 
 echo json_encode([
     'success' => true,
-    'message' => 'Report submitted! Waiting for admin review.'
+    'message' => 'Comment report submitted for admin review.'
 ]);
 
 db_close($conn);
-?>
