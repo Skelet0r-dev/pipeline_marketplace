@@ -142,6 +142,7 @@ CREATE TABLE IF NOT EXISTS LISTING_REPORTS (
 -- ============================================================
 -- Sample admin account (password: admin123 — change in prod!)
 -- ============================================================
+
 INSERT INTO ADMIN_LOGIN (ADMIN_NUMBER, USERNAME, PASSWORD)
 VALUES (1, 'admin', 'admin123')
 ON DUPLICATE KEY UPDATE USERNAME = VALUES(USERNAME);
