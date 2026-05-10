@@ -147,6 +147,16 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
                 <path fill-rule="evenodd" d="M2 15.5V2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.74.439L8 13.069l-5.26 2.87A.5.5 0 0 1 2 15.5M8.16 4.1a.178.178 0 0 0-.32 0l-.634 1.285a.18.18 0 0 1-.134.098l-1.42.206a.178.178 0 0 0-.098.303L6.58 6.993c.042.041.061.1.051.158L6.39 8.565a.178.178 0 0 0 .258.187l1.27-.668a.18.18 0 0 1 .165 0l1.27.668a.178.178 0 0 0 .257-.187L9.368 7.15a.18.18 0 0 1 .05-.158l1.028-1.001a.178.178 0 0 0-.098-.303l-1.42-.206a.18.18 0 0 1-.134-.098z"/>
             </svg>
         </a>
+
+        <!-- Notification Bell moved next to Bookmark -->
+        <a href="notifications.php" class="dash-nav-link" id="navNotifLink" title="Notifications">
+            <div style="position:relative; display:inline-block;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-bell-fill" viewBox="0 0 16 16" style="vertical-align: middle; margin-top: -3px;">
+                    <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2m.995-14.901a1 1 0 1 0-1.99 0A5 5 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901"/>
+                </svg>
+                <span id="navNotifBadge" style="display:none; position:absolute; top:-5px; right:-5px; background:#ef4444; color:white; font-size:9px; font-weight:800; width:16px; height:16px; border-radius:50%; text-align:center; line-height:16px; border:1.5px solid #fff;">0</span>
+            </div>
+        </a>
     </div>
     <div class="dash-nav-right">
         <div class="dash-greeting">
@@ -441,6 +451,61 @@ function closeLightbox() {
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeLightbox();
 });
+
+// Real-time Notification Polling
+let shownNotifIds = new Set();
+function checkNotifications() {
+    fetch('fetch_notifications.php')
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                const badge = document.getElementById('navNotifBadge');
+                const count = data.notifications.length;
+                if (count > 0) {
+                    badge.style.display = 'inline-block';
+                    badge.textContent = count;
+                } else {
+                    badge.style.display = 'none';
+                }
+
+                data.notifications.forEach(notif => {
+                    if (!shownNotifIds.has(notif.id)) {
+                        shownNotifIds.add(notif.id);
+                        if ("Notification" in window && Notification.permission === "granted") {
+                            new Notification(notif.sender, { body: notif.message, icon: notif.avatar });
+                        }
+                        showNotificationToast(notif);
+                    }
+                });
+            }
+        });
+}
+
+function showNotificationToast(notif) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `position:fixed; top:24px; right:24px; width:320px; background:white; border-left:5px solid #087832; box-shadow:0 15px 35px rgba(0,0,0,0.15); border-radius:12px; padding:16px; display:flex; gap:12px; z-index:10001; font-family:'DM Sans', sans-serif; transition: all 0.5s ease;`;
+    toast.innerHTML = `<img src="${notif.avatar}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;"><div><div style="font-weight:700;color:#087832;font-size:14px;">${notif.sender}</div><div style="color:#666;font-size:13px;">${notif.message}</div></div>`;
+    document.body.appendChild(toast);
+    
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(50px)';
+    setTimeout(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(0)';
+    }, 10);
+
+    setTimeout(() => { 
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(50px)';
+        setTimeout(() => toast.remove(), 500);
+    }, 6000);
+}
+
+if ("Notification" in window && Notification.permission !== "denied" && Notification.permission !== "granted") {
+    Notification.requestPermission();
+}
+checkNotifications();
+setInterval(checkNotifications, 10000);
 </script>
 </body>
 </html>

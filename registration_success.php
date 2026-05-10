@@ -123,6 +123,21 @@ $allowtypes = array('jpg', 'png', 'jpeg', 'gif', 'webp');
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Trigger Browser Notification on success
+        window.addEventListener('load', () => {
+            if ("Notification" in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        new Notification("Account Verified! 🎉", {
+                            body: "Welcome to Pipeline, <?php echo htmlspecialchars($firstname); ?>! Your digital ID is ready.",
+                            icon: "assets/img/pipeline_logo_light.png"
+                        });
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
 <?php db_close($conn); ?>

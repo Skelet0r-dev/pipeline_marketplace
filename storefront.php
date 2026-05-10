@@ -239,52 +239,6 @@ $sqlsoldlist="SELECT L.*, I.FILE_PATH AS IMG
               ORDER BY L.DATE_POSTED DESC";
 $resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
 
-// ── Fetch activity: likes on your listings ──────────────────
-// (join with LISTING_LIKES and LISTING_COMMENTS tables)
-$reactionOptions = listing_reaction_options();
-$sqlLikes = "SELECT LL.LIKE_ID, LL.REACTION_TYPE, LL.CREATED_AT,
-                    L.TITLE, L.LISTING_ID,
-                    U.FIRST_NAME, U.LAST_NAME, U.USERNAME,
-                    UI.FILE_PATH AS AVATAR
-             FROM LISTING_LIKES LL
-             JOIN LISTINGS L ON LL.LISTING_ID = L.LISTING_ID
-             JOIN USERS U    ON LL.USER_ID = U.USER_ID
-             LEFT JOIN USER_IMG UI ON LL.USER_ID = UI.USER_ID
-             WHERE L.USER_ID = ?
-             ORDER BY LL.CREATED_AT DESC";
-$resLikes = db_query($conn, $sqlLikes, [$loginId]);
-$activityLikes = [];
-if($resLikes){
-    while($row = db_fetch_assoc($resLikes)){
-        $row['CREATED_AT'] = $row['CREATED_AT'] instanceof DateTime
-            ? $row['CREATED_AT']->format('M d, Y g:i A')
-            : date('M d, Y g:i A', strtotime((string)$row['CREATED_AT']));
-        $row['REACTION_TYPE'] = normalize_listing_reaction($row['REACTION_TYPE'] ?? null);
-        $activityLikes[] = $row;
-    }
-}
-
-// ── Fetch activity: comments on your listings ───────────────
-$sqlComments = "SELECT LC.COMMENT_ID, LC.COMMENT_TEXT, LC.CREATED_AT,
-                       L.TITLE, L.LISTING_ID,
-                       U.FIRST_NAME, U.LAST_NAME, U.USERNAME,
-                       UI.FILE_PATH AS AVATAR
-                FROM LISTING_COMMENTS LC
-                JOIN LISTINGS L ON LC.LISTING_ID = L.LISTING_ID
-                JOIN USERS U    ON LC.USER_ID = U.USER_ID
-                LEFT JOIN USER_IMG UI ON LC.USER_ID = UI.USER_ID
-                WHERE L.USER_ID = ?
-                ORDER BY LC.CREATED_AT DESC";
-$resComments = db_query($conn, $sqlComments, [$loginId]);
-$activityComments = [];
-if($resComments){
-    while($row = db_fetch_assoc($resComments)){
-        $row['CREATED_AT'] = $row['CREATED_AT'] instanceof DateTime
-            ? $row['CREATED_AT']->format('M d, Y g:i A')
-            : date('M d, Y g:i A', strtotime((string)$row['CREATED_AT']));
-        $activityComments[] = $row;
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -315,9 +269,20 @@ if($resComments){
                     <path fill-rule="evenodd" d="M2 15.5V2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.74.439L8 13.069l-5.26 2.87A.5.5 0 0 1 2 15.5M8.16 4.1a.178.178 0 0 0-.32 0l-.634 1.285a.18.18 0 0 1-.134.098l-1.42.206a.178.178 0 0 0-.098.303L6.58 6.993c.042.041.061.1.051.158L6.39 8.565a.178.178 0 0 0 .258.187l1.27-.668a.18.18 0 0 1 .165 0l1.27.668a.178.178 0 0 0 .257-.187L9.368 7.15a.18.18 0 0 1 .05-.158l1.028-1.001a.178.178 0 0 0-.098-.303l-1.42-.206a.18.18 0 0 1-.134-.098z"/>
                 </svg>
             </a>
+            
+            <!-- Notification Bell moved next to Bookmark -->
+            <a href="notifications.php" class="dash-nav-link" id="navNotifLink" title="Notifications">
+                <div style="position:relative; display:inline-block;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-bell-fill" viewBox="0 0 16 16" style="vertical-align: middle; margin-top: -3px;">
+                        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2m.995-14.901a1 1 0 1 0-1.99 0A5 5 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901"/>
+                    </svg>
+                    <span id="navNotifBadge" style="display:none; position:absolute; top:-5px; right:-5px; background:#ef4444; color:white; font-size:9px; font-weight:800; width:16px; height:16px; border-radius:50%; text-align:center; line-height:16px; border:1.5px solid #fff;">0</span>
+                </div>
+            </a>
         </div>
 
         <div class="dash-nav-right">
+
             <div class="dash-greeting">
                 <span class="dash-hello">Hello,</span>
                 <span class="dash-name"><?php echo htmlspecialchars($firstname); ?></span>
@@ -368,7 +333,6 @@ if($resComments){
         <div class="sf-tabs">
             <button class="sf-tab active" data-tab="listings">🏷️ Listings</button>
             <button class="sf-tab" data-tab="sold">✅ Sold</button>
-            <button class="sf-tab" data-tab="activity">Activity</button>
         </div>
     </div>
 
@@ -503,66 +467,6 @@ if($resComments){
         </div>
     </div>
 
-    <!-- ── ACTIVITY TAB (likes + comments on your listings) ── -->
-    <div class="sf-content d-none" id="tab-activity">
-        <div class="sf-activity-wrap">
-
-            <!-- Reactions feed -->
-            <div class="sf-activity-col">
-                <h4 class="sf-activity-heading">Reactions</h4>
-                <?php if(empty($activityLikes)): ?>
-                <div class="sf-activity-empty">No reactions yet on your listings.</div>
-                <?php else: ?>
-                <div class="sf-activity-list">
-                    <?php foreach($activityLikes as $like): ?>
-                    <?php $reaction = $reactionOptions[$like['REACTION_TYPE']] ?? $reactionOptions[LISTING_REACTION_DEFAULT]; ?>
-                    <div class="sf-activity-item">
-                        <img src="<?php echo htmlspecialchars($like['AVATAR'] ?? 'assets/img/avatar.png'); ?>"
-                             class="sf-activity-avatar" alt="Avatar">
-                        <div class="sf-activity-body">
-                            <span class="sf-activity-user"><?php echo htmlspecialchars($like['FIRST_NAME'].' '.$like['LAST_NAME']); ?></span>
-                            <span class="sf-activity-handle">@<?php echo htmlspecialchars($like['USERNAME']); ?></span>
-                            reacted <?php echo $reaction['emoji']; ?> <?php echo htmlspecialchars(strtolower($reaction['label'])); ?> to your listing
-                            <a href="listing.php?id=<?php echo $like['LISTING_ID']; ?>" class="sf-activity-listing-link">
-                                <?php echo htmlspecialchars($like['TITLE']); ?>
-                            </a>
-                        </div>
-                        <span class="sf-activity-time"><?php echo htmlspecialchars($like['CREATED_AT']); ?></span>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-                <?php endif; ?>
-            </div>
-
-            <!-- Comments feed -->
-            <div class="sf-activity-col">
-                <h4 class="sf-activity-heading">💬 Comments</h4>
-                <?php if(empty($activityComments)): ?>
-                <div class="sf-activity-empty">No comments yet on your listings.</div>
-                <?php else: ?>
-                <div class="sf-activity-list">
-                    <?php foreach($activityComments as $comment): ?>
-                    <div class="sf-activity-item sf-activity-item-comment">
-                        <img src="<?php echo htmlspecialchars($comment['AVATAR'] ?? 'assets/img/avatar.png'); ?>"
-                             class="sf-activity-avatar" alt="Avatar">
-                        <div class="sf-activity-body">
-                            <span class="sf-activity-user"><?php echo htmlspecialchars($comment['FIRST_NAME'].' '.$comment['LAST_NAME']); ?></span>
-                            <span class="sf-activity-handle">@<?php echo htmlspecialchars($comment['USERNAME']); ?></span>
-                            commented on
-                            <a href="listing.php?id=<?php echo $comment['LISTING_ID']; ?>" class="sf-activity-listing-link">
-                                <?php echo htmlspecialchars($comment['TITLE']); ?>
-                            </a>
-                            <p class="sf-activity-comment-text">"<?php echo htmlspecialchars(mb_substr($comment['COMMENT_TEXT'],0,120)); ?><?php echo mb_strlen($comment['COMMENT_TEXT'])>120?'…':''; ?>"</p>
-                        </div>
-                        <span class="sf-activity-time"><?php echo htmlspecialchars($comment['CREATED_AT']); ?></span>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-                <?php endif; ?>
-            </div>
-
-        </div>
-    </div>
 
     <!-- ── ITEM DETAIL MODAL ── -->
     <div class="modal fade" id="itemDetailModal" tabindex="-1" aria-hidden="true">
@@ -906,6 +810,62 @@ if($resComments){
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/storefront.js"></script>
+    <script>
+        // Real-time Notification Polling
+        let shownNotifIds = new Set();
+        function checkNotifications() {
+            fetch('fetch_notifications.php')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        const badge = document.getElementById('navNotifBadge');
+                        const count = data.notifications.length;
+                        if (count > 0) {
+                            badge.style.display = 'inline-block';
+                            badge.textContent = count;
+                        } else {
+                            badge.style.display = 'none';
+                        }
+
+                        data.notifications.forEach(notif => {
+                            if (!shownNotifIds.has(notif.id)) {
+                                shownNotifIds.add(notif.id);
+                                if ("Notification" in window && Notification.permission === "granted") {
+                                    new Notification(notif.sender, { body: notif.message, icon: notif.avatar });
+                                }
+                                showNotificationToast(notif);
+                            }
+                        });
+                    }
+                });
+        }
+
+        function showNotificationToast(notif) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `position:fixed; top:24px; right:24px; width:320px; background:white; border-left:5px solid #087832; box-shadow:0 15px 35px rgba(0,0,0,0.15); border-radius:12px; padding:16px; display:flex; gap:12px; z-index:10001; font-family:'DM Sans', sans-serif; transition: all 0.5s ease;`;
+            toast.innerHTML = `<img src="${notif.avatar}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;"><div><div style="font-weight:700;color:#087832;font-size:14px;">${notif.sender}</div><div style="color:#666;font-size:13px;">${notif.message}</div></div>`;
+            document.body.appendChild(toast);
+            
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(50px)';
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(0)';
+            }, 10);
+
+            setTimeout(() => { 
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(50px)';
+                setTimeout(() => toast.remove(), 500);
+            }, 6000);
+        }
+
+        if ("Notification" in window && Notification.permission !== "denied" && Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+        checkNotifications();
+        setInterval(checkNotifications, 10000);
+    </script>
 </body>
 </html>
 <?php db_close($conn); ?>

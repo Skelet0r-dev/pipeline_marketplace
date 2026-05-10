@@ -60,6 +60,30 @@ if($existing && $existing['REACTION_TYPE'] === $reactionType){
     $selectedReaction = $reactionType;
 }
 
+// ── Trigger Notification ───────────────────────────────────────────────────
+if ($selectedReaction !== null) {
+    // Find the owner of the listing
+    $sqlOwner = "SELECT USER_ID, TITLE FROM LISTINGS WHERE LISTING_ID = ? LIMIT 1";
+    $resOwner = db_query($conn, $sqlOwner, [$listingId]);
+    $owner = db_fetch_assoc($resOwner);
+
+    if ($owner && (int)$owner['USER_ID'] !== $userId) {
+        // Only notify if the liker is NOT the owner
+        $ownerId = (int)$owner['USER_ID'];
+        $listingTitle = $owner['TITLE'];
+        
+        $emoji = '👍'; // Default
+        if (strtolower($selectedReaction) === 'heart_eyes') $emoji = '😍';
+        else if (strtolower($selectedReaction) === 'thumbs_down') $emoji = '👎';
+        
+        $msg = "reacted $emoji to your listing: \"$listingTitle\"";
+        
+        $sqlNotif = "INSERT INTO NOTIFICATIONS (USER_ID, SENDER_ID, TYPE, LISTING_ID, MESSAGE) VALUES (?, ?, 'LIKE', ?, ?)";
+        db_query($conn, $sqlNotif, [$ownerId, $userId, $listingId, $msg]);
+    }
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 $reactionCounts = listing_reaction_counts($conn, $listingId);
 
 echo json_encode([

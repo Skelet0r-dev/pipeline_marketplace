@@ -62,6 +62,23 @@ if(!$result){
     exit;
 }
 
+// ── Trigger Notification ───────────────────────────────────────────────────
+// Find the owner of the listing
+$sqlOwner = "SELECT USER_ID, TITLE FROM LISTINGS WHERE LISTING_ID = ? LIMIT 1";
+$resOwner = db_query($conn, $sqlOwner, [$listingId]);
+$owner = db_fetch_assoc($resOwner);
+
+if ($owner && (int)$owner['USER_ID'] !== $userId) {
+    // Only notify if the commenter is NOT the owner
+    $ownerId = (int)$owner['USER_ID'];
+    $listingTitle = $owner['TITLE'];
+    $msg = "commented on your listing: \"$listingTitle\"";
+    
+    $sqlNotif = "INSERT INTO NOTIFICATIONS (USER_ID, SENDER_ID, TYPE, LISTING_ID, MESSAGE) VALUES (?, ?, 'COMMENT', ?, ?)";
+    db_query($conn, $sqlNotif, [$ownerId, $userId, $listingId, $msg]);
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 // Fetch the newly inserted comment with user info to return to frontend
 $sqlNew = "SELECT C.COMMENT_ID, C.COMMENT_TEXT, C.CREATED_AT,
                   U.FIRST_NAME, U.LAST_NAME, U.USERNAME,
