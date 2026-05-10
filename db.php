@@ -24,7 +24,8 @@ function db_config(): array {
 
     // Detect if we are running locally or on the production server
     $http_host = $_SERVER['HTTP_HOST'] ?? '';
-    $is_docker = ($http_host === 'localhost:9090');
+    $is_cli = (php_sapi_name() === 'cli');
+    $is_docker = ($http_host === 'localhost:9090' || $is_cli); // Assume docker/local if CLI for testing
     $is_localhost = $is_docker || 
                    ($http_host === 'localhost' || 
                     $http_host === '127.0.0.1');
@@ -101,6 +102,10 @@ function db_fetch($stmt): bool {
     }
 
     return (bool) $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function db_last_insert_id($conn) {
+    return $conn->lastInsertId();
 }
 
 function db_last_error(?string $message = null): string {

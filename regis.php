@@ -1,226 +1,128 @@
 <?php
+session_start();
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/mail_util.php';
+
 $conn = db_connect();
-if($conn==false)
-    die(db_last_error());
+if($conn == false) die(db_last_error());
 
-$firstname  = strtoupper(trim($_POST['first_name']));
-$lastname   = strtoupper(trim($_POST['last_name']));
-$stdnum     = trim($_POST['std_num']);
-$college    = trim($_POST['college']);
-$department = trim($_POST['department']);
-$section    = trim($_POST['section']);
-$sex        = trim($_POST['sex']);
-$username   = trim($_POST['username']);
-$email      = strtolower(trim($_POST['email']));
-$password   = $_POST['password'];
+// ── Collect POST data ────────────────────────────────────────────────────────
+$firstname  = strtoupper(trim($_POST['f_name'] ?? ''));
+$lastname   = strtoupper(trim($_POST['l_name'] ?? ''));
+$stdnum     = trim($_POST['std_num'] ?? '');
+$college    = trim($_POST['college'] ?? '');
+$department = trim($_POST['department'] ?? '');
+$section    = trim($_POST['section'] ?? '');
+$sex        = trim($_POST['sex'] ?? '');
+$username   = trim($_POST['username'] ?? '');
+$email      = strtolower(trim($_POST['email'] ?? ''));
+$password   = $_POST['password'] ?? '';
 
-// ── Server-side validation ──
+// ── Validation ────────────────────────────────────────────────────────────────
 $errors = [];
-
 if(empty($firstname))  $errors[] = "First name is required.";
 if(empty($lastname))   $errors[] = "Last name is required.";
+if(empty($stdnum))     $errors[] = "Student number is required.";
 if(empty($username))   $errors[] = "Username is required.";
-if(empty($sex))        $errors[] = "Sex is required.";
-if(empty($college))    $errors[] = "College is required.";
-if(empty($department)) $errors[] = "Department is required.";
-if(empty($section))    $errors[] = "Section is required.";
+if(empty($email))      $errors[] = "Email is required.";
+if(empty($password))   $errors[] = "Password is required.";
 
 if(!preg_match('/^\d{9}$/', $stdnum))
     $errors[] = "Student number must be exactly 9 digits.";
 
-if(!filter_var($email, FILTER_VALIDATE_EMAIL))
-    $errors[] = "Please enter a valid email address.";
+if(!filter_var($email, FILTER_VALIDATE_EMAIL) || !str_ends_with($email, '@dlsud.edu.ph'))
+    $errors[] = "Please use your valid @dlsud.edu.ph email.";
 
-if(!str_ends_with($email, '@dlsud.edu.ph'))
-    $errors[] = "Email must be a valid @dlsud.edu.ph address.";
-
-$pwlen = strlen($password);
-if($pwlen < 8 || $pwlen > 255)          $errors[] = "Password must be at least 8 characters.";
-if(!preg_match('/[A-Z]/', $password))  $errors[] = "Password needs at least one uppercase letter.";
-if(!preg_match('/[a-z]/', $password))  $errors[] = "Password needs at least one lowercase letter.";
-if(!preg_match('/[0-9]/', $password))  $errors[] = "Password needs at least one number.";
-if(!preg_match('/[^A-Za-z0-9]/', $password)) $errors[] = "Password needs at least one symbol.";
-
-$allowedsex = ['Male','Female','Prefer Not To Say'];
-if(!in_array($sex, $allowedsex))
-    $errors[] = "Invalid value for sex.";
-
-// Errors will be checked after database queries below
-
-// ── Check if student number already exists ──
-$sql="SELECT * FROM USERS WHERE STD_NUM=?";
-$result=db_query($conn,$sql, [$stdnum]);
-if($result===false) die(db_last_error());
-
-if(db_fetch($result)===true){
-    $errors[] = "An account with this student number already exists.";
+// ── Check Duplicates ──────────────────────────────────────────────────────────
+$res = db_query($conn, "SELECT USER_ID FROM USERS WHERE STD_NUM = ? OR EMAIL = ?", [$stdnum, $email]);
+if(db_fetch($res)) {
+    $errors[] = "Student number or Email already registered.";
 }
 
-// ── Check if email already exists ──
-$sql="SELECT * FROM USERS WHERE EMAIL=?";
-$result=db_query($conn,$sql, [$email]);
-if($result===false) die(db_last_error());
-
-if(db_fetch($result)===true){
-    $errors[] = "An account with this email address already exists.";
-}
-
-if(!empty($errors)){
+if(!empty($errors)) {
+    // If AJAX request
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
         header('Content-Type: application/json');
         echo json_encode(['success' => false, 'errors' => $errors]);
         exit;
     }
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Registration Error</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/regis.css">
-</head>
-<body>
-    <div class="error-card">
-        <h2>⚠ Registration Error</h2>
-        <ul class="error-list">
-            <?php foreach($errors as $err){ echo '<li>'.htmlspecialchars($err).'</li>'; } ?>
-        </ul>
-        <a href="javascript:history.back()" class="btn-back">← Go Back</a>
-    </div>
-</body>
-</html>
-<?php
+    // For standard form submission (fallback)
+    $_SESSION['reg_errors'] = $errors;
+    header('Location: login.html#signup');
     exit;
 }
 
-// If it's an AJAX request but successful, we'll return success:true
-// so the JS can either redirect or show a message.
-// For now, standard success continues below with HTML.
+// ── Image Upload ─────────────────────────────────────────────────────────────
+$target_file = "";
+if (isset($_FILES['profile_img']) && $_FILES['profile_img']['error'] == 0) {
+    $target_dir = "uploads/profiles/";
+    if (!is_dir($target_dir)) mkdir($target_dir, 0777, true);
+    
+    $file_ext = strtolower(pathinfo($_FILES['profile_img']['name'], PATHINFO_EXTENSION));
+    $target_file = $target_dir . bin2hex(random_bytes(8)) . "." . $file_ext;
+    move_uploaded_file($_FILES['profile_img']['tmp_name'], $target_file);
+}
 
-// ── Insert new user ──
-$hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-$sql="INSERT INTO USERS (FIRST_NAME, LAST_NAME, STD_NUM, COLLEGE, DEPARTMENT, SECTION, SEX, USERNAME, EMAIL, `PASSWORD`, DATE_REGISTERED)
-      VALUES (?,?,?,?,?,?,?,?,?,?,NOW())";
-$result=db_query($conn,$sql, [$firstname,$lastname,$stdnum,$college,$department,$section,$sex,$username,$email,$hashedPassword]);
-if($result===false) die(db_last_error());
+// ── Hash Password ────────────────────────────────────────────────────────────
+$hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-// ── Get new user ID ──
-$sql="SELECT USER_ID FROM USERS WHERE STD_NUM=?";
-$result=db_query($conn,$sql, [$stdnum]);
-if($result===false) die(db_last_error());
-$row=db_fetch_assoc($result);
-$id=$row['USER_ID'];
+// ── Insert User ──────────────────────────────────────────────────────────────
+$date_now = date('Y-m-d');
+$sql = "INSERT INTO USERS (FIRST_NAME, LAST_NAME, STD_NUM, COLLEGE, DEPARTMENT, SECTION, SEX, USERNAME, EMAIL, PASSWORD, VERIFIED, DATE_REGISTERED) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)";
+$params = [$firstname, $lastname, $stdnum, $college, $department, $section, $sex, $username, $email, $hashed_password, $date_now];
 
-// ── Image upload ──
-$allowtypes = ['jpg'];
-$checkimage = '';
-$imagepath  = '';
+$stmt = db_query($conn, $sql, $params);
+if (!$stmt) {
+    $err = db_last_error();
+    file_put_contents(__DIR__ . '/reg_db_error.log', "[" . date('Y-m-d H:i:s') . "] INSERT FAILED: $err\nParams: " . print_r($params, true) . "\n", FILE_APPEND);
+    
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'errors' => ['Database insertion failed. Please contact admin.']]);
+    exit;
+}
 
-if(!empty($_FILES['image']['name'])){
-    $destination = "uploads/";
-    $imagename   = basename($_FILES['image']['name']);
-    $imagepath   = $destination.$imagename;
-    $checkimage  = strtolower(pathinfo($imagepath, PATHINFO_EXTENSION));
+$userId = db_last_insert_id($conn);
+file_put_contents(__DIR__ . '/reg_success.log', "[" . date('Y-m-d H:i:s') . "] SUCCESS: Created User ID $userId ($email)\n", FILE_APPEND);
 
-    if(in_array($checkimage, $allowtypes)){
-        if(move_uploaded_file($_FILES['image']['tmp_name'], $imagepath)){
-            $sql="INSERT INTO USER_IMG (IMG_NAME, FILE_PATH, USER_ID) VALUES (?,?,?)";
-            $result=db_query($conn,$sql, [$imagename,$imagepath,$id]);
-            if($result===false) die(db_last_error());
-        }
+// ── Store Image ──
+if ($target_file) {
+    $res_img = db_query($conn, "INSERT INTO USER_IMG (USER_ID, FILE_PATH) VALUES (?, ?)", [$userId, $target_file]);
+    if (!$res_img) {
+        file_put_contents(__DIR__ . '/reg_db_error.log', "[" . date('Y-m-d H:i:s') . "] IMG INSERT FAILED for User $userId: " . db_last_error() . "\n", FILE_APPEND);
     }
 }
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Created</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/regis_success.css">
 
-</head>
-<body>
-
-<!-- Account Created Card-->
-    <div class="id-card">
-        <!-- scan line sweeps after card enters -->
-        <div class="scan"></div>
-
-        <div class="id-card-header">
-            <img src="assets/img/pipeline_logo_light.png" class="brand-logo" alt="Pipeline">
-            <div class="card-title-block">
-                <div class="date-issue"> Date of issue <?php echo date("m. d. Y"); ?></div>
-                <div class="card-title">ACCOUNT CREATED</div>
-            </div>
+// ── OTP & Email ──────────────────────────────────────────────────────────────
+$code = generateVerificationCode($conn, $email, 'signup');
+$subject = "Verify Your Pipeline Account";
+$textPart = "Your verification code is: $code";
+$htmlPart = "
+    <div style='font-family: Arial, sans-serif; padding: 20px; color: #333;'>
+        <h2 style='color: #087832;'>Welcome to Pipeline!</h2>
+        <p>Thank you for registering. Please use the code below to verify your account:</p>
+        <div style='background: #f0faf4; padding: 15px; font-size: 24px; font-weight: bold; color: #087832; text-align: center; border-radius: 8px;'>
+            $code
         </div>
-
-        <div class="id-card-body">
-
-            <div class="id-photo-box">
-                <?php if($imagepath != '' && in_array($checkimage, $allowtypes)): ?>
-                    <img src="<?php echo htmlspecialchars($imagepath); ?>" alt="Profile Photo">
-                <?php else: ?>
-                    <img src="assets/img/regis_img.png" alt="Profile Photo">
-                <?php endif; ?>
-            </div>
-
-            <div class="id-fields">
-                <div class="id-field">
-                    <div class="id-field-label">Name.</div>
-                    <div class="id-field-value large"><?php echo htmlspecialchars(strtoupper($firstname.' '.$lastname)); ?></div>
-                </div>
-                <div class="id-field">
-                    <div class="id-field-label">Student Number.</div>
-                    <div class="id-field-value"><?php echo htmlspecialchars($stdnum); ?></div>
-                </div>
-                <div class="id-field">
-                    <div class="id-field-label">College.</div>
-                    <div class="id-field-value"><?php echo htmlspecialchars($college); ?></div>
-                </div>
-                <div class="id-field">
-                    <div class="id-field-label">Department.</div>
-                    <div class="id-field-value"><?php echo htmlspecialchars($department); ?></div>
-                </div>
-                <div class="id-field">
-                    <div class="id-field-label">Section.</div>
-                    <div class="id-field-value"><?php echo htmlspecialchars($section); ?></div>
-                </div>
-                <div class="id-field">
-                    <div class="id-field-label">Sex.</div>
-                    <div class="id-field-value"><?php echo htmlspecialchars($sex); ?></div>
-                </div>
-                <div class="id-field">
-                    <div class="id-field-label">Username.</div>
-                    <div class="id-field-value"><?php echo htmlspecialchars($username); ?></div>
-                </div>
-                <div class="id-field">
-                    <div class="id-field-label">Email.</div>
-                    <div class="id-field-value" style="font-size:14px"><?php echo htmlspecialchars($email); ?></div>
-                </div>
-            </div>
-
-            <div class="id-watermark">P</div>
-
-        </div>
-
-        <div class="id-card-footer">
-            <span class="tagline"></span>
-            <a href="login.html">OK</a>
-        </div>
-
+        <p>This code will expire in 15 minutes.</p>
     </div>
+";
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-<?php db_close($conn); ?>
+sendEmail($email, "$firstname $lastname", $subject, $textPart, $htmlPart);
+
+// ── Cleanup and Redirect ─────────────────────────────────────────────────────
+db_close($conn);
+
+$_SESSION['verify_email'] = $email;
+$_SESSION['verify_type']  = 'signup';
+
+// If AJAX
+if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true, 'redirect' => "verify.php?email=" . urlencode($email) . "&type=signup"]);
+    exit;
+}
+
+header("Location: verify.php?email=" . urlencode($email) . "&type=signup");
+exit;
+?>

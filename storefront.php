@@ -89,7 +89,9 @@ if(isset($_POST['add_listing']) && $_POST['add_listing']=='1'){
 
     $categoryval=$category;
     if($category=='Course-Specific' && $college!=''){
-        $categoryval='Course-Specific ('.$college.')';
+        $section_post_key = isset($_POST['add_listing']) ? 'section' : 'edit_section';
+        $section=isset($_POST[$section_post_key]) ? trim($_POST[$section_post_key]) : '';
+        $categoryval='Course-Specific ('.$college . ($section ? ' - '.$section : '') . ')';
     }
 
     $sqladd="INSERT INTO LISTINGS (USER_ID,TITLE,DESCRIPTION,PRICE,CATEGORY,`CONDITION`,`STATUS`,MEETUP_SPOT,PAYMENT_METHOD)
@@ -672,16 +674,21 @@ if($resComments){
                                 <label class="listing-label">College</label>
                                 <select name="edit_college" id="editCollege" class="listing-select">
                                     <option value="" disabled selected>Select College</option>
-                                    <option value="CCJE">CCJE</option>
-                                    <option value="COED">COED</option>
-                                    <option value="COL">COL</option>
-                                    <option value="CICS">CICS</option>
-                                    <option value="COS">COS</option>
-                                    <option value="CTHM">CTHM</option>
-                                    <option value="CBAA">CBAA</option>
-                                    <option value="CLAC">CLAC</option>
                                     <option value="CEAT">CEAT</option>
+                                    <option value="CLAC">CLAC</option>
+                                    <option value="CBAA">CBAA</option>
+                                    <option value="COS">COS</option>
+                                    <option value="CICS">CICS</option>
+                                    <option value="COED">COED</option>
+                                    <option value="CCJE">CCJE</option>
+                                    <option value="CTHM">CTHM</option>
+                                    <option value="COL">COL</option>
                                 </select>
+                            </div>
+
+                            <div class="mt-2 section-row-hidden" id="editSectionRow">
+                                <label class="listing-label">Section</label>
+                                <input type="text" name="edit_section" id="editSectionInput" class="listing-input" placeholder="e.g. CS31">
                             </div>
 
                             <div class="mt-2">
@@ -818,18 +825,23 @@ if($resComments){
 
                             <div class="mt-2 college-row-hidden" id="collegeRow">
                                 <label class="listing-label">College</label>
-                                <select name="college" class="listing-select" id="collegeSelect">
+                                <select name="college" id="collegeSelect" class="listing-select">
                                     <option value="" disabled selected>Select College</option>
-                                    <option value="CCJE">CCJE</option>
-                                    <option value="COED">COED</option>
-                                    <option value="COL">COL</option>
-                                    <option value="CICS">CICS</option>
-                                    <option value="COS">COS</option>
-                                    <option value="CTHM">CTHM</option>
-                                    <option value="CBAA">CBAA</option>
-                                    <option value="CLAC">CLAC</option>
                                     <option value="CEAT">CEAT</option>
+                                    <option value="CLAC">CLAC</option>
+                                    <option value="CBAA">CBAA</option>
+                                    <option value="COS">COS</option>
+                                    <option value="CICS">CICS</option>
+                                    <option value="COED">COED</option>
+                                    <option value="CCJE">CCJE</option>
+                                    <option value="CTHM">CTHM</option>
+                                    <option value="COL">COL</option>
                                 </select>
+                            </div>
+
+                            <div class="mt-2 section-row-hidden" id="sectionRow">
+                                <label class="listing-label">Section</label>
+                                <input type="text" name="section" id="sectionInput" class="listing-input" placeholder="e.g. CS31">
                             </div>
 
                             <div class="mt-2">

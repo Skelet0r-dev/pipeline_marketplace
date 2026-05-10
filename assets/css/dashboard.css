@@ -667,6 +667,94 @@ img {
     border-color: var(--green-600);
 }
 
+/* ── Section Pills (Sub-filters) ────────── */
+.section-filters-container {
+    display: none;
+    margin-bottom: 20px;
+    background: #fdfdfd;
+    padding: 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    animation: fadeInSlideUp 0.3s ease;
+}
+
+.section-filters-container.active {
+    display: block;
+}
+
+.section-filters-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-filters-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+.section-pills-scroll {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.section-pill {
+    padding: 6px 14px;
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-pill);
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.section-pill:hover {
+    border-color: var(--green-400);
+    color: var(--green-600);
+    background: var(--green-50);
+    transform: translateY(-1px);
+}
+
+.section-pill.active {
+    background: var(--green-600);
+    color: #fff;
+    border-color: var(--green-600);
+    box-shadow: 0 4px 12px rgba(8, 120, 50, 0.2);
+}
+
+@keyframes fadeInSlideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Storefront Section Pills (for forms) */
+.section-pills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.section-pills-container .section-pill {
+    padding: 4px 12px;
+    font-size: 11.5px;
+}
+
+.section-row-hidden {
+    display: none;
+}
+
 /* Category grid (the squares) */
 .category-grid {
     display: grid;

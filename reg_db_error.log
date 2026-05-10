@@ -1,0 +1,15 @@
+[2026-05-10 23:04:29] INSERT FAILED: SQLSTATE[HY000]: General error: 1364 Field 'DATE_REGISTERED' doesn't have a default value
+Params: Array
+(
+    [0] => GABRIEL
+    [1] => MANUEL
+    [2] => 202231367
+    [3] => CEAT
+    [4] => CPE
+    [5] => 42
+    [6] => Male
+    [7] => Skeletor
+    [8] => mgs1367@dlsud.edu.ph
+    [9] => $2y$10$0a4t.Q/inE0N07toay6YUOcm2MlICJnBdnwZdutS/LtyVI9B92x1W
+)
+

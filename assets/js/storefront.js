@@ -91,37 +91,70 @@ function openItemModal(card) {
 var categorySelect = document.getElementById('categorySelect');
 var collegeRow = document.getElementById('collegeRow');
 var collegeSelect = document.getElementById('collegeSelect');
+var sectionRow = document.getElementById('sectionRow');
 
-categorySelect.addEventListener('change', function(){
-    if(this.value == 'Course-Specific'){
-        collegeRow.classList.remove('college-row-hidden');
-        collegeSelect.setAttribute('required', 'required');
-    } else {
-        collegeRow.classList.add('college-row-hidden');
-        collegeSelect.removeAttribute('required');
-        collegeSelect.value = '';
-    }
-});
+if(categorySelect) {
+    categorySelect.addEventListener('change', function(){
+        if(this.value == 'Course-Specific'){
+            collegeRow.classList.remove('college-row-hidden');
+            collegeSelect.setAttribute('required', 'required');
+        } else {
+            collegeRow.classList.add('college-row-hidden');
+            sectionRow.classList.add('section-row-hidden');
+            collegeSelect.removeAttribute('required');
+            collegeSelect.value = '';
+            document.getElementById('sectionInput').value = '';
+        }
+    });
+}
+
+if(collegeSelect) {
+    collegeSelect.addEventListener('change', function() {
+        if(this.value) sectionRow.classList.remove('section-row-hidden');
+        else sectionRow.classList.add('section-row-hidden');
+    });
+}
+
+// Edit modal category → college toggle
+var editCategorySelect = document.getElementById('editCategory');
+var editCollegeRow = document.getElementById('editCollegeRow');
+var editCollegeSelect = document.getElementById('editCollege');
+var editSectionRow = document.getElementById('editSectionRow');
+
+if(editCategorySelect) {
+    editCategorySelect.addEventListener('change', function(){
+        if(this.value == 'Course-Specific'){
+            editCollegeRow.classList.remove('college-row-hidden');
+            editCollegeSelect.setAttribute('required', 'required');
+        } else {
+            editCollegeRow.classList.add('college-row-hidden');
+            editSectionRow.classList.add('section-row-hidden');
+            editCollegeSelect.removeAttribute('required');
+            editCollegeSelect.value = '';
+            document.getElementById('editSectionInput').value = '';
+        }
+    });
+}
+
+if(editCollegeSelect) {
+    editCollegeSelect.addEventListener('change', function() {
+        if(this.value) editSectionRow.classList.remove('section-row-hidden');
+        else editSectionRow.classList.add('section-row-hidden');
+    });
+}
 
 function confirmDelete() {
     return confirm('Are you sure you want to delete this listing? This cannot be undone.');
 }
 
 function normalizeCategoryValue(category) {
-    if(!category){
-        return '';
-    }
-
-    if(category.indexOf('Course-Specific') === 0){
-        return category;
-    }
-
+    if(!category) return '';
+    if(category.indexOf('Course-Specific') === 0) return category;
     var categoryMap = {
         'Clothing and Apparel': 'Clothing & Apparel',
         'Hobbies and Lifestyle': 'Hobbies & Lifestyle',
         'Events and Tickets': 'Events & Tickets'
     };
-
     return categoryMap[category] || category;
 }
 
@@ -147,16 +180,25 @@ function openEditModal(card) {
 
     var catSelect = document.getElementById('editCategory');
     var catVal = normalizeCategoryValue(category);
+    
     if(category.indexOf('Course-Specific') === 0){
         catVal = 'Course-Specific';
         var collegeMatch = category.match(/\(([^)]+)\)/);
         if(collegeMatch){
+            const parts = collegeMatch[1].split(' - ');
+            const college = parts[0];
+            const section = parts[1] || '';
+            
             document.getElementById('editCollegeRow').classList.remove('college-row-hidden');
-            document.getElementById('editCollege').value = collegeMatch[1];
+            setSelectValue(document.getElementById('editCollege'), college);
+            document.getElementById('editSectionRow').classList.remove('section-row-hidden');
+            document.getElementById('editSectionInput').value = section;
         }
     } else {
         document.getElementById('editCollegeRow').classList.add('college-row-hidden');
+        document.getElementById('editSectionRow').classList.add('section-row-hidden');
     }
+
     setSelectValue(catSelect, catVal);
     setSelectValue(document.getElementById('editCondition'), condition);
     setSelectValue(document.getElementById('editMeetup'), meetup);
@@ -172,6 +214,7 @@ function openEditModal(card) {
 }
 
 function setSelectValue(selectEl, val) {
+    if(!selectEl) return;
     for(var i = 0; i < selectEl.options.length; i++){
         if(selectEl.options[i].value === val){
             selectEl.selectedIndex = i;
@@ -179,22 +222,6 @@ function setSelectValue(selectEl, val) {
         }
     }
 }
-
-// Edit modal category → college toggle
-var editCategorySelect = document.getElementById('editCategory');
-var editCollegeRow = document.getElementById('editCollegeRow');
-var editCollegeSelect = document.getElementById('editCollege');
-
-editCategorySelect.addEventListener('change', function(){
-    if(this.value == 'Course-Specific'){
-        editCollegeRow.classList.remove('college-row-hidden');
-        editCollegeSelect.setAttribute('required', 'required');
-    } else {
-        editCollegeRow.classList.add('college-row-hidden');
-        editCollegeSelect.removeAttribute('required');
-        editCollegeSelect.value = '';
-    }
-});
 
 // Edit image preview
 var editImgInput = document.getElementById('editListingImgInput');

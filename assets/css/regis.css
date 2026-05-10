@@ -316,7 +316,7 @@ body {
     background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
 }
 
-.is-invalid ~ .invalid-feedback {
+.is-invalid~.invalid-feedback {
     display: block;
 }
 
@@ -559,4 +559,38 @@ body {
 
 .btn-back:hover {
     color: #087832;
+}
+
+/* ── Section Pills ────────────────── */
+.section-pills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.section-pill {
+    padding: 8px 16px;
+    background: #f3f4f6;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.section-pill:hover {
+    border-color: #087832;
+    color: #087832;
+    background: #f0faf4;
+}
+
+.section-pill.active {
+    background: #087832;
+    color: #fff;
+    border-color: #087832;
+    box-shadow: 0 4px 12px rgba(8, 120, 50, 0.2);
 }

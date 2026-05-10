@@ -41,6 +41,7 @@ if(!isset($_POST['stdnum']) && isset($_SESSION['user_id'])){
         $resultprofile=db_query($conn,$sqlprofile, [$loginId]);
         $rowprofile=db_fetch_assoc($resultprofile);
         $file_path = $rowprofile ? $rowprofile['FILE_PATH'] : 'assets/img/avatar.png';
+        $userCollege = $rowsess['COLLEGE'] ?? '';
     }
 }
 
@@ -103,6 +104,7 @@ if(!isset($_POST['stdnum']) && $firstname==''){
 // Fetch all available listings for the dashboard
 $dashItems = [];
 $currentCategory = isset($_GET['cat']) ? $_GET['cat'] : 'all';
+$currentCollegeFilter = isset($_GET['college']) ? $_GET['college'] : 'all';
 $searchQuery = isset($_GET['search']) ? trim($_GET['search']) : '';
 
     $sqlDash = "SELECT L.*, I.FILE_PATH, U.USER_ID AS SELLER_ID, U.FIRST_NAME, U.LAST_NAME 
@@ -114,8 +116,13 @@ $searchQuery = isset($_GET['search']) ? trim($_GET['search']) : '';
     $params = [];
     if ($currentCategory !== 'all') {
         if ($currentCategory === 'Course-Specific') {
-            $sqlDash .= " AND L.CATEGORY LIKE ?";
-            $params[] = "Course-Specific%";
+            if ($currentCollegeFilter !== 'all') {
+                $sqlDash .= " AND L.CATEGORY LIKE ?";
+                $params[] = "Course-Specific (" . $currentCollegeFilter . "%)";
+            } else {
+                $sqlDash .= " AND L.CATEGORY LIKE ?";
+                $params[] = "Course-Specific%";
+            }
         } else {
             $sqlDash .= " AND L.CATEGORY = ?";
             $params[] = $currentCategory;
@@ -264,14 +271,29 @@ db_close($conn);
                         Events
                     </a>
                     <a href="dashboard.php?cat=Course-Specific" class="dash-design-tab <?php echo ($currentCategory === 'Course-Specific') ? 'active' : ''; ?>">
-                        <img src="assets/img/electronics.svg" alt="Cart" style="width: 16px; height: 16px;">
-                        Course
+                        <img src="assets/img/electronics.svg" alt="Course" style="width: 16px; height: 16px;">
+                        Course-Specific
                     </a>
+
                     <a href="dashboard.php?cat=Food" class="dash-design-tab <?php echo ($currentCategory === 'Food') ? 'active' : ''; ?>">
                         <img src="assets/img/cookies.svg" alt="Cart" style="width: 16px; height: 16px;">
                         Food
                     </a>
                 </div>
+
+                <!-- Hero Section Sub-filters (College Pills) -->
+                <?php if ($currentCategory === 'Course-Specific'): ?>
+                <div class="section-pills-scroll mt-3" style="margin-bottom: 24px;">
+                    <a href="dashboard.php?cat=Course-Specific&college=all" class="section-pill <?php echo ($currentCollegeFilter === 'all') ? 'active' : ''; ?>">All Colleges</a>
+                    <?php
+                    $allColleges = ['CEAT', 'CLAC', 'CBAA', 'COS', 'CICS', 'COED', 'CCJE', 'CTHM', 'COL'];
+                    foreach ($allColleges as $clg):
+                        $active = ($currentCollegeFilter === $clg) ? 'active' : '';
+                        echo '<a href="dashboard.php?cat=Course-Specific&college='.urlencode($clg).'" class="section-pill '.$active.'">'.$clg.'</a>';
+                    endforeach;
+                    ?>
+                </div>
+                <?php endif; ?>
 
                 <!-- Search Bar -->
                 <div class="dash-hero-search-wrap">
@@ -384,7 +406,28 @@ db_close($conn);
                     <img src="assets/img/cookies.svg" alt="Cookies" style="width: 16px; height: 16px;"> Food</a>
             </div>
 
+            <!-- Row 3: College pills (only for Course-Specific) -->
+        </div> <!-- End dash-sticky-inner -->
+
+        <?php if ($currentCategory === 'Course-Specific'): ?>
+        <div class="dash-sticky-inner" style="padding-top: 0; border-top: 1px solid var(--border); margin-top: 10px;">
+            <div class="section-filters-container active" style="width: 100%; border: none; background: transparent; padding: 10px 0; margin-bottom: 0;">
+                <div class="section-filters-title">
+                    <span>🏢 Filter by College</span>
+                </div>
+                <div class="section-pills-scroll">
+                    <a href="dashboard.php?cat=Course-Specific&college=all" class="section-pill <?php echo ($currentCollegeFilter === 'all') ? 'active' : ''; ?>">All Colleges</a>
+                    <?php
+                    $allColleges = ['CEAT', 'CLAC', 'CBAA', 'COS', 'CICS', 'COED', 'CCJE', 'CTHM', 'COL'];
+                    foreach ($allColleges as $clg):
+                        $active = ($currentCollegeFilter === $clg) ? 'active' : '';
+                        echo '<a href="dashboard.php?cat=Course-Specific&college='.urlencode($clg).'" class="section-pill '.$active.'">'.$clg.'</a>';
+                    endforeach;
+                    ?>
+                </div>
+            </div>
         </div>
+        <?php endif; ?>
     </div>
 
     <!-- ── DASHBOARD LISTINGS ── -->
@@ -725,10 +768,30 @@ db_close($conn);
                     },
                     y: 40,
                     opacity: 0,
-                    duration: 0.4,
-                    delay: (i % 5) * 0.06
                 });
             });
+
+            // Account Created Toast
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('msg') === 'account_created') {
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+                    background: #087832; color: white; padding: 16px 32px;
+                    border-radius: 100px; font-weight: 700; box-shadow: 0 12px 40px rgba(8, 120, 50, 0.4);
+                    z-index: 10000; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 12px;
+                    font-size: 16px; pointer-events: none;
+                `;
+                toast.innerHTML = '<span style="font-size:20px">🎉</span> Account Created Successfully!';
+                document.body.appendChild(toast);
+                
+                gsap.from(toast, { y: 100, opacity: 0, duration: 0.6, ease: "back.out(1.4)" });
+                setTimeout(() => {
+                    gsap.to(toast, { y: 100, opacity: 0, duration: 0.5, onComplete: () => toast.remove() });
+                    // Clean URL without reloading
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }, 4000);
+            }
         });
     </script>
 </body>

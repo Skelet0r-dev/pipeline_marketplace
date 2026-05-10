@@ -67,9 +67,55 @@ if (!$user || !password_verify($password, $user['PASSWORD'])) {
     exit;
 }
 
-// ── Success — clear attempt tracking and set session ─────────────────────────
-$_SESSION['login_attempts']  = 0;
-$_SESSION['login_locked_at'] = null;
-$_SESSION['user_id']         = $user['USER_ID'];
-header('Location: dashboard.php');
+// ── Check if user is verified ───────────────────────────────────────────────
+if ($user['VERIFIED'] == 0) {
+    require_once __DIR__ . '/mail_util.php';
+    $conn = db_connect();
+    $code = generateVerificationCode($conn, $user['EMAIL'], 'signup');
+    
+    $subject = "Verify Your Pipeline Account";
+    $textPart = "Your verification code is: $code";
+    $htmlPart = "
+        <div style='font-family: Arial, sans-serif; padding: 20px; color: #333;'>
+            <h2 style='color: #087832;'>Complete Your Registration</h2>
+            <p>Please verify your account using the code below:</p>
+            <div style='background: #f0faf4; padding: 15px; font-size: 24px; font-weight: bold; color: #087832; text-align: center; border-radius: 8px;'>
+                $code
+            </div>
+            <p>This code will expire in 15 minutes.</p>
+        </div>
+    ";
+    sendEmail($user['EMAIL'], $user['FIRST_NAME'], $subject, $textPart, $htmlPart);
+    db_close($conn);
+    $_SESSION['verify_email'] = $user['EMAIL'];
+    $_SESSION['verify_type']  = 'signup';
+    header("Location: verify.php?email=" . urlencode($user['EMAIL']) . "&type=signup");
+    exit;
+}
+
+// ── Successful Password Verification — Now send Login OTP ──────────────────
+require_once __DIR__ . '/mail_util.php';
+$conn = db_connect(); // Re-open since we closed it above
+$code = generateVerificationCode($conn, $user['EMAIL'], 'login');
+
+$subject = "Your Pipeline Login Code";
+$textPart = "Your login verification code is: $code";
+$htmlPart = "
+    <div style='font-family: Arial, sans-serif; padding: 20px; color: #333;'>
+        <h2 style='color: #087832;'>Pipeline Login Verification</h2>
+        <p>Hello " . htmlspecialchars($user['FIRST_NAME']) . ",</p>
+        <p>You are trying to log in to your account. Please use the verification code below:</p>
+        <div style='background: #f0faf4; padding: 15px; font-size: 24px; font-weight: bold; color: #087832; text-align: center; border-radius: 8px;'>
+            $code
+        </div>
+        <p>This code will expire in 15 minutes.</p>
+        <p>If you didn't attempt to log in, please secure your account immediately.</p>
+    </div>
+";
+
+sendEmail($user['EMAIL'], $user['FIRST_NAME'], $subject, $textPart, $htmlPart);
+db_close($conn);
+
+// Redirect to verify page
+header("Location: verify.php?email=" . urlencode($user['EMAIL']) . "&type=login");
 exit;
