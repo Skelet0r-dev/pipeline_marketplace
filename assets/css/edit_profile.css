@@ -145,6 +145,39 @@ body.body {
 }
 .lock-icon svg { width: 16px !important; height: 16px !important; display: block; }
 
+/* ── Square Payment UI ── */
+#card-container {
+    margin-top: 15px;
+    padding: 12px;
+    background: #fff;
+    border: 1.5px solid #d5d5d5;
+    border-radius: 10px;
+    min-height: 40px;
+}
+
+.btn-amount {
+    flex: 1;
+    background: #f0f0f0;
+    border: 1.5px solid #d5d5d5;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-amount:hover {
+    background: #e8f5e9;
+    border-color: #087832;
+    color: #087832;
+}
+
+.btn-amount:active {
+    transform: translateY(1px);
+}
+
 /* ── Password Bar ── */
 .pw-strength-bar { height: 5px; background: #eee; border-radius: 5px; margin-top: 8px; overflow: hidden; }
 .pw-strength-fill { height: 100%; width: 0%; transition: 0.3s; }
@@ -204,6 +237,100 @@ body.body {
 }
 
 .info-icon { font-size: 16px; color: #087832; }
+
+/* ── Profile Tabs ── */
+.profile-tabs {
+    display: flex;
+    padding: 0 36px;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    gap: 20px;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 16px 4px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #888;
+    cursor: pointer;
+    position: relative;
+    transition: 0.2s;
+}
+
+.tab-btn:hover { color: #087832; }
+
+.tab-btn.active { color: #087832; }
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #087832;
+    border-radius: 3px 3px 0 0;
+}
+
+/* ── Support Us Content ── */
+.support-hero {
+    text-align: center;
+    padding: 40px 0 20px;
+}
+
+.support-icon-big {
+    font-size: 48px;
+    margin-bottom: 16px;
+    animation: heartBeat 1.5s infinite;
+}
+
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    15% { transform: scale(1.15); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.15); }
+    60% { transform: scale(1); }
+}
+
+.support-hero h2 { font-size: 24px; font-weight: 800; color: #087832; margin-bottom: 8px; }
+.support-hero p  { font-size: 14px; color: #666; }
+
+.donation-card {
+    background: #fafafa;
+    border: 1.5px solid #eee;
+    border-radius: 16px;
+    padding: 20px;
+    transition: 0.2s;
+}
+
+.donation-card:hover {
+    border-color: #087832;
+    background: #fff;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+.donation-header {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.account-name {
+    font-size: 11px;
+    font-weight: 800;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.account-number {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    font-family: monospace;
+}
 
 /* Responsive */
 @media (max-width: 768px) {

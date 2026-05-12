@@ -235,9 +235,8 @@ db_close($conn);
                      id="profileBtn">
 
                 <div class="profile-dropdown" id="profileDropdown">
-                    <a href="logout.php" class="dropdown-item-custom logout">
-                        <span class="item-icon">🚪</span> Log Out
-                    </a>
+                    <a href="edit_profile.php?tab=support" class="dropdown-item-custom"><span class="item-icon">💖</span> Support Us</a>
+                    <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
                 </div>
             </div>
         </div>

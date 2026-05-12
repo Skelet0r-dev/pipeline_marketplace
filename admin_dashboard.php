@@ -886,6 +886,11 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
 
         <div class="nav-section-label">System</div>
         <a class="<?php echo navClass('audit', $activePage); ?>" href="admin_dashboard.php?page=audit"><span class="icon">📋</span> Audit Snapshot</a>
+
+        <div class="nav-section-label">Tools</div>
+        <a class="nav-item" href="scratch/listing_bot.php" target="_blank">
+            <span class="icon">🤖</span> Listing Bot
+        </a>
     </nav>
 
     <div class="sidebar-footer">

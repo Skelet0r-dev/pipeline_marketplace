@@ -2,6 +2,7 @@
 session_start();
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/square_config.php';
 $conn = db_connect();
 if ($conn == false) die(db_last_error());
 
@@ -111,6 +112,8 @@ db_close($conn);
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/dashboard.css">
   <link rel="stylesheet" href="assets/css/edit_profile.css"/>
+  <!-- Square Web Payments SDK -->
+  <script src="https://sandbox.web.squarecdn.com/v1/square.js" onerror="console.error('Square SDK failed to load'); document.getElementById('card-container').innerHTML = '<span style="color:red;">Square SDK blocked by browser or network.</span>';"></script>
 </head>
 <body class="body">
 
@@ -149,6 +152,7 @@ db_close($conn);
       <div class="profile-wrapper">
         <img src="<?php echo $avatarSrc; ?>" class="img-profile" alt="Profile Picture" id="profileBtn">
         <div class="profile-dropdown" id="profileDropdown">
+          <a href="edit_profile.php?tab=support" class="dropdown-item-custom"><span class="item-icon">💖</span> Support Us</a>
           <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
         </div>
       </div>
@@ -181,7 +185,13 @@ db_close($conn);
         </div>
       </div>
 
-      <div class="card-body">
+      <div class="profile-tabs">
+        <button type="button" class="tab-btn active" onclick="switchTab('edit')">Settings</button>
+        <button type="button" class="tab-btn" onclick="switchTab('support')">Support Us</button>
+      </div>
+
+      <div class="tab-content" id="tab-edit">
+        <div class="card-body">
         <div class="section">
           <div class="section-label">
             <h3>Identity</h3>
@@ -305,6 +315,47 @@ db_close($conn);
         <button class="btn-cancel" type="button" onclick="window.location.href='dashboard.php'">Cancel</button>
         <button class="btn-save" name="save_profile" type="submit">Save Changes</button>
       </div>
+    </div>    <div class="tab-content" id="tab-support" style="display:none;">
+      <div class="card-body" style="padding: 60px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px;">
+        
+        <div class="checkout-container" style="width: 100%; max-width: 420px; text-align: center;">
+          <div class="support-icon-big">💖</div>
+          <h2 style="font-size: 24px; font-weight: 800; color: #087832; margin-bottom: 8px;">Support Pipeline</h2>
+          <p style="font-size: 14px; color: #666; margin-bottom: 32px;">Help keep the campus marketplace alive and free.</p>
+
+          <div class="payment-form-box" style="background: #fff; padding: 24px; border: 1.5px solid #eee; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+            <div class="field-group mb-4" style="text-align: left;">
+              <label class="field-label">Select Amount (PHP)</label>
+              <div class="d-flex gap-2 mt-2 mb-3">
+                <button type="button" class="btn-amount" onclick="setAmount(50)">₱50</button>
+                <button type="button" class="btn-amount" onclick="setAmount(100)">₱100</button>
+                <button type="button" class="btn-amount" onclick="setAmount(500)">₱500</button>
+              </div>
+              <input type="number" id="donation-amount" class="field-input" placeholder="Custom amount" value="100" style="text-align: center; font-size: 18px; font-weight: 700; color: #087832; border-color: #087832; background: #f0fdf4;">
+            </div>
+
+            <div id="card-container" style="min-height: 100px; display: flex; align-items: center; justify-content: center; background: #f9f9f9; border-radius: 10px; margin-bottom: 20px; color: #888; font-size: 13px;">
+               Loading Secure Payment Field...
+            </div>
+
+            <div class="donation-footer" style="margin-top:24px;">
+              <button type="button" id="card-button" class="btn-square-pay" style="width:100%; background:#000; color:white; border:none; padding:14px; border-radius:12px; font-weight:800; font-size:14px; display:flex; align-items:center; justify-content:center; gap:10px; cursor:pointer; transition: all 0.3s ease;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Square_Inc._logo.svg/1024px-Square_Inc._logo.svg.png" style="height:14px; filter:brightness(0) invert(1);"> Complete Donation
+              </button>
+            </div>
+            
+            <div id="payment-status-container" style="margin-top:16px; min-height: 20px; font-size:13px; font-weight:700;"></div>
+          </div>
+
+          <div style="margin-top: 24px;">
+            <p style="font-size: 12px; color: #999;">🔒 Secure payment processed by Square</p>
+          </div>
+        </div>
+
+      </div>
+      <div class="card-footer" style="justify-content: center; background: transparent; border-top: none;">
+        <button class="btn-cancel" type="button" onclick="switchTab('edit')">← Back to Profile Settings</button>
+      </div>
     </div>
   </form>
 </div>
@@ -317,6 +368,10 @@ db_close($conn);
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+  // --- SQUARE INTEGRATION GLOBALS ---
+  let sqPayments;
+  let sqCard;
+
   // Profile dropdown logic
   const profileBtn = document.getElementById('profileBtn');
   const profileDropdown = document.getElementById('profileDropdown');
@@ -363,8 +418,145 @@ db_close($conn);
     document.getElementById('header-name').textContent = (fn + ' ' + ln).trim() || '—';
   }
 
+  // Tab switching logic
+  function switchTab(tabName) {
+    // Update buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.remove('active');
+      if(btn.textContent.toLowerCase().includes(tabName === 'edit' ? 'settings' : 'support')) {
+        btn.classList.add('active');
+      }
+    });
+
+    // Update content
+    document.querySelectorAll('.tab-content').forEach(content => {
+      content.style.display = 'none';
+    });
+    document.getElementById('tab-' + tabName).style.display = 'block';
+
+    // Initialize Square if switching to support tab
+    if(tabName === 'support') {
+      initializeSquare();
+    }
+
+    // Update URL if possible without reload
+    const url = new URL(window.location);
+    url.searchParams.set('tab', tabName);
+    window.history.pushState({}, '', url);
+  }
+
+  // Check for tab in URL on load
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('tab') === 'support') {
+    switchTab('support');
+  }
+
   // Real-time Notification Polling
   let shownNotifIds = new Set();
+  
+  function setAmount(amt) {
+    document.getElementById('donation-amount').value = amt;
+  }
+
+  // --- SQUARE INTEGRATION ---
+  async function initializeSquare() {
+    if (sqCard) return; // Already initialized
+
+    // Wait for Square to be available in window
+    if (!window.Square) {
+      setTimeout(initializeSquare, 500);
+      return;
+    }
+
+    const appId = '<?php echo SQUARE_APPLICATION_ID; ?>';
+    const locId = '<?php echo SQUARE_LOCATION_ID; ?>';
+
+    console.log('Square Init: Starting with AppID:', appId, 'LocID:', locId);
+
+    try {
+      const cardContainer = document.getElementById('card-container');
+      console.log('Square Init: Creating payments object...');
+      sqPayments = window.Square.payments(appId, locId);
+      
+      console.log('Square Init: Initializing card element...');
+      sqCard = await sqPayments.card();
+      
+      console.log('Square Init: Attaching to DOM...');
+      cardContainer.innerHTML = ""; 
+      await sqCard.attach('#card-container');
+      console.log('Square Init: Success!');
+    } catch (e) {
+      console.error('Square Init: Failed at some step', e);
+      document.getElementById('card-container').innerHTML = '<span style="color:red;">Failed to load payment field. ' + e.message + '</span>';
+    }
+  }
+
+  async function handlePaymentSubmission(event) {
+    if (!sqCard) {
+      alert("Payment field is still loading. Please wait a moment.");
+      return;
+    }
+    const statusContainer = document.getElementById('payment-status-container');
+    const payButton = document.getElementById('card-button');
+    const amount = document.getElementById('donation-amount').value;
+
+    if (amount <= 0) {
+      statusContainer.innerHTML = '<span style="color:red;">Please enter a valid amount.</span>';
+      return;
+    }
+
+    payButton.disabled = true;
+    statusContainer.innerHTML = 'Processing...';
+
+    try {
+      const result = await sqCard.tokenize();
+      if (result.status === 'OK') {
+        // Send token to backend
+        const response = await fetch('process_square_payment.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sourceId: result.token,
+            amount: amount
+          }),
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          statusContainer.innerHTML = '<span style="color:#087832;">💖 Thank you for your donation!</span>';
+          confettiEffect();
+        } else {
+          statusContainer.innerHTML = '<span style="color:red;">Error: ' + data.message + '</span>';
+          payButton.disabled = false;
+        }
+      } else {
+        statusContainer.innerHTML = '<span style="color:red;">Tokenization failed: ' + result.errors[0].message + '</span>';
+        payButton.disabled = false;
+      }
+    } catch (e) {
+      console.error('Payment failed', e);
+      statusContainer.innerHTML = '<span style="color:red;">Error: ' + e.message + '</span>';
+      payButton.disabled = false;
+    }
+  }
+
+  document.getElementById('card-button')?.addEventListener('click', handlePaymentSubmission);
+
+  function confettiEffect() {
+    // Simple visual feedback
+    const colors = ['#087832', '#57b147', '#ffda44', '#ffffff'];
+    for(let i=0; i<30; i++) {
+      const p = document.createElement('div');
+      p.style.cssText = `position:fixed; left:${Math.random()*100}vw; top:-10px; width:8px; height:8px; background:${colors[Math.floor(Math.random()*4)]}; border-radius:50%; z-index:10002; transition: all 2s ease-out;`;
+      document.body.appendChild(p);
+      setTimeout(() => {
+        p.style.top = '110vh';
+        p.style.transform = `rotate(${Math.random()*360}deg) translateX(${Math.random()*100-50}px)`;
+        setTimeout(() => p.remove(), 2000);
+      }, 10);
+    }
+  }
+
   function checkNotifications() {
       fetch('fetch_notifications.php')
           .then(r => r.json())

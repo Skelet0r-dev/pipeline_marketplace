@@ -119,14 +119,7 @@ if ($stmtSaved) {
             <div class="profile-wrapper">
                 <img src="<?php echo htmlspecialchars($navFilePath); ?>" class="img-profile" id="profileBtn" alt="Profile">
                 <div class="profile-dropdown" id="profileDropdown">
-                    <div class="dropdown-profile-header">
-                        <img src="<?php echo htmlspecialchars($navFilePath); ?>" alt="Profile">
-                        <span class="dropdown-profile-name"><?php echo htmlspecialchars($firstname); ?></span>
-                    </div>
-                    <a href="dashboard.php"  class="dropdown-item-custom"><span class="item-icon">🏬</span> Browse Products</a>
-                    <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">🏪</span> My Storefront</a>
-                    <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
-                    <div class="dropdown-divider-custom"></div>
+                    <a href="edit_profile.php?tab=support" class="dropdown-item-custom"><span class="item-icon">💖</span> Support Us</a>
                     <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
                 </div>
             </div>

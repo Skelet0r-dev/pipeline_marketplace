@@ -54,13 +54,13 @@ if(!empty($errors)) {
 
 // ── Image Upload ─────────────────────────────────────────────────────────────
 $target_file = "";
-if (isset($_FILES['profile_img']) && $_FILES['profile_img']['error'] == 0) {
+if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
     $target_dir = "uploads/profiles/";
     if (!is_dir($target_dir)) mkdir($target_dir, 0777, true);
     
-    $file_ext = strtolower(pathinfo($_FILES['profile_img']['name'], PATHINFO_EXTENSION));
+    $file_ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
     $target_file = $target_dir . bin2hex(random_bytes(8)) . "." . $file_ext;
-    move_uploaded_file($_FILES['profile_img']['tmp_name'], $target_file);
+    move_uploaded_file($_FILES['image']['tmp_name'], $target_file);
 }
 
 // ── Hash Password ────────────────────────────────────────────────────────────
