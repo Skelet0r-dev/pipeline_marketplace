@@ -85,15 +85,23 @@ $messageLink = 'mailto:' . rawurlencode($profile['EMAIL']) . '?subject=' . rawur
             <div class="profile-wrapper">
                 <img src="<?php echo htmlspecialchars($meAvatar); ?>" class="img-profile" alt="Profile Picture" id="profileBtn">
                 <div class="profile-dropdown" id="profileDropdown">
-                    <div class="dropdown-profile-header">
-                        <img src="<?php echo htmlspecialchars($meAvatar); ?>" alt="Profile">
-                        <span class="dropdown-profile-name"><?php echo htmlspecialchars($me['FIRST_NAME'] ?? ''); ?></span>
+                    <div class="dropdown-mobile-nav">
+                        <div class="dropdown-profile-header">
+                            <img src="<?php echo htmlspecialchars($meAvatar); ?>" alt="Profile">
+                            <div>
+                                <div class="dropdown-profile-name"><?php echo htmlspecialchars($me['FIRST_NAME'] ?? ''); ?></div>
+                                <div style="font-size:11px; color:rgba(255,255,255,0.6);">DLSU-D Student</div>
+                            </div>
+                        </div>
+                        <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon">🛍️</span> Browse Products</a>
+                        <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">🏪</span> My Storefront</a>
+                        <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
+                        <a href="saved_listings.php" class="dropdown-item-custom"><span class="item-icon">🔖</span> Saved Listings</a>
+                        <a href="notifications.php" class="dropdown-item-custom"><span class="item-icon">🔔</span> Notifications</a>
+                        <div class="dropdown-divider-custom"></div>
                     </div>
-                    <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon">B</span> Browse Products</a>
-                    <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">S</span> My Storefront</a>
-                    <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon">P</span> My Profile</a>
-                    <div class="dropdown-divider-custom"></div>
-                    <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">X</span> Log Out</a>
+                    <a href="edit_profile.php?tab=support" class="dropdown-item-custom"><span class="item-icon">💖</span> Support Us</a>
+                    <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
                 </div>
             </div>
         </div>

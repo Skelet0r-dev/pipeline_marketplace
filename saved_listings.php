@@ -82,6 +82,46 @@ if ($stmtSaved) {
         }
         .status-available { background: #166534 !important; }
         .status-sold { background: #991b1b !important; }
+
+        /* ── Tablet (≤ 900px) ── */
+        @media (max-width: 900px) {
+            .saved-title    { font-size: 26px; }
+            .saved-subtitle { font-size: 14px; }
+        }
+
+        /* ── Mobile (≤ 768px) ── */
+        @media (max-width: 768px) {
+            .saved-header {
+                padding: 24px 4% 14px;
+            }
+            .saved-title    { font-size: 22px; }
+            .saved-subtitle { font-size: 13px; }
+
+            .empty-saved {
+                padding: 60px 20px;
+                border-radius: 14px;
+            }
+
+            /* 5→2 col on mobile (inherits from dashboard.css but override here) */
+            .dash-listings-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 12px;
+            }
+        }
+
+        /* ── Small phones (≤ 480px) ── */
+        @media (max-width: 480px) {
+            .saved-header { padding: 20px 4% 12px; }
+            .saved-title  { font-size: 20px; }
+
+            /* Single column on very small screens */
+            .dash-listings-grid {
+                grid-template-columns: 1fr !important;
+                gap: 10px;
+            }
+
+            .empty-saved { padding: 48px 16px; }
+        }
     </style>
 </head>
 <body class="body">
@@ -119,6 +159,21 @@ if ($stmtSaved) {
             <div class="profile-wrapper">
                 <img src="<?php echo htmlspecialchars($navFilePath); ?>" class="img-profile" id="profileBtn" alt="Profile">
                 <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-mobile-nav">
+                        <div class="dropdown-profile-header">
+                            <img src="<?php echo htmlspecialchars($navFilePath); ?>" alt="Profile">
+                            <div>
+                                <div class="dropdown-profile-name"><?php echo htmlspecialchars($firstname); ?></div>
+                                <div style="font-size:11px; color:rgba(255,255,255,0.6);">DLSU-D Student</div>
+                            </div>
+                        </div>
+                        <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon">🛍️</span> Browse Products</a>
+                        <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">🏪</span> My Storefront</a>
+                        <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
+                        <a href="saved_listings.php" class="dropdown-item-custom"><span class="item-icon">🔖</span> Saved Listings</a>
+                        <a href="notifications.php" class="dropdown-item-custom"><span class="item-icon">🔔</span> Notifications</a>
+                        <div class="dropdown-divider-custom"></div>
+                    </div>
                     <a href="edit_profile.php?tab=support" class="dropdown-item-custom"><span class="item-icon">💖</span> Support Us</a>
                     <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
                 </div>

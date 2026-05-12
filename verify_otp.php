@@ -22,7 +22,7 @@ if (!$conn) die('Database connection failed.');
 
 if (verifyCode($conn, $email, $code, $type)) {
     // Fetch user info for auto-login
-    $sql_user = "SELECT USER_ID FROM USERS WHERE EMAIL = ? LIMIT 1";
+    $sql_user = "SELECT USER_ID FROM USERS WHERE LOWER(EMAIL) = LOWER(?) LIMIT 1";
     $res_user = db_query($conn, $sql_user, [$email]);
     $user = db_fetch_assoc($res_user);
 
@@ -33,6 +33,9 @@ if (verifyCode($conn, $email, $code, $type)) {
         
         if ($user) {
             $_SESSION['user_id'] = $user['USER_ID'];
+            // Log auto-login after signup verification
+            log_audit($conn, $user['USER_ID'], $email, 'SUCCESS');
+
             header('Location: registration_success.php');
         } else {
             header('Location: registration_success.php');
@@ -42,6 +45,10 @@ if (verifyCode($conn, $email, $code, $type)) {
         
         if ($user) {
             $_SESSION['user_id'] = $user['USER_ID'];
+
+            // Log successful login
+            log_audit($conn, $user['USER_ID'], $email, 'SUCCESS');
+
             header('Location: dashboard.php');
         } else {
             header('Location: login.html?error=user_not_found');

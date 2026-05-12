@@ -40,6 +40,8 @@
     background: var(--off-white);
     color: var(--text-dark);
     -webkit-font-smoothing: antialiased;
+    /* Prevent any child from causing horizontal scroll */
+    overflow-x: hidden;
 }
 
 a {
@@ -292,7 +294,8 @@ img {
 
 .dash-hero-left-alt {
     flex: 1.2;
-    min-width: 400px;
+    min-width: 0; /* allow flex to shrink properly */
+    width: 100%;
 }
 
 .dash-eyebrow {
@@ -1252,4 +1255,115 @@ img {
 
 .dash-sticky-nav.is-sticky .dash-pill {
     white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Mobile nav dropdown: hide on desktop, show on mobile ── */
+.dropdown-mobile-nav { display: none; }
+
+/* ── Tablet (≤ 900px) ── */
+@media (max-width: 900px) {
+    /* Navbar: hide center links, keep logo + avatar */
+    .dash-nav-links  { display: none; }
+    .dash-greeting   { display: none; }
+    .dash-navbar     { padding: 14px 4%; }
+
+    /* Hero: single column, no overflow */
+    .dash-hero-inner      { gap: 40px; padding: 0 4%; max-width: 100%; }
+    .dash-hero-left-alt   { min-width: 0; width: 100%; }
+    .dash-hero-right-alt  { display: none; }
+    .dash-title-main      { font-size: clamp(32px, 6vw, 52px); }
+    .dash-desc-main       { font-size: 16px; }
+
+    /* Listings: 3 cols */
+    .dash-listings-grid   { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+    /* Category grid: 3 cols */
+    .category-grid        { grid-template-columns: repeat(3, 1fr); }
+
+    /* Sticky nav top offset */
+    .dash-sticky-nav      { top: 80px; }
+
+    /* Show mobile nav in dropdown */
+    .dropdown-mobile-nav  { display: block; }
+}
+
+/* ── Mobile (≤ 768px) ── */
+@media (max-width: 768px) {
+    /* Body: prevent horizontal overflow */
+    .body { overflow-x: hidden; }
+
+    /* Navbar */
+    .dash-navbar { padding: 12px 4%; }
+
+    /* Hero: full-width, no overflow */
+    .dash-hero        { padding: 40px 0 56px; overflow: hidden; }
+    .dash-hero-inner  { gap: 24px; flex-direction: column; max-width: 100%; overflow: hidden; }
+    .dash-hero-left-alt { min-width: 0; width: 100%; max-width: 100%; }
+    .dash-hero-right-alt { display: none; }
+    .dash-title-main  { font-size: clamp(28px, 8vw, 44px); letter-spacing: -0.5px; }
+    .dash-desc-main   { font-size: 15px; margin-bottom: 28px; }
+
+    /* Search bar: full width */
+    .dash-hero-search-wrap { margin-bottom: 20px; }
+    .dash-search-input-box { border-radius: 14px; padding: 6px 8px 6px 16px; max-width: 100%; }
+    .dash-search-main-input { height: 44px; font-size: 15px; }
+    .dash-search-main-btn   { width: 44px; height: 44px; }
+
+    /* Tabs: scroll horizontally without overflow */
+    .dash-design-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px;
+                        scrollbar-width: none; -ms-overflow-style: none; }
+    .dash-design-tabs::-webkit-scrollbar { display: none; }
+    .dash-design-tab  { white-space: nowrap; }
+
+    /* Hide hero category buttons & tags on mobile */
+    .desktop-only-hero { display: none !important; }
+
+    /* Listings: 1 col on mobile */
+    .dash-listings-grid { grid-template-columns: 1fr; gap: 16px; }
+
+    /* Category grid: 2 cols */
+    .category-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .cat-card { padding: 16px 8px; }
+
+    /* Sticky nav */
+    .dash-sticky-nav { top: 68px; padding: 12px 4% 10px; }
+
+    /* Popular pills wrap */
+    .dash-hero-popular { flex-wrap: wrap; gap: 8px; }
+
+    /* Eyebrow */
+    .dash-eyebrow { font-size: 10px; padding: 6px 14px; margin-bottom: 18px; }
+
+    /* Dropdown: wider on mobile for nav links */
+    .profile-dropdown { min-width: 260px; right: 0; }
+    .dropdown-mobile-nav { display: block; }
+}
+
+/* ── Small phones (≤ 480px) ── */
+@media (max-width: 480px) {
+    /* Hero */
+    .dash-hero      { padding: 32px 0 44px; }
+    .dash-title-main { font-size: clamp(26px, 9vw, 36px); }
+    .dash-desc-main  { font-size: 14px; }
+
+    /* Listings: 1 col */
+    .dash-listings-grid { grid-template-columns: 1fr; gap: 16px; }
+
+    /* Category grid */
+    .category-grid { gap: 8px; }
+    .cat-card      { padding: 12px 6px; gap: 6px; }
+    .cat-card img  { height: 36px; width: 36px; }
+    .cat-label     { font-size: 11px; }
+
+    /* Profile avatar: smaller */
+    .img-profile { width: 40px; height: 40px; }
+
+    /* Sticky inner: stack pills + search */
+    .dash-sticky-inner { flex-direction: column; align-items: stretch; gap: 10px; }
+    .dash-search-form  { max-width: 100% !important; width: 100%; }
+    .dash-search-wrapper { width: 100%; }
 }

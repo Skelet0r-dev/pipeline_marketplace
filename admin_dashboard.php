@@ -41,6 +41,20 @@ function columnExists($conn, $tableName, $columnName) {
     return !empty($row['COL_EXISTS']);
 }
 
+// Auto-create AUDIT_LOGINS if missing
+if (!tableExists($conn, 'AUDIT_LOGINS')) {
+    $createAuditSql = "CREATE TABLE AUDIT_LOGINS (
+        LOG_ID INT AUTO_INCREMENT PRIMARY KEY,
+        USER_ID INT NULL,
+        USERNAME_ATTEMPT VARCHAR(255) NOT NULL,
+        IP_ADDRESS VARCHAR(50) NOT NULL,
+        STATUS VARCHAR(20) NOT NULL,
+        CREATED_AT DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (USER_ID) REFERENCES USERS(USER_ID) ON DELETE SET NULL
+    )";
+    db_query($conn, $createAuditSql);
+}
+
 function scalarValue($conn, $sql, $params = [], $field = 'CNT', $fallback = 0) {
     $stmt = db_query($conn, $sql, $params);
     if (!$stmt) {
@@ -210,7 +224,7 @@ function donutGradient($segments) {
 }
 
 function currentPage() {
-    $allowedPages = ['dashboard', 'students', 'reports', 'categories', 'audit'];
+    $allowedPages = ['dashboard', 'students', 'reports', 'categories', 'audit', 'audit_logs'];
     $page = $_GET['page'] ?? 'dashboard';
 
     return in_array($page, $allowedPages, true) ? $page : 'dashboard';
@@ -357,10 +371,11 @@ $adminInitials = strtoupper(substr($adminName, 0, 2));
 $activePage = currentPage();
 $pageTitles = [
     'dashboard' => 'Dashboard Overview',
-    'students' => 'Students',
-    'reports' => 'Reports',
-    'categories' => 'All Categories',
-    'audit' => 'Audit Snapshot'
+    'students' => 'Students Management',
+    'reports' => 'Platform Reports',
+    'categories' => 'Category Management',
+    'audit' => 'Audit Snapshot',
+    'audit_logs' => 'Audit Logins'
 ];
 $flashMessage = $_SESSION['admin_flash'] ?? '';
 unset($_SESSION['admin_flash']);
@@ -658,6 +673,21 @@ if ($recentListingsStmt) {
     }
 }
 
+$auditLogs = [];
+if ($activePage === 'audit_logs') {
+    $auditLogsSql = "SELECT LOG_ID, USER_ID, USERNAME_ATTEMPT, IP_ADDRESS, STATUS, CREATED_AT 
+                     FROM AUDIT_LOGINS 
+                     ORDER BY CREATED_AT DESC 
+                     LIMIT 100";
+    $auditLogsStmt = db_query($conn, $auditLogsSql);
+    if ($auditLogsStmt) {
+        while ($row = db_fetch_assoc($auditLogsStmt)) {
+            $auditLogs[] = $row;
+        }
+    }
+}
+
+// ── Students Management (page=students) ──────────────────────────────────────
 $recentUsers = [];
 $recentUsersSql = "SELECT USER_ID, FIRST_NAME, LAST_NAME, STD_NUM, COLLEGE, SECTION
                    FROM USERS
@@ -886,6 +916,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
 
         <div class="nav-section-label">System</div>
         <a class="<?php echo navClass('audit', $activePage); ?>" href="admin_dashboard.php?page=audit"><span class="icon">📋</span> Audit Snapshot</a>
+        <a class="<?php echo navClass('audit_logs', $activePage); ?>" href="admin_dashboard.php?page=audit_logs"><span class="icon">🔐</span> Audit Logins</a>
 
         <div class="nav-section-label">Tools</div>
         <a class="nav-item" href="scratch/listing_bot.php" target="_blank">
@@ -1362,6 +1393,46 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
                     </div>
                 </div>
             </div>
+        </div>
+        <?php elseif ($activePage === 'audit_logs'): ?>
+        <div class="card">
+            <div class="card-title">Recent Login Attempts <span>Last 100 Records</span></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Log ID</th>
+                        <th>User ID</th>
+                        <th>Attempted Identifier</th>
+                        <th>IP Address</th>
+                        <th>Status</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($auditLogs)): ?>
+                    <tr><td colspan="6">No login attempts recorded yet.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($auditLogs as $log): ?>
+                        <tr>
+                            <td style="color:var(--muted); font-size:12px;">#<?php echo $log['LOG_ID']; ?></td>
+                            <td style="font-weight:600;"><?php echo $log['USER_ID'] ? $log['USER_ID'] : '-'; ?></td>
+                            <td><?php echo htmlspecialchars($log['USERNAME_ATTEMPT']); ?></td>
+                            <td><span style="font-family:monospace; background:var(--bg); padding:2px 6px; border-radius:4px; font-size:12px;"><?php echo htmlspecialchars($log['IP_ADDRESS']); ?></span></td>
+                            <td>
+                                <span class="badge <?php 
+                                    if ($log['STATUS'] === 'SUCCESS') echo 'badge-green';
+                                    elseif ($log['STATUS'] === 'FAILED') echo 'badge-red';
+                                    else echo 'badge-info';
+                                ?>">
+                                    <?php echo htmlspecialchars($log['STATUS']); ?>
+                                </span>
+                            </td>
+                            <td style="color:var(--muted); font-size:11px;"><?php echo htmlspecialchars(formatDateLong($log['CREATED_AT'])); ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
         <?php endif; ?>
         </div>

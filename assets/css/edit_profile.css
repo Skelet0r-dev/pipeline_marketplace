@@ -332,12 +332,85 @@ body.body {
     font-family: monospace;
 }
 
-/* Responsive */
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Tablet (≤ 900px) ── */
+@media (max-width: 900px) {
+    .profile-card { max-width: 100%; }
+    .section { grid-template-columns: 180px 1fr; gap: 16px; }
+    .section-fields.three { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── Mobile (≤ 768px) ── */
 @media (max-width: 768px) {
-    .section { grid-template-columns: 1fr; }
-    .section-fields, .section-fields.three { grid-template-columns: 1fr; }
-    .card-header { padding: 24px 20px; }
-    .card-body { padding: 0 20px; }
-    .card-footer { padding: 16px 20px; }
+    .page-wrapper { padding: 0 0 40px; align-items: stretch; }
+
+    .profile-card {
+        max-width: 100%;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    /* Header: stack avatar + text vertically */
+    .card-header {
+        padding: 24px 20px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .avatar-wrap img { width: 80px; height: 80px; }
+
+    .header-info h1 { font-size: 18px; }
+    .header-info p  { font-size: 12px; }
+
+    /* Tabs: scrollable */
+    .profile-tabs {
+        padding: 0 16px;
+        gap: 4px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        flex-wrap: nowrap;
+    }
+    .profile-tabs::-webkit-scrollbar { display: none; }
+    .tab-btn { white-space: nowrap; font-size: 13px; padding: 14px 8px; }
+
+    /* Body */
+    .card-body { padding: 0 16px; }
+
+    /* Sections: single column */
+    .section { grid-template-columns: 1fr; gap: 12px; padding: 20px 0; }
+    .section-fields,
+    .section-fields.three { grid-template-columns: 1fr; }
+    .section-fields.two-col { grid-template-columns: 1fr 1fr; }
+
+    /* Footer: stack buttons */
+    .card-footer {
+        padding: 16px;
+        flex-direction: column-reverse;
+        gap: 8px;
+    }
+    .btn-cancel, .btn-save { width: 100%; text-align: center; padding: 12px; }
+
+    /* Info banner spans full width */
     .info-banner-green { grid-column: span 1; }
+
+    /* Toast: full-width on mobile */
+    .toast {
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+        width: auto;
+    }
+}
+
+/* ── Small phones (≤ 480px) ── */
+@media (max-width: 480px) {
+    .card-header { padding: 20px 16px; }
+    .header-info h1 { font-size: 16px; }
+    .section-fields.two-col { grid-template-columns: 1fr; }
+    .section-label h3 { font-size: 13px; }
 }

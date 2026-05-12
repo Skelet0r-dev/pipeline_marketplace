@@ -152,6 +152,20 @@ CREATE TABLE IF NOT EXISTS USER_VERIFICATION (
     EXPIRES_AT DATETIME NOT NULL,
     CREATED_AT DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- ============================================================
+-- AUDIT_LOGINS
+-- ============================================================
+CREATE TABLE IF NOT EXISTS AUDIT_LOGINS (
+    LOG_ID INT AUTO_INCREMENT PRIMARY KEY,
+    USER_ID INT NULL,
+    USERNAME_ATTEMPT VARCHAR(255) NOT NULL,
+    IP_ADDRESS VARCHAR(50) NOT NULL,
+    STATUS VARCHAR(20) NOT NULL,
+    CREATED_AT DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (USER_ID) REFERENCES USERS(USER_ID) ON DELETE SET NULL
+);
+
 -- ============================================================
 -- Sample admin account (password: admin123 — change in prod!)
 -- ============================================================

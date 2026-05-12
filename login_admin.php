@@ -30,8 +30,14 @@ $sql_admin = "SELECT ADMIN_NUMBER, USERNAME, `PASSWORD`
 $result_admin = db_query($conn, $sql_admin, [$username, $password]);
 $row_admin = $result_admin ? db_fetch_assoc($result_admin) : false;
 
+// Log the attempt
+log_audit($conn, null, $username, 'ATTEMPT');
+
 // LOGIN SUCCESS
 if ($row_admin) {
+    // Log success
+    log_audit($conn, null, $username, 'SUCCESS');
+
     session_regenerate_id(true);
     $_SESSION['admin_username'] = $row_admin['USERNAME'];
     $_SESSION['admin_number'] = $row_admin['ADMIN_NUMBER'] ?? null;
@@ -40,6 +46,8 @@ if ($row_admin) {
 }
 
 // LOGIN FAILED
+// Log failure
+log_audit($conn, null, $username, 'FAILED');
 echo "
 <script>
     alert('Invalid admin credentials. Please try again.');

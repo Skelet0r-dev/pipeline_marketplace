@@ -396,3 +396,77 @@ html, body {
     transition: color 0.2s;
 }
 .btn-back:hover { color: var(--green); }
+
+/* ══════════════════════════════════════════════════════
+   SHARED MOBILE BREAKPOINTS (login.html + forgot_password.html)
+══════════════════════════════════════════════════════ */
+
+/* ── Tablet (≤ 900px) ── */
+@media (max-width: 900px) {
+    .login-navbar { padding: 14px 24px; }
+    .site-footer  { padding: 16px 24px; }
+}
+
+/* ── Mobile (≤ 768px) ── */
+@media (max-width: 768px) {
+    .login-navbar { padding: 12px 20px; }
+
+    /* login.html card stacks vertically */
+    .login-card {
+        flex-direction: column;
+        max-width: 100%;
+        min-height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    /* Hide the decorative right panel image on mobile */
+    .panel-right { display: none; }
+
+    /* Left panel (form) fills screen */
+    .panel-left {
+        flex: 1;
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--grey-light);
+        padding: 40px 24px 36px;
+        justify-content: flex-start;
+    }
+
+    /* Add the same green accent bar as forgot_password.html */
+    .panel-left::before {
+        content: '';
+        display: block;
+        width: 48px;
+        height: 5px;
+        background: var(--green);
+        border-radius: 3px;
+        margin-bottom: 32px;
+    }
+
+    /* main-content fills viewport without outer padding */
+    .main-content {
+        padding: 0;
+        align-items: flex-start;
+    }
+
+    /* Footer: stack vertically */
+    .site-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 20px 20px;
+    }
+    .footer-links { text-align: left; }
+
+    .login-greeting { font-size: 34px; }
+}
+
+/* ── Small phones (≤ 400px) ── */
+@media (max-width: 400px) {
+    .panel-left   { padding: 32px 18px 28px; }
+    .login-navbar { padding: 12px 16px; }
+    .login-greeting { font-size: 28px; }
+
+    .btn-method { font-size: 14px; padding: 12px 14px; }
+}

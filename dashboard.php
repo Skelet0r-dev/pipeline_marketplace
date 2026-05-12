@@ -235,6 +235,23 @@ db_close($conn);
                      id="profileBtn">
 
                 <div class="profile-dropdown" id="profileDropdown">
+                    <!-- Mobile-only nav links (hidden on desktop via CSS) -->
+                    <div class="dropdown-mobile-nav">
+                        <div class="dropdown-profile-header">
+                            <img src="<?php echo htmlspecialchars($file_path); ?>" alt="Profile">
+                            <div>
+                                <div class="dropdown-profile-name"><?php echo htmlspecialchars($firstname); ?></div>
+                                <div style="font-size:11px; color:rgba(255,255,255,0.6);">DLSU-D Student</div>
+                            </div>
+                        </div>
+                        <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon">🛍️</span> Browse Products</a>
+                        <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">🏪</span> My Storefront</a>
+                        <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
+                        <a href="saved_listings.php" class="dropdown-item-custom"><span class="item-icon">🔖</span> Saved Listings</a>
+                        <a href="notifications.php" class="dropdown-item-custom"><span class="item-icon">🔔</span> Notifications</a>
+                        <div class="dropdown-divider-custom"></div>
+                    </div>
+                    <!-- Always-visible items -->
                     <a href="edit_profile.php?tab=support" class="dropdown-item-custom"><span class="item-icon">💖</span> Support Us</a>
                     <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
                 </div>
@@ -255,7 +272,7 @@ db_close($conn);
                     students ready to sell their items on campus.</p>
                 
                 <!-- Category Tabs (Hero) -->
-                <div class="dash-design-tabs">
+                <div class="dash-design-tabs desktop-only-hero">
                     <a href="dashboard.php?cat=all" class="dash-design-tab <?php echo ($currentCategory === 'all') ? 'active' : ''; ?>">
                         <img src="assets/img/cart.svg" alt="Cart" style="width: 16px; height: 16px;">
                         All Items
@@ -293,7 +310,7 @@ db_close($conn);
 
                 <!-- Hero Section Sub-filters (College Pills) -->
                 <?php if ($currentCategory === 'Course-Specific'): ?>
-                <div class="section-pills-scroll mt-3" style="margin-bottom: 24px;">
+                <div class="section-pills-scroll mt-3 desktop-only-hero" style="margin-bottom: 24px;">
                     <a href="dashboard.php?cat=Course-Specific&college=all" class="section-pill <?php echo ($currentCollegeFilter === 'all') ? 'active' : ''; ?>">All Colleges</a>
                     <?php
                     $allColleges = ['CEAT', 'CLAC', 'CBAA', 'COS', 'CICS', 'COED', 'CCJE', 'CTHM', 'COL'];
@@ -318,7 +335,7 @@ db_close($conn);
                 </div>
 
                 <!-- Popular Tags -->
-                <div class="dash-hero-popular">
+                <div class="dash-hero-popular desktop-only-hero">
                     <span class="pop-label">Popular:</span>
                     <div class="pop-pills">
                         <a href="dashboard.php?search=iphone" class="pop-pill">iphone</a>

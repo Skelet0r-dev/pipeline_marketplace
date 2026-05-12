@@ -96,6 +96,29 @@ function db_fetch_assoc($stmt) {
     return $stmt ? $stmt->fetch(PDO::FETCH_ASSOC) : false;
 }
 
+/**
+ * Centrally log login attempts and status changes
+ */
+function log_audit($conn, $userId, $attemptedIdentifier, $status) {
+    // 1. Ensure table exists (fail-safe)
+    db_query($conn, "CREATE TABLE IF NOT EXISTS AUDIT_LOGINS (
+        LOG_ID INT AUTO_INCREMENT PRIMARY KEY,
+        USER_ID INT NULL,
+        USERNAME_ATTEMPT VARCHAR(255) NOT NULL,
+        IP_ADDRESS VARCHAR(50) NOT NULL,
+        STATUS VARCHAR(20) NOT NULL,
+        CREATED_AT DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (USER_ID) REFERENCES USERS(USER_ID) ON DELETE SET NULL
+    )");
+
+    // 2. Perform the insert
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
+    return db_query($conn, 
+        "INSERT INTO AUDIT_LOGINS (USER_ID, USERNAME_ATTEMPT, IP_ADDRESS, STATUS) VALUES (?, ?, ?, ?)", 
+        [$userId, $attemptedIdentifier, $ip, $status]
+    );
+}
+
 function db_fetch($stmt): bool {
     if (!$stmt) {
         return false;

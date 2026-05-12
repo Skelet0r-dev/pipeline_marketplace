@@ -530,6 +530,7 @@
         .badge-red    { background: #fde8e8; color: var(--danger); }
         .badge-blue   { background: #e0f0fe; color: var(--info); }
         .badge-purple { background: #f0e8fe; color: #5b2a86; }
+        .badge-info   { background: #e0f0fe; color: var(--info); }
 
         .item-name {
             font-weight: 700;

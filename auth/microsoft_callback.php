@@ -99,11 +99,17 @@ if (!$conn) die('Database connection failed.');
 
 $stmt = db_query($conn, "SELECT * FROM USERS WHERE LOWER(EMAIL) = ?", [$msEmail]);
 $user = db_fetch_assoc($stmt);
-db_close($conn);
 
+// Log the Microsoft login attempt
+log_audit($conn, null, $msEmail, 'ATTEMPT');
 if ($user) {
     // Existing user — log in directly, no profile completion needed
     $_SESSION['user_id'] = $user['USER_ID'];
+
+    // Log the successful Microsoft login
+    log_audit($conn, $user['USER_ID'], $msEmail, 'SUCCESS');
+
+    db_close($conn);
     header('Location: ../dashboard.php');
     exit;
 }

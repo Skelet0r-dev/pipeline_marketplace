@@ -48,10 +48,18 @@ if (!$conn) die('Database connection failed.');
 
 $stmt = db_query($conn, "SELECT * FROM USERS WHERE STD_NUM = ?", [$stdnum]);
 $user = db_fetch_assoc($stmt);
-db_close($conn);
+
+$uid = $user ? $user['USER_ID'] : null;
+// Log the initial login attempt
+log_audit($conn, $uid, $stdnum, 'ATTEMPT');
 
 // ── Validate credentials ──────────────────────────────────────────────────────
 if (!$user || !password_verify($password, $user['PASSWORD'])) {
+    // Log failed attempt
+    log_audit($conn, $uid, $stdnum, 'FAILED');
+
+    db_close($conn);
+
     $_SESSION['login_attempts']++;
     $attemptsLeft = MAX_ATTEMPTS - $_SESSION['login_attempts'];
 
@@ -70,7 +78,6 @@ if (!$user || !password_verify($password, $user['PASSWORD'])) {
 // ── Check if user is verified ───────────────────────────────────────────────
 if ($user['VERIFIED'] == 0) {
     require_once __DIR__ . '/mail_util.php';
-    $conn = db_connect();
     $code = generateVerificationCode($conn, $user['EMAIL'], 'signup');
     
     $subject = "Verify Your Pipeline Account";
@@ -95,7 +102,6 @@ if ($user['VERIFIED'] == 0) {
 
 // ── Successful Password Verification — Now send Login OTP ──────────────────
 require_once __DIR__ . '/mail_util.php';
-$conn = db_connect(); // Re-open since we closed it above
 $code = generateVerificationCode($conn, $user['EMAIL'], 'login');
 
 $subject = "Your Pipeline Login Code";
