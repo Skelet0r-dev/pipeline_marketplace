@@ -72,9 +72,9 @@ if ($selectedReaction !== null) {
         $ownerId = (int)$owner['USER_ID'];
         $listingTitle = $owner['TITLE'];
         
-        $emoji = '👍'; // Default
-        if (strtolower($selectedReaction) === 'heart_eyes') $emoji = '😍';
-        else if (strtolower($selectedReaction) === 'thumbs_down') $emoji = '👎';
+        $emoji = '<i class="bi bi-hand-thumbs-up"></i>'; // Default
+        if (strtolower($selectedReaction) === 'heart_eyes') $emoji = '<i class="bi bi-emoji-heart-eyes"></i>';
+        else if (strtolower($selectedReaction) === 'thumbs_down') $emoji = '<i class="bi bi-hand-thumbs-down"></i>';
         
         $msg = "reacted $emoji to your listing: \"$listingTitle\"";
         

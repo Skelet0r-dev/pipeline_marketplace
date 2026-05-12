@@ -114,6 +114,7 @@ db_close($conn);
   <link rel="stylesheet" href="assets/css/edit_profile.css"/>
   <!-- Square Web Payments SDK -->
   <script src="https://sandbox.web.squarecdn.com/v1/square.js" onerror="console.error('Square SDK failed to load'); document.getElementById('card-container').innerHTML = '<span style="color:red;">Square SDK blocked by browser or network.</span>';"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body class="body">
 
@@ -160,15 +161,15 @@ db_close($conn);
                 <div style="font-size:11px; color:rgba(255,255,255,0.6);">DLSU-D Student</div>
               </div>
             </div>
-            <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon">🛍️</span> Browse Products</a>
-            <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">🏪</span> My Storefront</a>
-            <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
-            <a href="saved_listings.php" class="dropdown-item-custom"><span class="item-icon">🔖</span> Saved Listings</a>
-            <a href="notifications.php" class="dropdown-item-custom"><span class="item-icon">🔔</span> Notifications</a>
+            <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-bag"></i></span> Browse Products</a>
+            <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-shop"></i></span> My Storefront</a>
+            <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-person"></i></span> My Profile</a>
+            <a href="saved_listings.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-bookmark-fill"></i></span> Saved Listings</a>
+            <a href="notifications.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-bell"></i></span> Notifications</a>
             <div class="dropdown-divider-custom"></div>
           </div>
-          <a href="edit_profile.php?tab=support" class="dropdown-item-custom"><span class="item-icon">💖</span> Support Us</a>
-          <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
+          <a href="edit_profile.php?tab=support" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-heart-fill" style="color: #22c55e;"></i></span> Support Us</a>
+          <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon"><i class="bi bi-box-arrow-right"></i></span> Log Out</a>
         </div>
       </div>
     </div>
@@ -334,7 +335,7 @@ db_close($conn);
       <div class="card-body" style="padding: 60px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px;">
         
         <div class="checkout-container" style="width: 100%; max-width: 420px; text-align: center;">
-          <div class="support-icon-big">💖</div>
+          <div class="support-icon-big"><i class="bi bi-heart-fill" style="color: #22c55e;"></i></div>
           <h2 style="font-size: 24px; font-weight: 800; color: #087832; margin-bottom: 8px;">Support Pipeline</h2>
           <p style="font-size: 14px; color: #666; margin-bottom: 32px;">Help keep the campus marketplace alive and free.</p>
 
@@ -363,7 +364,7 @@ db_close($conn);
           </div>
 
           <div style="margin-top: 24px;">
-            <p style="font-size: 12px; color: #999;">🔒 Secure payment processed by Square</p>
+            <p style="font-size: 12px; color: #999;"><i class="bi bi-lock-fill"></i> Secure payment processed by Square</p>
           </div>
         </div>
 
@@ -538,7 +539,7 @@ db_close($conn);
 
         const data = await response.json();
         if (data.success) {
-          statusContainer.innerHTML = '<span style="color:#087832;">💖 Thank you for your donation!</span>';
+          statusContainer.innerHTML = '<span style="color:#087832;"><i class="bi bi-heart-fill"></i> Thank you for your donation!</span>';
           confettiEffect();
         } else {
           statusContainer.innerHTML = '<span style="color:red;">Error: ' + data.message + '</span>';

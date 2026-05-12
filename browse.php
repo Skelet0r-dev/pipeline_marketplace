@@ -146,6 +146,7 @@ $accentColor = $catColors[$category] ?? '#606c38';
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/dashboard.css">
     <link rel="stylesheet" href="assets/css/browse.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body class="body">
 
@@ -168,15 +169,15 @@ $accentColor = $catColors[$category] ?? '#606c38';
                                 <div style="font-size:11px; color:rgba(255,255,255,0.6);">DLSU-D Student</div>
                             </div>
                         </div>
-                        <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon">🛍️</span> Browse Products</a>
-                        <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">🏪</span> My Storefront</a>
-                        <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
-                        <a href="saved_listings.php" class="dropdown-item-custom"><span class="item-icon">🔖</span> Saved Listings</a>
-                        <a href="notifications.php" class="dropdown-item-custom"><span class="item-icon">🔔</span> Notifications</a>
+                        <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-bag"></i></span> Browse Products</a>
+                        <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-shop"></i></span> My Storefront</a>
+                        <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-person"></i></span> My Profile</a>
+                        <a href="saved_listings.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-bookmark-fill"></i></span> Saved Listings</a>
+                        <a href="notifications.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-bell"></i></span> Notifications</a>
                         <div class="dropdown-divider-custom"></div>
                     </div>
-                    <a href="edit_profile.php?tab=support" class="dropdown-item-custom"><span class="item-icon">💖</span> Support Us</a>
-                    <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
+                    <a href="edit_profile.php?tab=support" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-heart-fill" style="color: #22c55e;"></i></span> Support Us</a>
+                    <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon"><i class="bi bi-box-arrow-right"></i></span> Log Out</a>
                 </div>
             </div>
         </div>
@@ -210,7 +211,7 @@ $accentColor = $catColors[$category] ?? '#606c38';
                 <form method="GET" action="browse.php" class="browse-search-form">
                     <input type="hidden" name="cat" value="<?php echo htmlspecialchars($category); ?>">
                     <div class="browse-search-wrap">
-                        <span class="browse-search-icon">🔍</span>
+                        <span class="browse-search-icon"><i class="bi bi-search"></i></span>
                         <input
                             type="text"
                             name="q"
@@ -219,7 +220,7 @@ $accentColor = $catColors[$category] ?? '#606c38';
                             value="<?php echo htmlspecialchars($search); ?>"
                             autocomplete="off">
                         <?php if($search): ?>
-                        <a href="browse.php?cat=<?php echo urlencode($category); ?>" class="browse-search-clear" title="Clear search">✕</a>
+                        <a href="browse.php?cat=<?php echo urlencode($category); ?>" class="browse-search-clear" title="Clear search"><i class="bi bi-x"></i></a>
                         <?php endif; ?>
                         <button type="submit" class="browse-search-btn">Search</button>
                     </div>
@@ -233,7 +234,7 @@ $accentColor = $catColors[$category] ?? '#606c38';
 
         <?php if(empty($items)): ?>
         <div class="browse-empty">
-            <div class="browse-empty-icon">🛍️</div>
+            <div class="browse-empty-icon"><i class="bi bi-bag"></i></div>
             <h5>No listings found</h5>
             <p class="text-muted">
                 <?php echo $search ? 'Try a different search term.' : 'Be the first to list something in this category!'; ?>

@@ -5,6 +5,7 @@ $type  = $_GET['type'] ?? $_SESSION['verify_type'] ?? '';
 $error = $_GET['error'] ?? '';
 $debug = $_GET['debug'] ?? '';
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -130,11 +131,12 @@ $debug = $_GET['debug'] ?? '';
             display: none;
         }
     </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
 
     <div class="verify-card">
-        <span class="verify-icon">📩</span>
+        <span class="verify-icon"><i class="bi bi-envelope"></i></span>
         <h1>Verify It's You</h1>
         <p>We've sent a 6-digit verification code to <br><strong><?php echo htmlspecialchars($email ?: 'your email'); ?></strong></p>
 
@@ -151,9 +153,7 @@ $debug = $_GET['debug'] ?? '';
                 <input type="text" class="otp-input" maxlength="1" pattern="\d*" inputmode="numeric">
             </div>
 
-            <div id="errorMessage" class="error-message" <?php if ($error === 'invalid') echo 'style="display:block;"'; ?>>
-                Invalid or expired code. Please try again.
-            </div>
+            <div id="errorMessage" class="error-message">Invalid or expired code. Please try again.</div>
 
             <input type="hidden" name="code" id="codeHidden">
             <button type="submit" class="btn-verify">Verify Now</button>

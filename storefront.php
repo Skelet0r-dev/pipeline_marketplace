@@ -252,6 +252,7 @@ $resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/dashboard.css">
     <link rel="stylesheet" href="assets/css/storefront.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body class="body">
 
@@ -298,15 +299,15 @@ $resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
                                 <div style="font-size:11px; color:rgba(255,255,255,0.6);">DLSU-D Student</div>
                             </div>
                         </div>
-                        <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon">🛍️</span> Browse Products</a>
-                        <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">🏪</span> My Storefront</a>
-                        <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
-                        <a href="saved_listings.php" class="dropdown-item-custom"><span class="item-icon">🔖</span> Saved Listings</a>
-                        <a href="notifications.php" class="dropdown-item-custom"><span class="item-icon">🔔</span> Notifications</a>
+                        <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-bag"></i></span> Browse Products</a>
+                        <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-shop"></i></span> My Storefront</a>
+                        <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-person"></i></span> My Profile</a>
+                        <a href="saved_listings.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-bookmark-fill"></i></span> Saved Listings</a>
+                        <a href="notifications.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-bell"></i></span> Notifications</a>
                         <div class="dropdown-divider-custom"></div>
                     </div>
-                    <a href="edit_profile.php?tab=support" class="dropdown-item-custom"><span class="item-icon">💖</span> Support Us</a>
-                    <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
+                    <a href="edit_profile.php?tab=support" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-heart-fill" style="color: #22c55e;"></i></span> Support Us</a>
+                    <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon"><i class="bi bi-box-arrow-right"></i></span> Log Out</a>
                 </div>
             </div>
         </div>
@@ -318,12 +319,12 @@ $resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
         <div class="sf-profile-row">
             <div class="sf-avatar-wrap">
                 <img src="<?php echo htmlspecialchars($file_path); ?>" class="sf-avatar" alt="Storefront Avatar">
-                <div class="sf-verified">✓</div>
+                <div class="sf-verified"><i class="bi bi-check"></i></div>
             </div>
             <div class="sf-info">
                 <div class="sf-name-row">
                     <h2 class="sf-name"><?php echo htmlspecialchars($fullname); ?></h2>
-                    <span class="sf-badge">🎓 <?php echo htmlspecialchars($department . ' - ' . $section); ?></span>
+                    <span class="sf-badge"><i class="bi bi-mortarboard"></i> <?php echo htmlspecialchars($department . ' - ' . $section); ?></span>
                 </div>
                 <p class="sf-handle">@<?php echo htmlspecialchars($username); ?></p>
                 <div class="sf-stats">
@@ -347,16 +348,16 @@ $resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
     <!-- Tab Navigation -->
     <div class="sf-tabs-wrap">
         <div class="sf-tabs">
-            <button class="sf-tab active" data-tab="listings">🏷️ Listings</button>
-            <button class="sf-tab" data-tab="sold">✅ Sold</button>
+            <button class="sf-tab active" data-tab="listings"><i class="bi bi-tag"></i> Listings</button>
+            <button class="sf-tab" data-tab="sold"><i class="bi bi-check-circle-fill"></i> Sold</button>
         </div>
     </div>
 
     <!-- ── Flash Toast ── -->
     <?php if($modal_success!=''): ?>
     <div class="sf-toast" id="sfToast">
-        <span>✅ <?php echo htmlspecialchars($modal_success); ?></span>
-        <button class="sf-toast-close" onclick="document.getElementById('sfToast').style.display='none'">✕</button>
+        <span><i class="bi bi-check-circle-fill"></i> <?php echo htmlspecialchars($modal_success); ?></span>
+        <button class="sf-toast-close" onclick="document.getElementById('sfToast').style.display='none'"><i class="bi bi-x"></i></button>
     </div>
     <?php endif; ?>
 
@@ -393,12 +394,12 @@ $resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
             echo '<span class="sf-card-cat">'.htmlspecialchars($categoryLabel).'</span>';
             echo '<div class="sf-card-hover">';
             echo '<button class="sf-card-view">View Item</button>';
-            echo '<button class="sf-card-edit-btn" onclick="event.stopPropagation(); openEditModal(this.closest(\'.sf-card\'))">✏️ Edit</button>';
+            echo '<button class="sf-card-edit-btn" onclick="event.stopPropagation(); openEditModal(this.closest(\'.sf-card\'))"><i class="bi bi-pencil"></i> Edit</button>';
             
             // ── SOLD Button ──
             echo '<form method="POST" action="storefront.php" style="display:inline;" onclick="event.stopPropagation()">';
             echo '<input type="hidden" name="mark_listing_id" value="'.$item['LISTING_ID'].'">';
-            echo '<button type="submit" name="mark_sold" class="sf-card-sold-btn" onclick="return confirm(\'Mark this item as SOLD?\')">✅ Sold</button>';
+            echo '<button type="submit" name="mark_sold" class="sf-card-sold-btn" onclick="return confirm(\'Mark this item as SOLD?\')"><i class="bi bi-check-circle-fill"></i> Sold</button>';
             echo '</form>';
             
             echo '</div>';
@@ -414,7 +415,7 @@ $resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
         }
         if(!$haslistings){
             echo '<div class="sf-empty sf-empty-fullrow">';
-            echo '<div class="sf-empty-icon">🏷️</div>';
+            echo '<div class="sf-empty-icon"><i class="bi bi-tag"></i></div>';
             echo '<p class="sf-empty-text">No active listings yet. Add one!</p>';
             echo '</div>';
         }
@@ -456,7 +457,7 @@ $resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
             echo '<div class="sf-card-sold-overlay"><span class="sf-card-sold-badge">SOLD</span></div>';
             echo '<span class="sf-card-cat">'.htmlspecialchars($categoryLabel).'</span>';
             echo '<div class="sf-card-hover">';
-            echo '<button class="sf-card-edit-btn" onclick="event.stopPropagation(); openEditModal(this.closest(\'.sf-card\'))">✏️ Edit</button>';
+            echo '<button class="sf-card-edit-btn" onclick="event.stopPropagation(); openEditModal(this.closest(\'.sf-card\'))"><i class="bi bi-pencil"></i> Edit</button>';
             // ── NEW: Mark as Available button ──
             echo '<form method="POST" action="storefront.php" style="display:inline;" onclick="event.stopPropagation()">';
             echo '<input type="hidden" name="mark_listing_id" value="'.$listingId.'">';
@@ -475,7 +476,7 @@ $resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
         }
         if(!$hassold){
             echo '<div class="sf-empty sf-empty-fullrow">';
-            echo '<div class="sf-empty-icon">📦</div>';
+            echo '<div class="sf-empty-icon"><i class="bi bi-box"></i></div>';
             echo '<p class="sf-empty-text">Sold items will appear here.</p>';
             echo '</div>';
         }
@@ -509,15 +510,15 @@ $resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
                                 <p class="detail-desc" id="detailDesc"></p>
                                 <div class="detail-meta">
                                     <div class="detail-meta-row">
-                                        <span class="detail-meta-label">📍 Meet-up Spot</span>
+                                        <span class="detail-meta-label"><i class="bi bi-geo-alt"></i> Meet-up Spot</span>
                                         <span class="detail-meta-val" id="detailMeetup"></span>
                                     </div>
                                     <div class="detail-meta-row">
-                                        <span class="detail-meta-label">💳 Preferred Payment</span>
+                                        <span class="detail-meta-label"><i class="bi bi-credit-card"></i> Preferred Payment</span>
                                         <span class="detail-meta-val" id="detailPayment"></span>
                                     </div>
                                     <div class="detail-meta-row">
-                                        <span class="detail-meta-label">📅 Date Posted</span>
+                                        <span class="detail-meta-label"><i class="bi bi-calendar"></i> Date Posted</span>
                                         <span class="detail-meta-val" id="detailDate"></span>
                                     </div>
                                 </div>
@@ -536,7 +537,7 @@ $resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editListingModalLabel">✏️ Edit Listing</h5>
+                    <h5 class="modal-title" id="editListingModalLabel"><i class="bi bi-pencil"></i> Edit Listing</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="storefront.php" method="POST" enctype="multipart/form-data">
@@ -570,13 +571,13 @@ $resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
                                     <label class="listing-label">Category</label>
                                     <select name="edit_category" id="editCategory" class="listing-select" required>
                                         <option value="" disabled>Select</option>
-                                        <option value="Academics">📚 Academics</option>
-                                        <option value="Electronics and Tech">💻 Electronics & Tech</option>
-                                        <option value="Clothing & Apparel">👕 Clothing & Apparel</option>
-                                        <option value="Hobbies & Lifestyle">🐇 Hobbies & Lifestyle</option>
-                                        <option value="Food">🍪 Food</option>
-                                        <option value="Events & Tickets">🎟️ Events & Tickets</option>
-                                        <option value="Course-Specific">🔬 Course-Specific</option>
+                                        <option value="Academics"><i class="bi bi-book"></i> Academics</option>
+                                        <option value="Electronics and Tech"><i class="bi bi-laptop"></i> Electronics & Tech</option>
+                                        <option value="Clothing & Apparel"><i class="bi bi-tag"></i> Clothing & Apparel</option>
+                                        <option value="Hobbies & Lifestyle"><i class="bi bi-bicycle"></i> Hobbies & Lifestyle</option>
+                                        <option value="Food"><i class="bi bi-basket"></i> Food</option>
+                                        <option value="Events & Tickets"><i class="bi bi-ticket-perforated"></i> Events & Tickets</option>
+                                        <option value="Course-Specific"><i class="bi bi-journal-text"></i> Course-Specific</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
@@ -659,7 +660,7 @@ $resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
                             <div class="img-upload-box" id="editUploadBox" onclick="document.getElementById('editListingImgInput').click()">
                                 <input type="file" name="edit_listing_img" id="editListingImgInput" accept=".jpg,.jpeg,.png,.webp">
                                 <div id="editUploadPrompt">
-                                    <div class="img-upload-icon">🖼️</div>
+                                    <div class="img-upload-icon"><i class="bi bi-image"></i></div>
                                     <div class="img-upload-text">Click to replace photo</div>
                                     <div class="img-upload-sub">Leave blank to keep current</div>
                                 </div>
@@ -675,7 +676,7 @@ $resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
                 <div class="modal-footer">
                     <form method="POST" action="storefront.php" onsubmit="return confirmDelete()" style="margin:0;">
                         <input type="hidden" name="edit_listing_id" id="deleteListingId">
-                        <button type="submit" name="delete_listing" class="btn-delete-listing">🗑️ Delete</button>
+                        <button type="submit" name="delete_listing" class="btn-delete-listing"><i class="bi bi-trash"></i> Delete</button>
                     </form>
                     <button type="button" class="btn-cancel-listing" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" name="edit_listing" class="btn-add-listing">Save Changes</button>
@@ -723,13 +724,13 @@ $resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
                                     <label class="listing-label">Category</label>
                                     <select name="category" class="listing-select" id="categorySelect" required>
                                         <option value="" disabled selected>Select</option>
-                                        <option value="Academics">📚 Academics</option>
-                                        <option value="Electronics and Tech">💻 Electronics & Tech</option>
-                                        <option value="Clothing & Apparel">👕 Clothing & Apparel</option>
-                                        <option value="Hobbies & Lifestyle">🐇 Hobbies & Lifestyle</option>
-                                        <option value="Food">🍪 Food</option>
-                                        <option value="Events & Tickets">🎟️ Events & Tickets</option>
-                                        <option value="Course-Specific">🔬 Course-Specific</option>
+                                        <option value="Academics"><i class="bi bi-book"></i> Academics</option>
+                                        <option value="Electronics and Tech"><i class="bi bi-laptop"></i> Electronics & Tech</option>
+                                        <option value="Clothing & Apparel"><i class="bi bi-tag"></i> Clothing & Apparel</option>
+                                        <option value="Hobbies & Lifestyle"><i class="bi bi-bicycle"></i> Hobbies & Lifestyle</option>
+                                        <option value="Food"><i class="bi bi-basket"></i> Food</option>
+                                        <option value="Events & Tickets"><i class="bi bi-ticket-perforated"></i> Events & Tickets</option>
+                                        <option value="Course-Specific"><i class="bi bi-journal-text"></i> Course-Specific</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
@@ -805,7 +806,7 @@ $resultsoldlist=db_query($conn,$sqlsoldlist, [$loginId]);
                             <div class="img-upload-box" id="uploadBox" onclick="document.getElementById('listingImgInput').click()">
                                 <input type="file" name="listing_img" id="listingImgInput" accept=".jpg,.jpeg,.png,.webp">
                                 <div id="uploadPrompt">
-                                    <div class="img-upload-icon">🖼️</div>
+                                    <div class="img-upload-icon"><i class="bi bi-image"></i></div>
                                     <div class="img-upload-text">Click to upload photo</div>
                                     <div class="img-upload-sub">JPG, PNG, WEBP · Max 5MB</div>
                                 </div>

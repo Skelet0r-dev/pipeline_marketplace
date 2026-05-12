@@ -135,18 +135,18 @@ db_close($conn);
         <div class="lm-meta">
             <?php if($listing['MEETUP_SPOT']): ?>
             <div class="lm-meta-card">
-                <span class="lm-meta-label">📍 Meet-up</span>
+                <span class="lm-meta-label"><i class="bi bi-geo-alt"></i> Meet-up</span>
                 <span class="lm-meta-value"><?php echo htmlspecialchars($listing['MEETUP_SPOT']); ?></span>
             </div>
             <?php endif; ?>
             <?php if($listing['PAYMENT_METHOD']): ?>
             <div class="lm-meta-card">
-                <span class="lm-meta-label">💳 Payment</span>
+                <span class="lm-meta-label"><i class="bi bi-credit-card"></i> Payment</span>
                 <span class="lm-meta-value"><?php echo htmlspecialchars($listing['PAYMENT_METHOD']); ?></span>
             </div>
             <?php endif; ?>
             <div class="lm-meta-card">
-                <span class="lm-meta-label">🧾 Posted</span>
+                <span class="lm-meta-label"><i class="bi bi-receipt"></i> Posted</span>
                 <span class="lm-meta-value"><?php echo $datePosted; ?></span>
             </div>
         </div>

@@ -157,7 +157,7 @@ if (saveBtn) {
                 if (data.error) { console.error(data.error); return; }
                 this.dataset.saved = data.saved ? '1' : '0';
                 this.classList.toggle('saved', data.saved);
-                this.querySelector('.save-icon').textContent = data.saved ? '🔖' : '📑';
+                this.querySelector('.save-icon').textContent = data.saved ? '<i class="bi bi-bookmark-fill"></i>' : '<i class="bi bi-file-earmark"></i>';
                 this.querySelector('.save-label').textContent = data.saved ? 'Saved' : 'Save for Later';
             })
             .catch(err => console.error('Save error:', err));

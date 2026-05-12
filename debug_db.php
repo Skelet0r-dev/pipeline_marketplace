@@ -11,9 +11,9 @@ echo "<b>Detected Environment:</b> " . (isset($_SERVER['HTTP_HOST']) ? $_SERVER[
 $conn = db_connect();
 
 if ($conn) {
-    echo "<span style='color: green;'>✔ Connection Successful!</span>";
+    echo "<span style='color: green;'><i class="bi bi-check"></i> Connection Successful!</span>";
 } else {
-    echo "<span style='color: red;'>✘ Connection Failed!</span><br>";
+    echo "<span style='color: red;'><i class="bi bi-x"></i> Connection Failed!</span><br>";
     echo "<b>Error:</b> " . db_last_error();
 }
 ?>

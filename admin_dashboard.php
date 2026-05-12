@@ -825,7 +825,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'audit_pdf') {
 if (isset($_GET['export']) && $_GET['export'] === 'audit_excel') {
     header('Content-Type: application/vnd.ms-excel; charset=utf-8');
     header('Content-Disposition: attachment; filename="pipeline_audit_' . $auditPeriod . '_' . date('Ymd_His') . '.xls"');
-    echo '<html><head><meta charset="UTF-8"></head><body>';
+    echo '<html><head><meta charset="UTF-8">    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head><body>';
     echo '<h2>Pipeline ' . htmlspecialchars($auditPeriodLabel) . ' Audit</h2>';
     echo '<p>Period: ' . htmlspecialchars($auditStart->format('M d, Y')) . ' to ' . htmlspecialchars((clone $auditEnd)->modify('-1 day')->format('M d, Y')) . '</p>';
     echo '<p>Generated ' . htmlspecialchars(date('M d, Y h:i A')) . '</p>';
@@ -882,6 +883,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
     <title>Pipeline - Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/admin_dashboard.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
 
@@ -904,23 +906,23 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
             <span class="icon">⊞</span> Dashboard
         </a>
         <a class="<?php echo navClass('students', $activePage); ?>" href="admin_dashboard.php?page=students">
-            <span class="icon">👥</span> Students
+            <span class="icon"><i class="bi bi-people"></i></span> Students
         </a>
         <a class="<?php echo navClass('categories', $activePage); ?>" href="admin_dashboard.php?page=categories">
-            <span class="icon">📦</span> All Categories
+            <span class="icon"><i class="bi bi-box"></i></span> All Categories
         </a>
         <a class="<?php echo navClass('reports', $activePage); ?>" href="admin_dashboard.php?page=reports">
-            <span class="icon">⚠️</span> Reports
+            <span class="icon"><i class="bi bi-exclamation-triangle-fill"></i></span> Reports
             <span class="nav-badge"><?php echo number_format($pendingReports); ?></span>
         </a>
 
         <div class="nav-section-label">System</div>
-        <a class="<?php echo navClass('audit', $activePage); ?>" href="admin_dashboard.php?page=audit"><span class="icon">📋</span> Audit Snapshot</a>
-        <a class="<?php echo navClass('audit_logs', $activePage); ?>" href="admin_dashboard.php?page=audit_logs"><span class="icon">🔐</span> Audit Logins</a>
+        <a class="<?php echo navClass('audit', $activePage); ?>" href="admin_dashboard.php?page=audit"><span class="icon"><i class="bi bi-clipboard"></i></span> Audit Snapshot</a>
+        <a class="<?php echo navClass('audit_logs', $activePage); ?>" href="admin_dashboard.php?page=audit_logs"><span class="icon"><i class="bi bi-lock-fill"></i></span> Audit Logins</a>
 
         <div class="nav-section-label">Tools</div>
         <a class="nav-item" href="scratch/listing_bot.php" target="_blank">
-            <span class="icon">🤖</span> Listing Bot
+            <span class="icon"><i class="bi bi-robot"></i></span> Listing Bot
         </a>
     </nav>
 
@@ -933,7 +935,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
     <div class="topbar">
         <div class="topbar-left">
             <h2><?php echo htmlspecialchars($pageTitles[$activePage] ?? 'Dashboard Overview'); ?></h2>
-            <p>✦ DLSU-D Campus Marketplace - Admin View</p>
+            <p><i class="bi bi-stars"></i> DLSU-D Campus Marketplace - Admin View</p>
         </div>
         <div class="topbar-right">
             <span class="topbar-date"><?php echo htmlspecialchars($todayDisplay); ?></span>
@@ -946,25 +948,25 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
 
         <div class="stats-grid">
             <div class="stat-card green">
-                <div class="stat-icon">👥</div>
+                <div class="stat-icon"><i class="bi bi-people"></i></div>
                 <div class="stat-label">Total Students</div>
                 <div class="stat-value"><?php echo number_format($totalStudents); ?></div>
                 <div class="stat-change">Current registered users</div>
             </div>
             <div class="stat-card olive">
-                <div class="stat-icon">📦</div>
+                <div class="stat-icon"><i class="bi bi-box"></i></div>
                 <div class="stat-label">Active Listings</div>
                 <div class="stat-value"><?php echo number_format($activeListings); ?></div>
                 <div class="stat-change"><?php echo number_format($listedThisWeek); ?> posted this week</div>
             </div>
             <div class="stat-card amber">
-                <div class="stat-icon">⚠️</div>
+                <div class="stat-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
                 <div class="stat-label">Pending Reports</div>
                 <div class="stat-value"><?php echo number_format($pendingReports); ?></div>
                 <div class="stat-change"><?php echo number_format($reportsThisWeek); ?> filed this week</div>
             </div>
             <div class="stat-card teal">
-                <div class="stat-icon">✅</div>
+                <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
                 <div class="stat-label">Marked as Sold</div>
                 <div class="stat-value"><?php echo number_format($soldListings); ?></div>
                 <div class="stat-change"><?php echo number_format($soldThisMonth); ?> posted in last 30 days</div>
@@ -1100,7 +1102,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
                     <div class="card-title">Recent Reports <span><?php echo $reportsTableExists ? 'Live Data' : 'Table Missing'; ?></span></div>
                     <?php if (!$reportsTableExists): ?>
                     <div class="alert-item">
-                        <div class="alert-icon warn">⚠️</div>
+                        <div class="alert-icon warn"><i class="bi bi-exclamation-triangle-fill"></i></div>
                         <div class="alert-text">
                             <div class="title">LISTING_REPORTS not found</div>
                             <div class="desc">Run the report table script first to populate admin reports.</div>
@@ -1108,7 +1110,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
                     </div>
                     <?php elseif (empty($recentReports)): ?>
                     <div class="alert-item">
-                        <div class="alert-icon ok">✅</div>
+                        <div class="alert-icon ok"><i class="bi bi-check-circle-fill"></i></div>
                         <div class="alert-text">
                             <div class="title">No reports yet</div>
                             <div class="desc">The report queue is currently empty.</div>
@@ -1119,7 +1121,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
                     <?php $alertClass = alertClassFromReason($report['REPORT_REASON']); ?>
                     <div class="alert-item">
                         <div class="alert-icon <?php echo $alertClass; ?>">
-                            <?php echo $alertClass === 'danger' ? '🚨' : ($alertClass === 'warn' ? '⚠️' : ($alertClass === 'info' ? 'ℹ️' : '✅')); ?>
+                            <?php echo $alertClass === 'danger' ? '<i class="bi bi-exclamation-octagon-fill"></i>' : ($alertClass === 'warn' ? '<i class="bi bi-exclamation-triangle-fill"></i>' : ($alertClass === 'info' ? '<i class="bi bi-info-circle-fill"></i>' : '<i class="bi bi-check-circle-fill"></i>')); ?>
                         </div>
                         <div class="alert-text">
                             <div class="title"><?php echo htmlspecialchars($report['REPORT_REASON']); ?></div>
@@ -1168,7 +1170,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
         <div class="flash-message"><?php echo htmlspecialchars($flashMessage); ?></div>
         <?php endif; ?>
         <div class="actions-row">
-            <a class="action-btn secondary" href="admin_dashboard.php?export=reports">📊 &nbsp;Export Reports CSV</a>
+            <a class="action-btn secondary" href="admin_dashboard.php?export=reports"><i class="bi bi-bar-chart-fill"></i> &nbsp;Export Reports CSV</a>
         </div>
         <div class="card">
             <div class="card-title">Reports <span><?php echo $reportsTableExists ? number_format(count($allReports)) . ' shown' : 'Table Missing'; ?></span></div>
@@ -1358,8 +1360,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'reports') {
             <button class="action-btn primary" type="submit">Apply</button>
         </form>
         <div class="actions-row">
-            <a class="action-btn primary" href="admin_dashboard.php?export=audit_pdf&audit_period=<?php echo urlencode($auditPeriod); ?>">📄 &nbsp;Download PDF</a>
-            <a class="action-btn secondary" href="admin_dashboard.php?export=audit_excel&audit_period=<?php echo urlencode($auditPeriod); ?>">📊 &nbsp;Download Excel</a>
+            <a class="action-btn primary" href="admin_dashboard.php?export=audit_pdf&audit_period=<?php echo urlencode($auditPeriod); ?>"><i class="bi bi-file-earmark-text"></i> &nbsp;Download PDF</a>
+            <a class="action-btn secondary" href="admin_dashboard.php?export=audit_excel&audit_period=<?php echo urlencode($auditPeriod); ?>"><i class="bi bi-bar-chart-fill"></i> &nbsp;Download Excel</a>
         </div>
         <div class="stats-grid">
             <?php foreach ($auditMetrics as $index => $metric): ?>

@@ -44,13 +44,13 @@ if ($stmtShowcase) {
 
 // Helper function to map categories to gradients and emojis
 function getCategoryStyle($category) {
-    if (stripos($category, 'Books') !== false) return ['📚', 'linear-gradient(135deg,#d4f0e0,#86c9a0)'];
-    if (stripos($category, 'Clothing') !== false) return ['👗', 'linear-gradient(135deg,#e8d5f5,#c9a8e8)'];
-    if (stripos($category, 'Electronics') !== false) return ['💻', 'linear-gradient(135deg,#fde8c8,#f5c98a)'];
-    if (stripos($category, 'Hobbies') !== false) return ['🎸', 'linear-gradient(135deg,#d0f0e8,#8fd5c0)'];
-    if (stripos($category, 'Events') !== false) return ['🎟️', 'linear-gradient(135deg,#ffd6d6,#ffadad)'];
-    if (stripos($category, 'Course') !== false) return ['🧪', 'linear-gradient(135deg,#dce8ff,#a8c4f5)'];
-    return ['🛍️', 'linear-gradient(135deg,#eee,#ccc)'];
+    if (stripos($category, 'Books') !== false) return ['<i class="bi bi-book"></i>', 'linear-gradient(135deg,#d4f0e0,#86c9a0)'];
+    if (stripos($category, 'Clothing') !== false) return ['<i class="bi bi-tag"></i>', 'linear-gradient(135deg,#e8d5f5,#c9a8e8)'];
+    if (stripos($category, 'Electronics') !== false) return ['<i class="bi bi-laptop"></i>', 'linear-gradient(135deg,#fde8c8,#f5c98a)'];
+    if (stripos($category, 'Hobbies') !== false) return ['<i class="bi bi-music-note"></i>', 'linear-gradient(135deg,#d0f0e8,#8fd5c0)'];
+    if (stripos($category, 'Events') !== false) return ['<i class="bi bi-ticket-perforated"></i>', 'linear-gradient(135deg,#ffd6d6,#ffadad)'];
+    if (stripos($category, 'Course') !== false) return ['<i class="bi bi-journal-text"></i>', 'linear-gradient(135deg,#dce8ff,#a8c4f5)'];
+    return ['<i class="bi bi-bag"></i>', 'linear-gradient(135deg,#eee,#ccc)'];
 }
 ?>
 <!DOCTYPE html>
@@ -68,6 +68,7 @@ function getCategoryStyle($category) {
         href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Display&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="assets/css/index.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body>
@@ -101,7 +102,7 @@ function getCategoryStyle($category) {
 
                 <!-- LEFT: text content -->
                 <div class="hero-left">
-                    <p class="hero-eyebrow">✦ The campus exchange for Lasallians</p>
+                    <p class="hero-eyebrow"><i class="bi bi-stars"></i> The campus exchange for Lasallians</p>
                     <h1 class="hero-headline">Discover, Buy &amp; Sell<br>Inside La Salle</h1>
                     <p class="hero-sub">Pipeline is the official student marketplace of DLSU-D. Find textbooks,
                         clothing, gadgets, and more from your campus community.</p>
@@ -160,7 +161,7 @@ function getCategoryStyle($category) {
                                 <?php else: ?>
                                     <div class="hc-card">
                                         <div class="hc-card-img" style="background:linear-gradient(135deg,#d4f0e0,#86c9a0)">
-                                            <span class="hc-emoji">📚</span>
+                                            <span class="hc-emoji"><i class="bi bi-book"></i></span>
                                         </div>
                                         <div class="hc-card-body">
                                             <span class="hc-tag">Books</span>
@@ -189,7 +190,7 @@ function getCategoryStyle($category) {
         <section class="showcase" id="showcase">
             <div class="container">
                 <div class="section-header" style="margin-bottom: 40px; text-align: left;">
-                    <span class="section-eyebrow">✦ Browse Listings</span>
+                    <span class="section-eyebrow"><i class="bi bi-stars"></i> Browse Listings</span>
                     <h2 style="font-family: 'DM Sans', sans-serif; font-size: 42px; font-weight: 800;">
                         <?php echo ($currentCategory === 'all') ? 'Recently Listed' : htmlspecialchars($currentCategory) . ' Listings'; ?>
                     </h2>
@@ -197,7 +198,7 @@ function getCategoryStyle($category) {
                 
                 <?php if (empty($showcaseItems)): ?>
                     <div style="text-align: center; padding: 60px 0; color: var(--text-soft); background: var(--white); border-radius: var(--radius-md); border: 1px solid var(--border); animation: fadeInUp 0.6s ease forwards;">
-                        <div style="font-size: 48px; margin-bottom: 16px;">🛍️</div>
+                        <div style="font-size: 48px; margin-bottom: 16px;"><i class="bi bi-bag"></i></div>
                         <h3>No listings found in this category</h3>
                         <p>Check back later or explore other categories!</p>
                     </div>
@@ -325,7 +326,7 @@ function getCategoryStyle($category) {
         <div class="auth-modal-overlay" id="authModal">
             <div class="auth-modal">
                 <button class="auth-modal-close" id="authModalClose" aria-label="Close">&times;</button>
-                <div class="auth-modal-icon">🔒</div>
+                <div class="auth-modal-icon"><i class="bi bi-lock-fill"></i></div>
                 <h3 class="auth-modal-title">Join Pipeline</h3>
                 <p class="auth-modal-desc">You need to log in or create an account with your DLSU-D email to view full listings and connect with sellers.</p>
                 <div class="auth-modal-actions">

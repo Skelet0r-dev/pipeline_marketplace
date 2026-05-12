@@ -130,6 +130,7 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/dashboard.css">
     <link rel="stylesheet" href="assets/css/listing.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body class="body">
 
@@ -174,15 +175,15 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
                             <div style="font-size:11px; color:rgba(255,255,255,0.6);">DLSU-D Student</div>
                         </div>
                     </div>
-                    <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon">🛍️</span> Browse Products</a>
-                    <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">🏪</span> My Storefront</a>
-                    <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
-                    <a href="saved_listings.php" class="dropdown-item-custom"><span class="item-icon">🔖</span> Saved Listings</a>
-                    <a href="notifications.php" class="dropdown-item-custom"><span class="item-icon">🔔</span> Notifications</a>
+                    <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-bag"></i></span> Browse Products</a>
+                    <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-shop"></i></span> My Storefront</a>
+                    <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-person"></i></span> My Profile</a>
+                    <a href="saved_listings.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-bookmark-fill"></i></span> Saved Listings</a>
+                    <a href="notifications.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-bell"></i></span> Notifications</a>
                     <div class="dropdown-divider-custom"></div>
                 </div>
-                <a href="edit_profile.php?tab=support" class="dropdown-item-custom"><span class="item-icon">💖</span> Support Us</a>
-                <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
+                <a href="edit_profile.php?tab=support" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-heart-fill" style="color: #22c55e;"></i></span> Support Us</a>
+                <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon"><i class="bi bi-box-arrow-right"></i></span> Log Out</a>
             </div>
         </div>
     </div>
@@ -272,15 +273,15 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
             <!-- Info grid -->
             <div class="listing-info-grid">
                 <div class="listing-info-item">
-                    <span class="listing-info-label">📍 Meet-up</span>
+                    <span class="listing-info-label"><i class="bi bi-geo-alt"></i> Meet-up</span>
                     <span class="listing-info-val"><?php echo htmlspecialchars($listing['MEETUP_SPOT'] ?? '—'); ?></span>
                 </div>
                 <div class="listing-info-item">
-                    <span class="listing-info-label">💳 Payment</span>
+                    <span class="listing-info-label"><i class="bi bi-credit-card"></i> Payment</span>
                     <span class="listing-info-val"><?php echo htmlspecialchars($listing['PAYMENT_METHOD'] ?? '—'); ?></span>
                 </div>
                 <div class="listing-info-item">
-                    <span class="listing-info-label">📅 Posted</span>
+                    <span class="listing-info-label"><i class="bi bi-calendar"></i> Posted</span>
                     <span class="listing-info-val"><?php echo $datePosted; ?></span>
                 </div>
             </div>
@@ -305,7 +306,7 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
                         id="saveBtn"
                         data-id="<?php echo $listingId; ?>"
                         data-saved="<?php echo $iSaved?'1':'0'; ?>">
-                    <span class="save-icon"><?php echo $iSaved?'🔖':'📑'; ?></span>
+                    <span class="save-icon"><?php echo $iSaved?'<i class="bi bi-bookmark-fill"></i>':'<i class="bi bi-file-earmark"></i>'; ?></span>
                     <span class="save-label"><?php echo $iSaved?'Saved':'Save for Later'; ?></span>
                 </button>
             </div>
@@ -316,7 +317,7 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
     <!-- ── COMMENTS SECTION ── -->
     <div class="listing-comments-section">
         <h3 class="comments-heading">
-            💬 Comments
+            <i class="bi bi-chat"></i> Comments
             <span class="comments-count" id="commentsCount"><?php echo count($comments); ?></span>
         </h3>
 
@@ -443,7 +444,7 @@ $sellerProfileLink = $isOwner ? 'storefront.php' : 'public_profile.php?id=' . (i
 
 <!-- ── LIGHTBOX ── -->
 <div class="listing-lightbox" id="listingLightbox" onclick="closeLightbox()">
-    <button class="listing-lightbox-close" onclick="closeLightbox()">✕</button>
+    <button class="listing-lightbox-close" onclick="closeLightbox()"><i class="bi bi-x"></i></button>
     <img src="" id="lightboxImg" alt="Full view" onclick="event.stopPropagation()">
 </div>
 <script>

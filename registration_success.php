@@ -50,6 +50,7 @@ $allowtypes = array('jpg', 'png', 'jpeg', 'gif', 'webp');
     <title>Account Created | Pipeline</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/regis_success.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
 
@@ -129,7 +130,7 @@ $allowtypes = array('jpg', 'png', 'jpeg', 'gif', 'webp');
             if ("Notification" in window) {
                 Notification.requestPermission().then(permission => {
                     if (permission === "granted") {
-                        new Notification("Account Verified! 🎉", {
+                        new Notification("Account Verified! <i class="bi bi-party-popper"></i>", {
                             body: "Welcome to Pipeline, <?php echo htmlspecialchars($firstname); ?>! Your digital ID is ready.",
                             icon: "assets/img/pipeline_logo_light.png"
                         });

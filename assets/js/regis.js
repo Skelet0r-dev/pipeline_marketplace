@@ -157,7 +157,7 @@ document.getElementById('regisForm').addEventListener('submit', function (e) {
                 warn.classList.remove('show');
             } else {
                 saveAttempts(d);
-                warn.textContent = '⚠️ ' + left + ' attempt' + (left !== 1 ? 's' : '') + ' remaining before cooldown.';
+                warn.textContent = '<i class="bi bi-exclamation-triangle-fill"></i> ' + left + ' attempt' + (left !== 1 ? 's' : '') + ' remaining before cooldown.';
                 warn.classList.add('show');
             }
         }

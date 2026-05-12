@@ -161,15 +161,15 @@ if ($stmtCarousel) {
 
 function getCategoryStyle($cat) {
     $styles = [
-        'Clothing & Apparel'   => ['👕', 'linear-gradient(135deg, #dcfce7, #86efac)'],
-        'Electronics and Tech' => ['💻', 'linear-gradient(135deg, #dbeafe, #93c5fd)'],
-        'Academics'            => ['📚', 'linear-gradient(135deg, #fef3c7, #fcd34d)'],
-        'Hobbies & Lifestyle'  => ['🎨', 'linear-gradient(135deg, #fce7f3, #f9a8d4)'],
-        'Events & Tickets'     => ['🎟️', 'linear-gradient(135deg, #ede9fe, #c4b5fd)'],
-        'Course-Specific'      => ['🔬', 'linear-gradient(135deg, #ffedd5, #fdba74)'],
-        'Food'                 => ['🍪', 'linear-gradient(135deg, #fef2f2, #fecaca)']
+        'Clothing & Apparel'   => ['<i class="bi bi-tag"></i>', 'linear-gradient(135deg, #dcfce7, #86efac)'],
+        'Electronics and Tech' => ['<i class="bi bi-laptop"></i>', 'linear-gradient(135deg, #dbeafe, #93c5fd)'],
+        'Academics'            => ['<i class="bi bi-book"></i>', 'linear-gradient(135deg, #fef3c7, #fcd34d)'],
+        'Hobbies & Lifestyle'  => ['<i class="bi bi-palette"></i>', 'linear-gradient(135deg, #fce7f3, #f9a8d4)'],
+        'Events & Tickets'     => ['<i class="bi bi-ticket-perforated"></i>', 'linear-gradient(135deg, #ede9fe, #c4b5fd)'],
+        'Course-Specific'      => ['<i class="bi bi-journal-text"></i>', 'linear-gradient(135deg, #ffedd5, #fdba74)'],
+        'Food'                 => ['<i class="bi bi-basket"></i>', 'linear-gradient(135deg, #fef2f2, #fecaca)']
     ];
-    return $styles[$cat] ?? ['📦', 'linear-gradient(135deg, #f3f4f6, #d1d5db)'];
+    return $styles[$cat] ?? ['<i class="bi bi-box"></i>', 'linear-gradient(135deg, #f3f4f6, #d1d5db)'];
 }
 
 db_close($conn);
@@ -189,6 +189,7 @@ db_close($conn);
     <?php else: ?>
     <link rel="stylesheet" href="assets/css/login.css">
     <?php endif; ?>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body class="body">
 
@@ -244,16 +245,16 @@ db_close($conn);
                                 <div style="font-size:11px; color:rgba(255,255,255,0.6);">DLSU-D Student</div>
                             </div>
                         </div>
-                        <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon">🛍️</span> Browse Products</a>
-                        <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">🏪</span> My Storefront</a>
-                        <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
-                        <a href="saved_listings.php" class="dropdown-item-custom"><span class="item-icon">🔖</span> Saved Listings</a>
-                        <a href="notifications.php" class="dropdown-item-custom"><span class="item-icon">🔔</span> Notifications</a>
+                        <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-bag"></i></span> Browse Products</a>
+                        <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-shop"></i></span> My Storefront</a>
+                        <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-person"></i></span> My Profile</a>
+                        <a href="saved_listings.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-bookmark-fill"></i></span> Saved Listings</a>
+                        <a href="notifications.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-bell"></i></span> Notifications</a>
                         <div class="dropdown-divider-custom"></div>
                     </div>
                     <!-- Always-visible items -->
-                    <a href="edit_profile.php?tab=support" class="dropdown-item-custom"><span class="item-icon">💖</span> Support Us</a>
-                    <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
+                    <a href="edit_profile.php?tab=support" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-heart-fill" style="color: #22c55e;"></i></span> Support Us</a>
+                    <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon"><i class="bi bi-box-arrow-right"></i></span> Log Out</a>
                 </div>
             </div>
         </div>
@@ -266,7 +267,7 @@ db_close($conn);
         <div class="dash-hero-inner">
             <!-- LEFT: Dribbble-style text -->
             <div class="dash-hero-left-alt">
-                <span class="dash-eyebrow">✦ Welcome, <?php echo htmlspecialchars($firstname); ?>!</span>
+                <span class="dash-eyebrow"><i class="bi bi-stars"></i> Welcome, <?php echo htmlspecialchars($firstname); ?>!</span>
                 <h1 class="dash-title-main">Featured Items<br>Within Campus Reach</h1>
                 <p class="dash-desc-main">Explore work from the most talented and accomplished 
                     students ready to sell their items on campus.</p>
@@ -381,7 +382,7 @@ db_close($conn);
                             <?php else: ?>
                                 <div class="dc-card">
                                     <div class="dc-card-img" style="background:linear-gradient(135deg,#dcfce7,#86efac)">
-                                        <span class="dc-emoji">🎒</span>
+                                        <span class="dc-emoji"><i class="bi bi-backpack"></i></span>
                                     </div>
                                     <div class="dc-card-body">
                                         <span class="dc-tag">Featured</span>
@@ -407,7 +408,7 @@ db_close($conn);
             <form action="dashboard.php" method="GET" class="dash-search-form" style="width: 280px; margin: 0; flex-shrink: 0;">
                 <input type="hidden" name="cat" value="<?php echo htmlspecialchars($currentCategory); ?>">
                 <div class="dash-search-wrapper">
-                    <span class="dash-search-icon">🔍</span>
+                    <span class="dash-search-icon"><i class="bi bi-search"></i></span>
                     <input type="text" name="search" class="dash-search-input" placeholder="Search..." value="<?php echo htmlspecialchars($searchQuery); ?>">
                     <button type="submit" class="dash-search-btn">Search</button>
                 </div>
@@ -440,7 +441,7 @@ db_close($conn);
         <div class="dash-sticky-inner" style="padding-top: 0; border-top: 1px solid var(--border); margin-top: 10px;">
             <div class="section-filters-container active" style="width: 100%; border: none; background: transparent; padding: 10px 0; margin-bottom: 0;">
                 <div class="section-filters-title">
-                    <span>🏢 Filter by College</span>
+                    <span><i class="bi bi-building"></i> Filter by College</span>
                 </div>
                 <div class="section-pills-scroll">
                     <a href="dashboard.php?cat=Course-Specific&college=all" class="section-pill <?php echo ($currentCollegeFilter === 'all') ? 'active' : ''; ?>">All Colleges</a>
@@ -477,7 +478,7 @@ db_close($conn);
         
         <?php if(empty($dashItems)): ?>
             <div style="text-align: center; padding: 60px 0; color: var(--text-soft);">
-                <div style="font-size: 48px; margin-bottom: 16px;">🛍️</div>
+                <div style="font-size: 48px; margin-bottom: 16px;"><i class="bi bi-bag"></i></div>
                 <h5>No listings found</h5>
                 <p>Be the first to list something!</p>
             </div>
@@ -549,7 +550,7 @@ db_close($conn);
 
             <div class="login-left">
                 <div class="login-form-header">
-                    <div class="form-label-small">👤 WELCOME BACK</div>
+                    <div class="form-label-small"><i class="bi bi-person"></i> WELCOME BACK</div>
                     <h1 class="login-title">Hello Lasallian!</h1>
                     <p class="login-sub">Please login to continue</p>
                 </div>
@@ -810,7 +811,7 @@ db_close($conn);
                     z-index: 10000; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 12px;
                     font-size: 16px; pointer-events: none;
                 `;
-                toast.innerHTML = '<span style="font-size:20px">🎉</span> Account Created Successfully!';
+                toast.innerHTML = '<span style="font-size:20px"><i class="bi bi-party-popper"></i></span> Account Created Successfully!';
                 document.body.appendChild(toast);
                 
                 gsap.from(toast, { y: 100, opacity: 0, duration: 0.6, ease: "back.out(1.4)" });

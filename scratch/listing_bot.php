@@ -69,6 +69,7 @@ $samples = [
         'cond' => 'Like New',
         'img' => 'https://images.unsplash.com/photo-1516116216624-53e697fedbea?auto=format&fit=crop&q=80&w=400'
     ],
+    
     // --- Local Assets from /listings/ ---
     [
         'title' => 'Vintage Gaming Console',
@@ -220,7 +221,7 @@ $samples = [
         'price' => 550.00,
         'cat' => 'Electronics & Tech',
         'cond' => 'Like New',
-        'img' => 'listings/listing_28_1778419506.jpg'
+        'img' => 'listings/listing_28_1778419506.jpg'   
     ],
     [
         'title' => 'University Green Hoodie',

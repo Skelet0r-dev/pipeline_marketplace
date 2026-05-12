@@ -73,6 +73,7 @@ $messageLink = 'mailto:' . rawurlencode($profile['EMAIL']) . '?subject=' . rawur
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/dashboard.css">
     <link rel="stylesheet" href="assets/css/storefront.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body class="body">
     <div class="dash-navbar">
@@ -93,15 +94,15 @@ $messageLink = 'mailto:' . rawurlencode($profile['EMAIL']) . '?subject=' . rawur
                                 <div style="font-size:11px; color:rgba(255,255,255,0.6);">DLSU-D Student</div>
                             </div>
                         </div>
-                        <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon">🛍️</span> Browse Products</a>
-                        <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon">🏪</span> My Storefront</a>
-                        <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon">👤</span> My Profile</a>
-                        <a href="saved_listings.php" class="dropdown-item-custom"><span class="item-icon">🔖</span> Saved Listings</a>
-                        <a href="notifications.php" class="dropdown-item-custom"><span class="item-icon">🔔</span> Notifications</a>
+                        <a href="dashboard.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-bag"></i></span> Browse Products</a>
+                        <a href="storefront.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-shop"></i></span> My Storefront</a>
+                        <a href="edit_profile.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-person"></i></span> My Profile</a>
+                        <a href="saved_listings.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-bookmark-fill"></i></span> Saved Listings</a>
+                        <a href="notifications.php" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-bell"></i></span> Notifications</a>
                         <div class="dropdown-divider-custom"></div>
                     </div>
-                    <a href="edit_profile.php?tab=support" class="dropdown-item-custom"><span class="item-icon">💖</span> Support Us</a>
-                    <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon">🚪</span> Log Out</a>
+                    <a href="edit_profile.php?tab=support" class="dropdown-item-custom"><span class="item-icon"><i class="bi bi-heart-fill" style="color: #22c55e;"></i></span> Support Us</a>
+                    <a href="logout.php" class="dropdown-item-custom logout"><span class="item-icon"><i class="bi bi-box-arrow-right"></i></span> Log Out</a>
                 </div>
             </div>
         </div>
@@ -112,7 +113,7 @@ $messageLink = 'mailto:' . rawurlencode($profile['EMAIL']) . '?subject=' . rawur
         <div class="sf-profile-row">
             <div class="sf-avatar-wrap">
                 <img src="<?php echo htmlspecialchars($avatar); ?>" class="sf-avatar" alt="Profile Avatar">
-                <div class="sf-verified">✓</div>
+                <div class="sf-verified"><i class="bi bi-check"></i></div>
             </div>
             <div class="sf-info">
                 <div class="sf-name-row">
